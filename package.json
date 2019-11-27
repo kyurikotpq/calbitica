@@ -5,8 +5,8 @@
   "main": "index.js",
   "watch": {
     "start": [
-      "{routes,test,models,middleware,controllers,config}/**/*.js",
-      "{views}/**/*.ejs"
+      "index.js",
+      "{routes,test,models,middleware,controllers,config}/**/*.js"
     ]
   },
   "scripts": {

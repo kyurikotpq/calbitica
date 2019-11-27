@@ -12,7 +12,9 @@ router.get('/login', authCheck.isLoggedin, (req, res) => {
 router.get('/logout', (req, res) => {
     req.session = null; // invalidate all sessions
     
-    //
+    // invalidate tokens in DB!
+
+    // redirect back to home page
     res.redirect('/');
 })
 

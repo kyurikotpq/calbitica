@@ -1,0 +1,156 @@
+/* // Colors used */
+:root {
+  --teal-100: #c6f7e2;
+  --teal-900: #014d40;
+
+  --blue-grey-050: #f0f4f8;
+  --blue-grey-100: #d9e2ec;
+  --blue-grey-200: #bcccdc;
+  --blue-grey-600: #486581;
+  --blue-grey-700: #334e68;
+}
+
+body {
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  background : var(--blue-grey-100);
+}
+
+main {
+  max-width       : max-content;
+  padding         : 1em;
+  background-color: #fff;
+  border          : 2px solid var(--blue-grey-200);
+  border-radius   : 8px;
+}
+
+section {
+  text-align      : center;
+  width           : 120px;
+  height          : 100px;
+  padding         : 1em;
+  background-color: #fff;
+  border          : 2px solid var(--blue-grey-200);
+}
+
+article {
+  text-align      : center;
+  width           : 120px;
+  height          : 90px;
+  padding         : 1em;
+  background-color: #fff;
+  border          : 2px solid var(--blue-grey-200);
+}
+
+/* // CSS grid used for the dates */
+.day-of-week,
+.date-grid {
+  display              : grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+/* // Styles for the weekday/weekend header */
+.day-of-week {
+  margin-top    : 1.25em;
+  font-size     : 0.7em;
+  font-weight   : 500;
+  letter-spacing: 0.1em;
+  font-variant  : small-caps;
+  text-align    : center;
+}
+
+/* Dates */
+.date-grid {
+  margin-top: 0.5em;
+}
+
+/* // Style for each day */
+.date-grid button,
+.date-gridContent button {
+  position        : relative;
+  border          : 0;
+  width           : 4.5ch;
+  height          : 4.5ch;
+  border-radius   : 50%;
+  background-color: transparent;
+  color           : var(--blue-grey-600);
+}
+
+.date-grid button:hover,
+.date-grid button:focus,
+.date-gridContent button:hover,
+.date-gridContent button:focus,
+#clickMenu:hover,
+#clickMenu:focus,
+#today:hover,
+#today:focus {
+  outline         : none;
+  background-color: var(--blue-grey-050);
+  color           : var(--blue-grey-700);
+}
+
+.date-grid button:active,
+.date-grid button.is-selected,
+.date-gridContent button:active,
+.date-gridContent button.is-selected,
+#clickMenu:active,
+#clickMenu.is-selected,
+#today:active,
+#today.is-selected {
+  background-color: var(--teal-100);
+  color           : var(--teal-900);
+}
+
+#menu {
+  padding: 0.5em;
+  display: flex;
+}
+
+#clickMenu {
+  padding      : 0.5em;
+  border       : 2px solid var(--blue-grey-200);
+  border-radius: 8px;
+}
+
+.menu {
+  width           : 20px;
+  height          : 2px;
+  background-color: black;
+  margin          : 4.5px 0;
+}
+
+#today {
+  padding         : 0.7em;
+  background-color: #fff;
+  border          : 2px solid var(--blue-grey-200);
+  border-radius   : 8px;
+  cursor          : pointer;
+}
+
+.container {
+  display: inline-block;
+  cursor : pointer;
+}
+
+.bar1,
+.bar2,
+.bar3 {
+  width           : 35px;
+  height          : 5px;
+  background-color: #333;
+  margin          : 6px 0;
+  transition      : 0.4s;
+}
+
+.change .bar1 {
+  -webkit-transform: rotate(-45deg) translate(-9px, 6px);
+  transform        : rotate(-45deg) translate(-9px, 6px);
+}
+
+.change .bar2 {
+  opacity: 0;
+}
+
+.change .bar3 {
+  -webkit-transform: rotate(45deg) translate(-8px, -8px);
+  transform        : rotate(45deg) translate(-8px, -8px);
+}

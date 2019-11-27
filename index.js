@@ -4,15 +4,16 @@
  */
 require('dotenv').config(); // env
 const express = require('express'); // EXPRESS
-const cookieSession = require('cookie-session');
+const cookieSession = require('cookie-session'); // cookie
 const mongoose = require('mongoose'); // mongoose
 
 // Import route files
 // let habits = require('./routes/api/habitica');
 let mvc = require('./routes/mvc/index');
 
-// Setup app, view engine, cookie
+// Setup app, static assets, view engine, cookie
 let app = express();
+app.use(express.static('public'));
 app.set('view engine', 'ejs');
 app.use(cookieSession({
     name: 'calbitica',
