@@ -26,7 +26,7 @@
 
 <body>
     <header>
-        <nav class="navbar navbar-light bg-light">
+        <nav class="navbar">
             <a class="navbar-brand" href="/">
                 <img src="/images/brand/icon/color_icon.svg" alt="Calbitica logo" title="Back to dashboard">
             </a>
@@ -36,18 +36,18 @@
             <a class="plain g_btn" href="/auth/login">Continue with Google</a>
             <% } else { %>
             <!-- If signed in -->
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">Sup <%= user.displayName %></li>
-                <li class="nav-item">Calendar</li>
+            <ul class="navbar">
+                <li>Welcome, <%= user.displayName %></li>
+                <li>Calendar</li>
 
                 <!-- The Habitica 3-col view -->
-                <li class="nav-item">Habitica</li>
+                <li>Habitica</li>
 
                 <!-- Habitica Stats -->
-                <li class="nav-item">20 Gems, 1000 Gold</li>
+                <li>20 Gems, 1000 Gold</li>
 
                 <!-- Profile -->
-                <li class="nav-item">Sign Out of Google</li>
+                <li>Sign Out of Google</li>
             </ul>
             <% } %>
         </nav>

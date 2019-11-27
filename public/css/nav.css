@@ -1,4 +1,25 @@
-/* Styles for navbar */
-.navbar-brand img {
-    height: 40px;
+nav {
+  border: 2px solid #bcccdc;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+nav a {
+  width: 5%;
+  position: relative;
+}
+
+nav a img {
+  width: 100%;
+}
+
+nav ul {
+  width: 85%;
+}
+
+nav ul li {
+  list-style-type: none;
 }

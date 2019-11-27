@@ -1,0 +1,48 @@
+// Mixins
+@mixin brand {
+    width: 5%;
+    position: relative;
+     img{
+         width: 100%;
+     }
+}
+
+@mixin date-gridHF {
+    outline: none;
+    background-color: $blue-grey-050;
+    color: $blue-grey-700;
+}
+
+@mixin date-gridAI {
+    background-color: $teal-100;
+    color: $teal-900;
+}
+
+//Useful for Calendar to give a same size in this function
+//By giving how many columns(numbers) and margin(with %)
+@mixin grid($cols, $mgn) {
+    float: left;
+    margin-right: $mgn;
+    margin-bottom: $mgn;
+    width: ((100% - (($cols - 1) * $mgn)) / $cols);
+    &:nth-child(#{$cols}n) {
+        margin-right: 0;
+    }
+}
+
+//Useful for responsive sizes
+//By giving respective max-width(with px) and return all the content
+@mixin responsive($arg...) {
+    @if length($arg) == 1 {
+        @media screen and (max-width: nth($arg, 1)) {
+            @content;
+        }
+    }
+
+    //Give the [higher value](with px), [lower value](with px), in between will return all the content
+    @if(length($arg) == 2) {
+        @media screen and (max-width: nth($arg, 1)) and (min-width: nth($arg, 2)) {
+            @content;
+        }
+    }
+}
