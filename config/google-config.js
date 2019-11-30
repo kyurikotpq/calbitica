@@ -1,5 +1,7 @@
+/**
+ * Information for Google OAuth2 client
+ */
 const G_CONFIG = {
-    // Options for strategy
     clientID: process.env.GCLIENT_ID,
     clientSecret: process.env.GCLIENT_SECRET,
     callbackURL: process.env.GCLIENT_REDIRECT,

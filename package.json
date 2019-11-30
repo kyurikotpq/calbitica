@@ -6,7 +6,7 @@
   "watch": {
     "start": [
       "index.js",
-      "{routes,test,models,middleware,controllers,config}/**/*.js"
+      "{routes,test,models,middleware,controllers,config,util}/**/*.js"
     ]
   },
   "scripts": {

@@ -7,7 +7,63 @@
 const oauth2Client = require('../config/google-setup');
 const { google } = require('googleapis');
 const User = require('../models/user');
+const crypt = require('../util/crypt');
 
+/**
+ * Handle the storing of user profile in session
+ * @param {*} req 
+ * @param {*} next 
+ * @param {*} userObj (user, profile, refresh_token) 
+ */
+function handleOAuthSuccess(req, next, userObj) {
+    let user = userObj.user,
+        profile = userObj.profile,
+        refresh_token = userObj.refresh_token;
+
+    if (user) { // user exists
+        // update the refresh token if necessary
+        // get indexof the googleID & retrieve the token in the same index
+        let index = user.googleIDs.indexOf(profile.id);
+        let old_refresh_token = user.refresh_tokens[index];
+
+        if (old_refresh_token != refresh_token) { // old refresh token is different
+            user.refresh_tokens[index] = refresh_token;
+            user.save();
+        }
+
+        req.session.user = user.profile;
+        req.session.habiticaAPI = (!user.habiticaAPI)
+            ? null
+            : crypt.decrypt(user.habiticaAPI);
+
+        next();
+    } else { // user doesn't exist
+        // Create a new User
+        new User({
+            googleIDs: [profile.id],
+            refresh_tokens: [refresh_token],
+            profile: {
+                displayNames: [profile.name],
+                thumbnails: [profile.picture],
+            },
+        }).save()
+          .then((newUserObj) => {
+              req.session.user = newUserObj.profile;
+              req.session.habiticaAPI = null;
+              next();
+          })
+          .catch((err) => {
+              console.log(err);
+          });
+    }
+}
+
+/**
+ * Retrieve authorization code and later tokens from Google
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 const retrieveTokens = (req, res, next) => {
     let code = req.query.code; // authorization code
     let err = req.query.error; // error param if any
@@ -21,48 +77,30 @@ const retrieveTokens = (req, res, next) => {
         return;
     }
 
-    oauth2Client.getToken(code).then((data) => {
+    oauth2Client.getToken(code)
+    .then((data) => {
         // retrieve the profile....
-        // store the accessToken in the cookies
         let tokens = data.tokens;
+        let refresh_token = crypt.encrypt(tokens.refresh_token);
         oauth2Client.setCredentials(tokens);
-        req.session.access_token = tokens.access_token;
-        
-        google.oauth2("v2").userinfo.get().then((json) => {
+
+        // store the accessToken in the cookies
+        req.session.access_token = crypt.encrypt(tokens.access_token);
+        console.log(req.session.access_token)
+
+        google.oauth2("v2").userinfo.get()
+        .then((json) => {
             let profile = json.data;
 
             // check if user exists in DB
-            User.findOne({
-                googleID: profile.id
-            }).then((currentUserObj) => {
-                if (currentUserObj) { // user exists
-                    // update the refresh token if necessary
-                    // get indexof the googleID & retrieve the token in the same index
-                    let index = currentUserObj.googleID.indexOf(profile.id);
-                    let old_refresh_token = currentUserObj.refresh_token[index];
-
-                    if (old_refresh_token != tokens.refresh_token) { // old refresh token is different
-                        currentUserObj.refresh_token[index] = tokens.refresh_token;
-                        currentUserObj.save();
-                    }
-
-                    req.session.user = currentUserObj;
-                    next();
-                } else { // user doesn't exist
-                    // Create a new User
-                    new User({
-                        displayName: profile.name,
-                        googleID: [profile.id],
-                        thumbnail: [profile.picture],
-                        // TODO: encrypt this token
-                        refresh_token: [tokens.refresh_token]
-                    }).save().then((newUserObj) => {
-                        req.session.user = newUserObj;
-                        next();
-                    });
-                }
-            });
-        }).catch((err) => {
+            User.findOne({ googleIDs: profile.id })
+                .then((user) => handleOAuthSuccess(
+                    req,
+                    next,
+                    { user, profile, refresh_token }
+                ));
+        })
+        .catch((err) => {
             if (err) {
                 console.log("ERROR GETTING PROFILE")
                 console.log(err);
@@ -70,7 +108,8 @@ const retrieveTokens = (req, res, next) => {
             }
             next();
         });
-    }).catch((err) => {
+    })
+    .catch((err) => {
         console.log(err)
         next();
     });

@@ -4,13 +4,22 @@ const cal = google.calendar({
     version: 'v3'
 });
 
+/**
+ * List all calendars associated with the account
+ */
+function listCal() {
+    return cal.calendarList.list({
+        maxResults: 20,
+        showDeleted: false
+    });
+}
+
+/**
+ * Compile the functions into one object
+ */
 let gcalController = {
-    calList() {
-        return cal.calendarList.list({
-            maxResults: 20,
-            showDeleted: false
-        });
-    }
-};
+    importToH,
+    listCal
+}
 
 module.exports = gcalController;

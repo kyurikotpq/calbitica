@@ -33,11 +33,11 @@
 
             <!-- If not signed in  -->
             <% if(!user) { %>
-            <a class="plain g_btn" href="/auth/login">Continue with Google</a>
+            <a class="plain g_btn" href="/auth/google">Continue with Google</a>
             <% } else { %>
             <!-- If signed in -->
             <ul class="navbar">
-                <li>Welcome, <%= user.displayName %></li>
+                <li>Welcome, <%= user.displayNames[0] %></li>
                 <li>Calendar</li>
 
                 <!-- The Habitica 3-col view -->
@@ -47,7 +47,7 @@
                 <li>20 Gems, 1000 Gold</li>
 
                 <!-- Profile -->
-                <li>Sign Out of Google</li>
+                <li>Profile</li>
             </ul>
             <% } %>
         </nav>

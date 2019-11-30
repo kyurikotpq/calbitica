@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const authCheck = require('../../middleware/auth-check');
-const sync = require('../../controllers/gcal-import');
 const gcal = require('../../controllers/gcal');
 
 router.get('/', authCheck.isLoggedin, (req, res) => {

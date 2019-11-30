@@ -30,7 +30,10 @@ app.use(cookieSession({
 
 // connect to mongodb
 mongoose.connect(process.env.MONGO_URI,
-    { useNewUrlParser: true },
+    { 
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    },
     () => {
         console.log('Successfully connected to MongoDB')
     }

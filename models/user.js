@@ -6,12 +6,14 @@ const Schema = mongoose.Schema;
 
 // Create a new Schema (data structure)
 const userSchema = new Schema({
-    displayName: String,
-    googleID: [String],
-    thumbnail: [String],
+    googleIDs: [String],
     habiticaID: String,
     habiticaAPI: String,
-    refresh_token: [String]
+    refresh_tokens: [String],
+    profile: {
+        displayNames: [String],
+        thumbnails: [String],
+    }
 });
 
 // create the model
