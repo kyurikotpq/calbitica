@@ -9,13 +9,13 @@
 
 @mixin date-gridHF {
     outline: none;
-    background-color: $blue-grey-050;
-    color: $blue-grey-700;
+    background-color: $gray-5;
+    color: $blue-3;
 }
 
 @mixin date-gridAI {
-    background-color: $teal-100;
-    color: $teal-900;
+    background-color: $teal-2;
+    color: $teal-3;
 }
 
 //Useful for Calendar to give a same size in this function
@@ -30,8 +30,8 @@
     }
 }
 
-//Useful for responsive sizes
-//By giving respective max-width(with px) and return all the content
+// Useful for responsive sizes
+// By giving respective max-width(with px) and return all the content
 @mixin responsive($arg...) {
     @if length($arg) == 1 {
         @media screen and (max-width: nth($arg, 1)) {

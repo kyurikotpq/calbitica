@@ -1,25 +1,18 @@
+/* Colors: 
+ * The higher the number,
+ * the lighter the color :)
+*/
 nav {
-  border: 2px solid #bcccdc;
-  display: -webkit-box;
-  display: -ms-flexbox;
+  border: 2px solid #828282;
   display: flex;
   border-radius: 8px;
-  background-color: #fff;
-}
-
-nav a {
-  width: 5%;
-  position: relative;
-}
-
-nav a img {
-  width: 100%;
-}
-
-nav ul {
-  width: 85%;
-}
-
-nav ul li {
-  list-style-type: none;
-}
+  background-color: #FFFFFF; }
+  nav a {
+    width: 5%;
+    position: relative; }
+    nav a img {
+      width: 100%; }
+  nav ul {
+    width: 85%; }
+    nav ul li {
+      list-style-type: none; }

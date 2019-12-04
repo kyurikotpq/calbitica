@@ -1,149 +1,106 @@
+/* Colors: 
+ * The higher the number,
+ * the lighter the color :)
+*/
 body {
   font-family: "Roboto", "Helvetica", "Arial", sans-serif;
-  background: #d9e2ec;
-}
+  background: #FFFFFF; }
 
 main {
-  max-width: -webkit-max-content;
-  max-width: -moz-max-content;
   max-width: max-content;
   padding: 1em;
-  background-color: #fff;
-  border: 2px solid #bcccdc;
+  background-color: #FFFFFF;
+  border: 2px solid #F2F2F2;
   border-radius: 8px;
   /* // Styles for the weekday/weekend header */
   /* // CSS grid used for the dates */
-  /* // Style for each day */
-}
-
-main #menu {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-pack: distribute;
-  justify-content: space-around;
-}
-
-main #menu #clickMenu {
-  padding: 0.5em;
-  border: 2px solid #bcccdc;
-  border-radius: 8px;
-}
-
-main #menu #clickMenu:hover, main #menu #clickMenu:focus {
-  outline: none;
-  background-color: #f0f4f8;
-  color: #334e68;
-}
-
-main #menu #clickMenu:active, main #menu #clickMenu.is-selected {
-  background-color: #c6f7e2;
-  color: #014d40;
-}
-
-main #menu #clickMenu .menu {
-  width: 20px;
-  height: 2px;
-  background-color: black;
-  margin: 4.5px 0;
-}
-
-main #menu #today {
-  padding: 0.7em;
-  background-color: #fff;
-  border: 2px solid #bcccdc;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-main #menu #today:hover, main #menu #today:focus {
-  outline: none;
-  background-color: #f0f4f8;
-  color: #334e68;
-}
-
-main #menu #today:active, main #menu #today.is-selected {
-  background-color: #c6f7e2;
-  color: #014d40;
-}
-
-main .day-of-week {
-  margin-top: 1.25em;
-  font-size: 0.7em;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  font-variant: small-caps;
-  text-align: center;
-  display: -ms-grid;
-  display: grid;
-  -ms-grid-columns: (1fr)[7];
-  grid-template-columns: repeat(7, 1fr);
-}
-
-main .date-grid {
-  margin-top: 0.5em;
-  display: -ms-grid;
-  display: grid;
-  -ms-grid-columns: (1fr)[7];
-  grid-template-columns: repeat(7, 1fr);
-}
-
-main .date-grid button {
-  position: relative;
-  border: 0;
-  width: 4.5ch;
-  height: 4.5ch;
-  border-radius: 50%;
-  background-color: transparent;
-  color: #486581;
-}
-
-main .date-grid button:hover, main .date-grid button:focus {
-  outline: none;
-  background-color: #f0f4f8;
-  color: #334e68;
-}
-
-main .date-grid button:active, main .date-grid button.is-selected {
-  background-color: #c6f7e2;
-  color: #014d40;
-}
-
-main .date-gridContent button {
-  position: relative;
-  border: 0;
-  width: 4.5ch;
-  height: 4.5ch;
-  border-radius: 50%;
-  background-color: transparent;
-  color: #486581;
-}
-
-main .date-gridContent button:hover, main .date-gridContent button:focus {
-  outline: none;
-  background-color: #f0f4f8;
-  color: #334e68;
-}
-
-main .date-gridContent button:active, main .date-gridContent button.is-selected {
-  background-color: #c6f7e2;
-  color: #014d40;
-}
-
-main section {
-  text-align: center;
-  width: 120px;
-  height: 100px;
-  padding: 1em;
-  background-color: #fff;
-  border: 2px solid #bcccdc;
-}
-
-main article {
-  text-align: center;
-  width: 120px;
-  height: 90px;
-  padding: 1em;
-  background-color: #fff;
-  border: 2px solid #bcccdc;
-}
+  /* // Style for each day */ }
+  main #menu {
+    display: flex;
+    justify-content: space-around; }
+    main #menu #clickMenu {
+      padding: 0.5em;
+      border: 2px solid #F2F2F2;
+      border-radius: 8px; }
+      main #menu #clickMenu:hover, main #menu #clickMenu:focus {
+        outline: none;
+        background-color: #E0E0E0;
+        color: #44D3FF; }
+      main #menu #clickMenu:active, main #menu #clickMenu.is-selected {
+        background-color: #3BCAD7;
+        color: #3EEDF6; }
+      main #menu #clickMenu .menu {
+        width: 20px;
+        height: 2px;
+        background-color: black;
+        margin: 4.5px 0; }
+    main #menu #today {
+      padding: 0.7em;
+      background-color: #FFFFFF;
+      border: 2px solid #F2F2F2;
+      border-radius: 8px;
+      cursor: pointer; }
+      main #menu #today:hover, main #menu #today:focus {
+        outline: none;
+        background-color: #E0E0E0;
+        color: #44D3FF; }
+      main #menu #today:active, main #menu #today.is-selected {
+        background-color: #3BCAD7;
+        color: #3EEDF6; }
+  main .day-of-week {
+    margin-top: 1.25em;
+    font-size: 0.7em;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    font-variant: small-caps;
+    text-align: center;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); }
+  main .date-grid {
+    margin-top: 0.5em;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); }
+  main .date-grid button {
+    position: relative;
+    border: 0;
+    width: 4.5ch;
+    height: 4.5ch;
+    border-radius: 50%;
+    background-color: transparent;
+    color: #4F4F4F; }
+    main .date-grid button:hover, main .date-grid button:focus {
+      outline: none;
+      background-color: #E0E0E0;
+      color: #44D3FF; }
+    main .date-grid button:active, main .date-grid button.is-selected {
+      background-color: #3BCAD7;
+      color: #3EEDF6; }
+  main .date-gridContent button {
+    position: relative;
+    border: 0;
+    width: 4.5ch;
+    height: 4.5ch;
+    border-radius: 50%;
+    background-color: transparent;
+    color: #4F4F4F; }
+    main .date-gridContent button:hover, main .date-gridContent button:focus {
+      outline: none;
+      background-color: #E0E0E0;
+      color: #44D3FF; }
+    main .date-gridContent button:active, main .date-gridContent button.is-selected {
+      background-color: #3BCAD7;
+      color: #3EEDF6; }
+  main section {
+    text-align: center;
+    width: 120px;
+    height: 100px;
+    padding: 1em;
+    background-color: #fff;
+    border: 2px solid #F2F2F2; }
+  main article {
+    text-align: center;
+    width: 120px;
+    height: 90px;
+    padding: 1em;
+    background-color: #fff;
+    border: 2px solid #F2F2F2; }

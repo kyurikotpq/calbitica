@@ -11,7 +11,8 @@
   },
   "scripts": {
     "start": "node index.js",
-    "watch": "npm-watch"
+    "scss": "node-sass --watch scss -o public/css",
+    "watch": "start npm run scss && start npm-watch"
   },
   "repository": {
     "type": "git",
@@ -30,8 +31,7 @@
     "ejs": "^2.7.1",
     "express": "^4.17.1",
     "googleapis": "^45.0.0",
-    "mongoose": "^5.7.7",
-    "sass": "^1.23.7"
+    "mongoose": "^5.7.7"
   },
   "devDependencies": {
     "chai": "^4.2.0",

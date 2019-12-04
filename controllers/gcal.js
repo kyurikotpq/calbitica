@@ -18,7 +18,6 @@ function listCal() {
  * Compile the functions into one object
  */
 let gcalController = {
-    importToH,
     listCal
 }
 

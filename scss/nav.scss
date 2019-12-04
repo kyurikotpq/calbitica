@@ -1,11 +1,11 @@
-@import "variables";
-@import "mixins";
+@import "_variables";
+@import "_mixins";
 
 nav{
-    border: 2px solid $blue-grey-200;
+    border: 2px solid $gray-3;
     display: flex;
     border-radius: 8px;
-    background-color: #fff;
+    background-color: $fff;
 
     a {
         @include brand;
