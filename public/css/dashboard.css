@@ -4,103 +4,27 @@
 */
 body {
   font-family: "Roboto", "Helvetica", "Arial", sans-serif;
-  background: #FFFFFF; }
+  background: #ffffff; }
+
+#container {
+  justify-content: space-between;
+  display: flex;
+  max-width: 100%; }
+
+#small {
+  max-width: 20%; }
+  #small .fc-left h2 {
+    font-size: 17px; }
+  #small .fc-right button {
+    font-size: 13px; }
+
+#big {
+  max-width: 80%; }
 
 main {
   max-width: max-content;
   padding: 1em;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   border: 2px solid #F2F2F2;
   border-radius: 8px;
-  /* // Styles for the weekday/weekend header */
-  /* // CSS grid used for the dates */
-  /* // Style for each day */ }
-  main #menu {
-    display: flex;
-    justify-content: space-around; }
-    main #menu #clickMenu {
-      padding: 0.5em;
-      border: 2px solid #F2F2F2;
-      border-radius: 8px; }
-      main #menu #clickMenu:hover, main #menu #clickMenu:focus {
-        outline: none;
-        background-color: #E0E0E0;
-        color: #44D3FF; }
-      main #menu #clickMenu:active, main #menu #clickMenu.is-selected {
-        background-color: #3BCAD7;
-        color: #3EEDF6; }
-      main #menu #clickMenu .menu {
-        width: 20px;
-        height: 2px;
-        background-color: black;
-        margin: 4.5px 0; }
-    main #menu #today {
-      padding: 0.7em;
-      background-color: #FFFFFF;
-      border: 2px solid #F2F2F2;
-      border-radius: 8px;
-      cursor: pointer; }
-      main #menu #today:hover, main #menu #today:focus {
-        outline: none;
-        background-color: #E0E0E0;
-        color: #44D3FF; }
-      main #menu #today:active, main #menu #today.is-selected {
-        background-color: #3BCAD7;
-        color: #3EEDF6; }
-  main .day-of-week {
-    margin-top: 1.25em;
-    font-size: 0.7em;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    font-variant: small-caps;
-    text-align: center;
-    display: grid;
-    grid-template-columns: repeat(7, 1fr); }
-  main .date-grid {
-    margin-top: 0.5em;
-    display: grid;
-    grid-template-columns: repeat(7, 1fr); }
-  main .date-grid button {
-    position: relative;
-    border: 0;
-    width: 4.5ch;
-    height: 4.5ch;
-    border-radius: 50%;
-    background-color: transparent;
-    color: #4F4F4F; }
-    main .date-grid button:hover, main .date-grid button:focus {
-      outline: none;
-      background-color: #E0E0E0;
-      color: #44D3FF; }
-    main .date-grid button:active, main .date-grid button.is-selected {
-      background-color: #3BCAD7;
-      color: #3EEDF6; }
-  main .date-gridContent button {
-    position: relative;
-    border: 0;
-    width: 4.5ch;
-    height: 4.5ch;
-    border-radius: 50%;
-    background-color: transparent;
-    color: #4F4F4F; }
-    main .date-gridContent button:hover, main .date-gridContent button:focus {
-      outline: none;
-      background-color: #E0E0E0;
-      color: #44D3FF; }
-    main .date-gridContent button:active, main .date-gridContent button.is-selected {
-      background-color: #3BCAD7;
-      color: #3EEDF6; }
-  main section {
-    text-align: center;
-    width: 120px;
-    height: 100px;
-    padding: 1em;
-    background-color: #fff;
-    border: 2px solid #F2F2F2; }
-  main article {
-    text-align: center;
-    width: 120px;
-    height: 90px;
-    padding: 1em;
-    background-color: #fff;
-    border: 2px solid #F2F2F2; }
+  justify-content: space-between; }

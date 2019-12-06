@@ -1,54 +1,55 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title><%= title %> - Calbitica</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title><%= title %> - Calbitica</title>
 
-    <!-- Bootstrap CSS. Got time then compile own version -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <!-- Bootstrap CSS. Got time then compile own version -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-    <!-- Own CSS -->
-    <% 
+  <!-- Calendar link -->
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.css' />
+  <link href="//cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@3/dark.css" rel="stylesheet" />
+
+  <!-- Own CSS -->
+  <% 
         if(styles) {
             styles.forEach(s => { 
     %>
-    <link rel="stylesheet" type="text/css" href="/<%= s %>">
-    <%  
+  <link rel="stylesheet" type="text/css" href="/<%= s %>">
+  <%  
             });
         }
     %>
 </head>
 
 <body>
-    <header>
-        <nav class="navbar">
-            <a class="navbar-brand" href="/">
-                <img src="/images/brand/icon/color_icon.svg" alt="Calbitica logo" title="Back to dashboard">
-            </a>
+  <header>
+    <nav class="navbar">
+      <a class="navbar-brand" href="/">
+        <img src="/images/brand/icon/color_icon.svg" alt="Calbitica logo" title="Back to dashboard">
+      </a>
 
-            <!-- If not signed in  -->
-            <% if(!user) { %>
-            <a class="plain g_btn" href="/auth/google">Continue with Google</a>
-            <% } else { %>
-            <!-- If signed in -->
-            <ul class="navbar">
-                <li>Welcome, <%= user.displayNames[0] %></li>
-                <li>Calendar</li>
+      <!-- If not signed in  -->
+      <% if(!user) { %>
+      <a class="plain g_btn" href="/auth/google">Continue with Google</a>
+      <% } else { %>
+      <!-- If signed in -->
+      <ul class="navbar">
+        <li>Welcome, <%= user.displayNames[0] %></li>
+        <li>Calendar</li>
 
-                <!-- The Habitica 3-col view -->
-                <li>Habitica</li>
+        <!-- The Habitica 3-col view -->
+        <li>Habitica</li>
 
-                <!-- Habitica Stats -->
-                <li>20 Gems, 1000 Gold</li>
+        <!-- Habitica Stats -->
+        <li>20 Gems, 1000 Gold</li>
 
-                <!-- Profile -->
-                <li>Profile</li>
-            </ul>
-            <% } %>
-        </nav>
-    </header>
+        <!-- Profile -->
+        <li>Profile</li>
+      </ul>
+      <% } %>
+    </nav>
+  </header>
