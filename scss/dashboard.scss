@@ -10,28 +10,37 @@ body {
     justify-content: space-between;
     display: flex;
     max-width: 100%;
-}
 
-#small {
-    max-width: 20%;
-
-    .fc-left h2{
-        font-size: 17px;
+    main {
+        max-width: max-content;
+        padding: 1em;
+        border: 2px solid $gray-6;
+        border-radius: 8px;
+        justify-content: space-between;
     }
-    .fc-right button {
-        font-size: 13px;
+
+    #small {
+        max-width: 20%;
+        border-color: $c-orange-1;
+    
+        .fc-left h2{
+            font-size: 17px;
+        }
+        .fc-right button {
+            font-size: 13px;
+        }
+
+        .fc-widget-content{
+            min-height: max-content;
+
+            .fc-scroller {
+                height: auto !important;
+            }
+        }
     }
-}
-
-#big {
-    max-width: 80%;
-}
-
-main {
-    max-width: max-content;
-    padding: 1em;
-    background-color: $fff;
-    border: 2px solid $gray-6;
-    border-radius: 8px;
-    justify-content: space-between;
+    
+    #big {
+        max-width: 80%;
+        border-color: $c-dgreen-1;
+    }
 }

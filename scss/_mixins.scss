@@ -7,15 +7,8 @@
      }
 }
 
-@mixin date-gridHF {
-    outline: none;
-    background-color: $gray-5;
-    color: $blue-3;
-}
-
-@mixin date-gridAI {
-    background-color: $teal-2;
-    color: $teal-3;
+@mixin modifyEvents {
+    background-color: $gray-2;
 }
 
 //Useful for Calendar to give a same size in this function

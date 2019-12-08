@@ -4,9 +4,11 @@
 */
 nav {
   border: 2px solid #828282;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   border-radius: 8px;
-  background-color: #FFFFFF; }
+  background-color: #ffffff; }
   nav a {
     width: 5%;
     position: relative; }

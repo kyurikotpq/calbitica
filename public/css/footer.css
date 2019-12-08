@@ -1,0 +1,43 @@
+/* Colors: 
+ * The higher the number,
+ * the lighter the color :)
+*/
+.modal {
+  text-align: center;
+  padding: 0 !important; }
+  .modal:before {
+    content: '';
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle; }
+  .modal .modal-dialog {
+    width: 100%;
+    display: inline-block;
+    vertical-align: middle; }
+
+input[type=date]::-webkit-inner-spin-button,
+input[type=time]::-webkit-inner-spin-button,
+input[type=datetime-local]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  display: none; }
+
+.modifyEvents {
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 10px;
+  margin-left: auto;
+  margin-right: auto; }
+
+#edit {
+  background-color: #0009E6; }
+  #edit:hover {
+    background-color: #4F4F4F; }
+
+#delete {
+  background-color: #E60000; }
+  #delete:hover {
+    background-color: #4F4F4F; }
+
+#fields {
+  color: #F23035;
+  display: none; }

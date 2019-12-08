@@ -34,6 +34,12 @@ var database = {
             end: end
         });
         newEvent.save(callback);
+    },
+    updateEventById: function(id, title, start, end, callback) {
+        EventModel.updateMany({_id:id},{title:title,start:start, end:end}, callback);
+    },
+    deleteEventById: function(id, callback) {
+        EventModel.deleteMany({_id: id}, callback);
     }
 };
 

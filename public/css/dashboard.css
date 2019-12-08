@@ -7,24 +7,36 @@ body {
   background: #ffffff; }
 
 #container {
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
   justify-content: space-between;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   max-width: 100%; }
-
-#small {
-  max-width: 20%; }
-  #small .fc-left h2 {
-    font-size: 17px; }
-  #small .fc-right button {
-    font-size: 13px; }
-
-#big {
-  max-width: 80%; }
-
-main {
-  max-width: max-content;
-  padding: 1em;
-  background-color: #ffffff;
-  border: 2px solid #F2F2F2;
-  border-radius: 8px;
-  justify-content: space-between; }
+  #container main {
+    max-width: -webkit-max-content;
+    max-width: -moz-max-content;
+    max-width: max-content;
+    padding: 1em;
+    border: 2px solid #F2F2F2;
+    border-radius: 8px;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between; }
+  #container #small {
+    max-width: 20%;
+    border-color: #E68800; }
+    #container #small .fc-left h2 {
+      font-size: 17px; }
+    #container #small .fc-right button {
+      font-size: 13px; }
+    #container #small .fc-widget-content {
+      min-height: -webkit-max-content;
+      min-height: -moz-max-content;
+      min-height: max-content; }
+      #container #small .fc-widget-content .fc-scroller {
+        height: auto !important; }
+  #container #big {
+    max-width: 80%;
+    border-color: #219653; }

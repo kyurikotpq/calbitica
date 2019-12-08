@@ -1,6 +1,6 @@
 <%# The Calendar View (Agenda, Week views) %>
 <% 
-    let styles = ["css/dashboard.css", "css/nav.css"],
+    let styles = ["css/dashboard.css", "css/nav.css", "css/footer.css"],
         title = "Dashboard";
 %>
 <%- include templates/header.ejs %>
@@ -12,5 +12,28 @@
   <main id="big">
     <div id='calendar'></div>
   </main>
+</div>
+
+<!-- Modal, will be keep reusing -->
+<div class="modal fade" id="myModal" role="dialog">
+  <div class="modal-dialog">
+  
+    <!-- Modal content, will be keep reusing-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title text-center">The title</h3>
+        <button type="button" class="close" data-dismiss="modal">x</button>
+      </div>
+      <div class="modal-body">
+        <p>The body</p>
+        <p><strong>Note:</strong> You cannot click outside of this modal to close it.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default">Editing event?</button>
+        <button type="button" class="btn btn-default">Deleting event?</button>
+      </div>
+    </div>
+    
+  </div>
 </div>
 <%- include templates/footer.ejs %>

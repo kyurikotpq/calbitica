@@ -50,6 +50,39 @@ router.post('/saveEvent', function (req, res) {
     });
 });
 
+// Calendar Update Event by _id
+router.post('/updateEvent/:id', function (req, res) {
+    var id = req.params.id;
+    var data = req.body;
+    db.updateEventById(id , data.title, data.start, data.end, function (err, events) {
+        if (err) {
+            res.status(500).send("Unable to update the events");
+        } else {
+            if (events.n == 0) {
+                res.status(200).send("No events were updated");
+            } else {
+                res.status(200).send("Events successfully updated");
+            }
+        }
+    });
+});
+
+// Calendar Delete Event by _id
+router.delete('/deleteEvent/:id', function (req, res) {
+    var id = req.params.id;
+    db.deleteEventById(id, function (err, event) {
+        if (err) {
+            res.status(500).send("Unable to delete event");
+        } else {
+            if (event.n == 0) {
+                res.status(200).send("No event were deleted");
+            } else {
+                res.status(200).send("Event from "+ id + " have been successfully deleted.");
+            }
+        }
+    })
+});
+
 router.get('/calList', (req, res) => {
     // gcal.calList().then((list) => {
     //     console.log(list);
