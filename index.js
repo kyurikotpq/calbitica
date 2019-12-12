@@ -6,9 +6,10 @@ require('dotenv').config(); // env
 const express = require('express'); // EXPRESS
 const cookieSession = require('cookie-session'); // cookie
 const mongoose = require('mongoose'); // mongoose
+// const websocket = require('./websocket')
 
-// Import route files
-// let habits = require('./routes/api/habitica');
+// Import route files and websocket controller
+let api = require('./routes/api/index');
 let mvc = require('./routes/mvc/index');
 
 // Setup app, static assets, view engine, cookie
@@ -30,7 +31,7 @@ app.use(cookieSession({
 
 // connect to mongodb
 mongoose.connect(process.env.MONGO_URI,
-    { 
+    {
         useNewUrlParser: true,
         useUnifiedTopology: true
     },
@@ -42,13 +43,15 @@ mongoose.connect(process.env.MONGO_URI,
 // Frontend portion
 app.use('/', mvc.dashboard);
 app.use('/auth', mvc.auth);
+app.use('/settings', mvc.settings);
 
 // API portion
 // Accept JSON only
 app.use(express.json())
-// app.use('/api/v1/habits', habits);
+app.use('/api/settings', api.settings);
 
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log('Calbitica started! Visit http://localhost:' + PORT);
+// Web portion
+const MVC_PORT = 3000;
+app.listen(MVC_PORT, () => {
+    console.log('Calbitica started! Visit http://localhost:' + MVC_PORT);
 });

@@ -1,11 +1,10 @@
 const router = require('express').Router();
 const authCheck = require('../../middleware/auth-check');
-// const gcal = require('../../controllers/gcal');
 
-router.get('/settings', authCheck.mustLogin, (req, res) => {
-    res.render("dashboard", { 
+router.get('/', authCheck.mustLogin, (req, res) => {
+    res.render("settings", {
         user: req.session.user,
-        habiticaAPI: req.session.habiticaAPI
+        habiticaID: !req.session.habiticaID ? "" : req.session.habiticaID
     });
 });
 

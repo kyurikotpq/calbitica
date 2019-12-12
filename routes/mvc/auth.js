@@ -33,7 +33,8 @@ router.get('/google', (req, res) => {
 
 // callback for google to redirect to
 router.get('/google/callback',
-    // use the middleware before we fire the cb function
+    // use the middleware to capture tokens
+    // before we redirect to the dashboard page
     authToken,
     (req, res) => {
         res.redirect('/dashboard');

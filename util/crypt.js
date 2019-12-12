@@ -3,6 +3,12 @@ const crypto = require('crypto');
 const ENCRYPTION_KEY = process.env.COOKIE_KEY; // Must be 256 bits (32 characters)
 const IV_LENGTH = 16; // For AES, this is always 16
 
+function random() {
+    let str = crypto.randomBytes(IV_LENGTH).toString('hex');
+    str = str + new Date().getTime();
+    return str;
+}
+
 function encrypt(text) {
     let iv = crypto.randomBytes(IV_LENGTH);
     let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
@@ -24,4 +30,4 @@ function decrypt(text) {
     return plainText.toString();
 }
 
-module.exports = { decrypt, encrypt };
+module.exports = { decrypt, encrypt, random };

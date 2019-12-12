@@ -5,11 +5,12 @@ let router = express.Router();
 // Get a user's tasks
 // "habits", "dailys", "todos", "rewards", "completedTodos"
 router.get('/', function (req, res) {
-    habitica.getAll()
+    const apiKey = req.header("Bearer");
+    habitica.getAll(apiKey)
         .then((data) => {
-            res.send(data);
+            res.status(400).json(data);
         }).catch((err) => {
-            res.send(err);
+            res.status(500).json(err);
         });
     // res.send('Hello World!');
 });

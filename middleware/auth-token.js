@@ -31,15 +31,21 @@ function handleOAuthSuccess(req, next, userObj) {
             user.save();
         }
 
+        req.session.calbitAPI = user.calbitAPI;
         req.session.user = user.profile;
+        req.session.habiticaID = (!user.habiticaID)
+            ? null : user.habiticaID;
         req.session.habiticaAPI = (!user.habiticaAPI)
-            ? null
-            : crypt.decrypt(user.habiticaAPI);
+            ? null : user.habiticaAPI;
 
         next();
-    } else { // user doesn't exist
-        // Create a new User
-        new User({
+    } else { // user doesn't exist, create new user
+        const calbitAPI = crypt.random();
+
+        new User.model({
+            calbitAPI,
+            habiticaAPI: null,
+            habiticaID: null,
             googleIDs: [profile.id],
             refresh_tokens: [refresh_token],
             profile: {
@@ -47,14 +53,16 @@ function handleOAuthSuccess(req, next, userObj) {
                 thumbnails: [profile.picture],
             },
         }).save()
-          .then((newUserObj) => {
-              req.session.user = newUserObj.profile;
-              req.session.habiticaAPI = null;
-              next();
-          })
-          .catch((err) => {
-              console.log(err);
-          });
+            .then((newUserObj) => {
+                req.session.calbitAPI = calbitAPI;
+                req.session.user = newUserObj.profile;
+                req.session.habiticaID = null;
+                req.session.habiticaAPI = null;
+                next();
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     }
 }
 
@@ -78,41 +86,47 @@ const retrieveTokens = (req, res, next) => {
     }
 
     oauth2Client.getToken(code)
-    .then((data) => {
-        // retrieve the profile....
-        let tokens = data.tokens;
-        let refresh_token = crypt.encrypt(tokens.refresh_token);
-        oauth2Client.setCredentials(tokens);
+        .then((data) => {
+            // retrieve the profile....
+            let tokens = data.tokens;
 
-        // store the accessToken in the cookies
-        req.session.access_token = crypt.encrypt(tokens.access_token);
-        console.log(req.session.access_token)
+            // If the user has authorized the app b4,
+            // refresh_token key will not exist -> don't do anything
+            // else store the refresh_token in DB
+            let refresh_token = (!tokens.refresh_token) ? ""
+                : crypt.encrypt(tokens.refresh_token);
 
-        google.oauth2("v2").userinfo.get()
-        .then((json) => {
-            let profile = json.data;
+            // Set tokens on the oAuth client
+            oauth2Client.setCredentials(tokens);
 
-            // check if user exists in DB
-            User.findOne({ googleIDs: profile.id })
-                .then((user) => handleOAuthSuccess(
-                    req,
-                    next,
-                    { user, profile, refresh_token }
-                ));
+            // store the accessToken in the cookies
+            req.session.access_token = crypt.encrypt(tokens.access_token);
+
+            google.oauth2("v2").userinfo.get()
+                .then((json) => {
+                    let profile = json.data;
+
+                    // check if user exists in DB
+                    User.model.findOne({ googleIDs: profile.id })
+                        .then((user) => handleOAuthSuccess(
+                            req,
+                            next,
+                            { user, profile, refresh_token }
+                        ));
+                })
+                .catch((err) => {
+                    if (err) {
+                        console.log("ERROR GETTING PROFILE")
+                        console.log(err);
+                        return;
+                    }
+                    next();
+                });
         })
         .catch((err) => {
-            if (err) {
-                console.log("ERROR GETTING PROFILE")
-                console.log(err);
-                return;
-            }
+            console.log(err)
             next();
         });
-    })
-    .catch((err) => {
-        console.log(err)
-        next();
-    });
 }
 
 module.exports = retrieveTokens;

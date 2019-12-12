@@ -4,8 +4,9 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// Create a new Schema (data structure)
-const userSchema = new Schema({
+// Define fields and data types
+let fields = {
+    calbitAPI: String, // using our own APIs
     googleIDs: [String],
     habiticaID: String,
     habiticaAPI: String,
@@ -13,11 +14,14 @@ const userSchema = new Schema({
     profile: {
         displayNames: [String],
         thumbnails: [String],
-    }
-});
+    },
+};
+
+// Create a new Schema (data structure)
+const userSchema = new Schema(fields);
 
 // create the model
 const User = mongoose.model('user', userSchema);
 
 // export model for use
-module.exports = User;
+module.exports = { model: User, fields: Object.keys(fields) };;
