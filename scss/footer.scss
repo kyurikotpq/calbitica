@@ -2,9 +2,10 @@
 @import "_mixins";
 
 .modal {
+    word-break: break-all;
     text-align: center;
     padding: 0!important;
-
+    
     &:before {
         content: '';
         display: inline-block;
@@ -20,8 +21,7 @@
 }
 
 input[type=date]::-webkit-inner-spin-button,
-input[type=time]::-webkit-inner-spin-button,
-input[type=datetime-local]::-webkit-inner-spin-button {
+input[type=time]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     display: none;
 }
@@ -34,7 +34,7 @@ input[type=datetime-local]::-webkit-inner-spin-button {
     margin-right: auto;
 }
 
-#edit {
+#add, #edit {
     background-color: $c-dblue-1;
 
     &:hover{

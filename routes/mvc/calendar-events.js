@@ -11,32 +11,32 @@ var database = {
 
         function(err){
             if(err == null) {
-            console.log("Connected to MongoDB of Calendar Events");
-
             eventSchema = {
                 title: String,
                 start: String,
-                end: String
+                end: String,
+                color: String
             };
                 EventModel = mongoose.model('calendar', eventSchema);
             } else {
-                console.log("Error connecting to MongoDB");
+                console.log("Error connecting to MongoDB, collection of Calendar Events");
             }
         })
     },
     getAllEvents: function(callback) {
         EventModel.find({}, callback);
     },
-    saveEvent: function(title, start, end, callback) {
+    saveEvent: function(title, start, end, color, callback) {
         var newEvent = new EventModel({
             title: title,
             start: start,
-            end: end
+            end: end,
+            color: color
         });
         newEvent.save(callback);
     },
-    updateEventById: function(id, title, start, end, callback) {
-        EventModel.updateMany({_id:id},{title:title,start:start, end:end}, callback);
+    updateEventById: function(id, title, start, end, color, callback) {
+        EventModel.updateMany({_id:id},{title:title,start:start, end:end, color:color}, callback);
     },
     deleteEventById: function(id, callback) {
         EventModel.deleteMany({_id: id}, callback);

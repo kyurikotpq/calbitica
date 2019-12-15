@@ -3,7 +3,7 @@ const router = require('express').Router();
 const authCheck = require('../../middleware/auth-check');
 const gcal = require('../../controllers/gcal');
 
-var db = require('./calendarEvents.js');
+var db = require('./calendar-events.js');
 db.connect();
 
 router.use(bodyParser.urlencoded({
@@ -41,7 +41,7 @@ router.get('/getEvents', function (req, res) {
 router.post('/saveEvent', function (req, res) {
     var data = req.body;
 
-    db.saveEvent(data.title, data.start, data.end, function (err, event) {
+    db.saveEvent(data.title, data.start, data.end, data.color, function (err, event) {
         if (err) {
             res.status(500).send("Unable to add a new event");
         } else {
@@ -54,7 +54,7 @@ router.post('/saveEvent', function (req, res) {
 router.post('/updateEvent/:id', function (req, res) {
     var id = req.params.id;
     var data = req.body;
-    db.updateEventById(id , data.title, data.start, data.end, function (err, events) {
+    db.updateEventById(id , data.title, data.start, data.end, data.color, function (err, events) {
         if (err) {
             res.status(500).send("Unable to update the events");
         } else {
