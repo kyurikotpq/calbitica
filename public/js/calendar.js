@@ -3,6 +3,8 @@ function getCalendarHeight() {
 }
 
 function setCalendarModalPosition(selected) {
+    console.log(selected)
+
     // Paiseh this not dynamically, not benefit for responsive
     // This whole function trigger only once, all in if else statement
 
@@ -30,7 +32,7 @@ function setCalendarModalPosition(selected) {
         document.getElementById("myModal").style.overflowY = "hidden";
     }
 
-    // This is Week View Side and Columns Positioning hardcoded, will be distorted when smaller browser width change
+    // // This is Week View Side and Columns Positioning hardcoded, will be distorted when smaller browser width change
     else if (selected.indexOf("Sun") > -1 && $(".fc-agendaWeek-view")[0] != undefined) {
         document.getElementById("myModal").style.marginLeft = "100px";
         document.getElementById("myModal").style.overflowY = "hidden";
@@ -62,13 +64,13 @@ function getCalendarColor(color) {
         "#E600AC", "#FF99E6", "#E60000", "#FF9999", "#12E600", "#A1FF99"];
     const data = [];
 
-    for(let i = 0; i < colorPattern.length; i++) {
-        if(colorPattern[i] == color) {
+    for (let i = 0; i < colorPattern.length; i++) {
+        if (colorPattern[i] == color) {
             data.push('<option value="' + color + '" style="color: ' + color + '; background-color: black;" selected>' + colorValue[i] + '</option>');
         } else {
             data.push('<option value="' + colorPattern[i] + '" style="color: ' + colorPattern[i] + '; background-color: black;">' + colorValue[i] + '</option>');
         }
-    }    
+    }
     return data;
 }
 
@@ -95,8 +97,10 @@ $(document).ready(function () {
         navLinks: true,
         editable: true,
         selectable: true,
-        events: "/getEvents",
-        select: function (start, end, allDay) {
+        events: "/api/calbit",
+        select: function (start, end) {
+            let allDay = !start.hasTime();
+
             setCalendarModalPosition(start._d.toString());
 
             $("#myModal").modal({ backdrop: false });
@@ -109,21 +113,21 @@ $(document).ready(function () {
                 'End Date: <input type="date" id="endDate" value="' + $.fullCalendar.formatDate(end, "YYYY-MM-DD") + '">' +
                 '\tEnd Time: <input type="time" id="endTime" value="' + $.fullCalendar.formatDate(end, "HH:mm") + '"><br/><br/>' +
                 'Choose your Color: <select id="color">' +
-                    '<option value="">-Select Color-</option>' +
-                    '<option value="#E68800" style="color: #E68800; background-color: black;"">Orange 1</option>' +
-                    '<option value="#FFD699" style="color: #FFD699; background-color: black;"">Orange 2</option>' +
-                    '<option value="#00D3E6" style="color: #00D3E6; background-color: black;"">Teal 1</option>' +
-                    '<option value="#99F6FF" style="color: #99F6FF; background-color: black;"">Teal 2</option>' +
-                    '<option value="#0088E6" style="color: #0088E6; background-color: black;"">Blue 1</option>' +
-                    '<option value="#99D5FF" style="color: #99D5FF; background-color: black;"">Blue 2</option>' +
-                    '<option value="#8600E6" style="color: #8600E6; background-color: black;"">Purple 1</option>' +
-                    '<option value="#D499FF" style="color: #D499FF; background-color: black;"">Purple 2</option>' +
-                    '<option value="#E600AC" style="color: #E600AC; background-color: black;"">Pink 1</option>' +
-                    '<option value="#FF99E6" style="color: #FF99E6; background-color: black;"">Pink 2</option>' +
-                    '<option value="#E60000" style="color: #E60000; background-color: black;"">Red 1</option>' +
-                    '<option value="#FF9999" style="color: #FF9999; background-color: black;"">Red 2</option>' +
-                    '<option value="#12E600" style="color: #12E600; background-color: black;"">Green 1</option>' +
-                    '<option value="#A1FF99" style="color: #A1FF99; background-color: black;"">Green 2</option>' +
+                '<option value="">-Select Color-</option>' +
+                '<option value="#E68800" style="color: #E68800; background-color: black;"">Orange 1</option>' +
+                '<option value="#FFD699" style="color: #FFD699; background-color: black;"">Orange 2</option>' +
+                '<option value="#00D3E6" style="color: #00D3E6; background-color: black;"">Teal 1</option>' +
+                '<option value="#99F6FF" style="color: #99F6FF; background-color: black;"">Teal 2</option>' +
+                '<option value="#0088E6" style="color: #0088E6; background-color: black;"">Blue 1</option>' +
+                '<option value="#99D5FF" style="color: #99D5FF; background-color: black;"">Blue 2</option>' +
+                '<option value="#8600E6" style="color: #8600E6; background-color: black;"">Purple 1</option>' +
+                '<option value="#D499FF" style="color: #D499FF; background-color: black;"">Purple 2</option>' +
+                '<option value="#E600AC" style="color: #E600AC; background-color: black;"">Pink 1</option>' +
+                '<option value="#FF99E6" style="color: #FF99E6; background-color: black;"">Pink 2</option>' +
+                '<option value="#E60000" style="color: #E60000; background-color: black;"">Red 1</option>' +
+                '<option value="#FF9999" style="color: #FF9999; background-color: black;"">Red 2</option>' +
+                '<option value="#12E600" style="color: #12E600; background-color: black;"">Green 1</option>' +
+                '<option value="#A1FF99" style="color: #A1FF99; background-color: black;"">Green 2</option>' +
                 '</select>');
             $("#myModal .modal-footer").html("<button class='modifyEvents' id='add'>&nbsp&nbspOk&nbsp&nbsp</button>" +
                 "<button class='modifyEvents' id='delete'>Cancel</button>");
@@ -153,9 +157,15 @@ $(document).ready(function () {
                         $('#fields').text("Start Date&Time cannot be more than or equal to End Date&Time");
                     } else {
                         $.ajax({
-                            url: "/saveEvent",
+                            url: "/api/calbit",
                             type: "post",
-                            data: { title: title, start: moment(startDateTime).format("YYYY-MM-DD HH:mm:ss"), end: moment(endDateTime).format("YYYY-MM-DD HH:mm:ss"), color: color },
+                            data: {
+                                title,
+                                start: start.toDate(),
+                                end: end.toDate(),
+                                color,
+                                allDay
+                            },
                             success: function () {
                                 $('#myModal').modal('toggle');
                                 alert("Added Successfully");
@@ -192,8 +202,8 @@ $(document).ready(function () {
                         'End Date: <input type="date" id="endDate" value="' + moment(calEvent.end).format("YYYY-MM-DD") + '">' +
                         '\tEnd Time: <input type="time" id="endTime" value="' + moment(calEvent.end).format("HH:mm") + '"><br/><br/>' +
                         'Choose your Color: <select id="color" value="' + calEvent.color + '">' +
-                            '<option value="">-Select Color-</option>' +
-                            getCalendarColor(calEvent.color) +
+                        '<option value="">-Select Color-</option>' +
+                        getCalendarColor(calEvent.color) +
                         '</select>');
                     $("#myModal .modal-footer").html("<button class='modifyEvents' id='edit'>&nbsp&nbspOk&nbsp&nbsp</button>" +
                         "<button class='modifyEvents' id='delete'>Cancel</button>");
@@ -224,9 +234,15 @@ $(document).ready(function () {
                             } else {
                                 var id = calEvent._id;
                                 $.ajax({
-                                    url: "/updateEvent/" + id,
-                                    type: "post",
-                                    data: { _id: id, title: title, start: moment(startDateTime).format("YYYY-MM-DD HH:mm:ss"), end: moment(endDateTime).format("YYYY-MM-DD HH:mm:ss"), color: color },
+                                    url: "/api/calbit/" + id,
+                                    type: "put",
+                                    data: {
+                                        _id: id, 
+                                        title: title,
+                                        start: moment(startDateTime).toDate(),
+                                        end: moment(endDateTime).toDate(),
+                                        color: color
+                                    },
                                     success: function () {
                                         $('#myModal').modal('toggle');
                                         alert("Updated Successfully");
@@ -247,7 +263,7 @@ $(document).ready(function () {
 
                     var id = calEvent._id;
                     $.ajax({
-                        url: "/deleteEvent/" + id,
+                        url: "/api/calbit/" + id,
                         type: "delete",
                         data: { _id: id },
                         success: function () {
@@ -266,13 +282,14 @@ $(document).ready(function () {
         eventResize: function (event) {
             var id = event._id;
             var title = event.title;
-            var start = $.fullCalendar.formatDate(event.start, "YYYY-MM-DD HH:mm:ss");
-            var end = $.fullCalendar.formatDate(event.end, "YYYY-MM-DD HH:mm:ss");
+            var start = event.start;
+            var end = event.end;
+
             var color = event.color;
             $.ajax({
-                url: "/updateEvent/" + id,
-                type: "post",
-                data: { _id: id, title: title, start: start, end: end, color: color },
+                url: "/api/calbit/" + id,
+                type: "put",
+                data: { _id: id, title: title, start: start.toDate(), end: end.toDate(), color: color },
                 success: function () {
                     alert("Updated Successfully");
                     $('#calendar').fullCalendar('refetchEvents');
@@ -286,13 +303,13 @@ $(document).ready(function () {
         eventDrop: function (event) {
             var id = event._id;
             var title = event.title;
-            var start = $.fullCalendar.formatDate(event.start, "YYYY-MM-DD HH:mm:ss");
-            var end = $.fullCalendar.formatDate(event.end, "YYYY-MM-DD HH:mm:ss");
+            var start = event.start;
+            var end = event.end;
             var color = event.color;
             $.ajax({
-                url: "/updateEvent/" + id,
-                type: "post",
-                data: { _id: id, title: title, start: start, end: end, color: color },
+                url: "/api/calbit/" + id,
+                type: "put",
+                data: { _id: id, title: title, start: start.toDate(), end: end.toDate(), color: color },
                 success: function () {
                     alert("Updated Successfully");
                     $('#calendar').fullCalendar('refetchEvents');

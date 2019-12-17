@@ -12,6 +12,8 @@ const mongoose = require('mongoose'); // mongoose
 let api = require('./routes/api/index');
 let mvc = require('./routes/mvc/index');
 
+let apiErrorHandler = require('./middleware/api-error');
+
 // Setup app, static assets, view engine, cookie
 let app = express();
 app.use(express.static('public'));
@@ -49,6 +51,11 @@ app.use('/settings', mvc.settings);
 // Accept JSON only
 app.use(express.json())
 app.use('/api/settings', api.settings);
+app.use('/api/h', api.habitica);
+app.use('/api/calbit', api.calbitCalendar);
+
+// Error handling portion
+app.use(apiErrorHandler);
 
 // Web portion
 const MVC_PORT = 3000;
