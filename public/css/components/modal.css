@@ -1,0 +1,28 @@
+/* Colors: 
+ * The higher the number,
+ * the lighter the color :)
+*/
+.modal {
+  padding: 0 !important; }
+  .modal .modal-body {
+    padding: 2rem 0 0; }
+    .modal .modal-body .form-group {
+      margin-top: 0; }
+
+.ui-dialog {
+  z-index: 4;
+  background-color: #4F4F4F;
+  padding: 1rem;
+  box-shadow: 0 2px 15px #333333; }
+
+.ui-dialog-titlebar,
+.ui-dialog-buttonset {
+  display: flex;
+  justify-content: flex-end; }
+
+.btn.ui-dialog-titlebar-close {
+  font-weight: bold;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0; }

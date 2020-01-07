@@ -6,7 +6,6 @@ require('dotenv').config(); // env
 const express = require('express'); // EXPRESS
 const cookieSession = require('cookie-session'); // cookie
 const mongoose = require('mongoose'); // mongoose
-// const websocket = require('./websocket')
 
 // Import route files and websocket controller
 let api = require('./routes/api/index');
@@ -35,7 +34,8 @@ app.use(cookieSession({
 mongoose.connect(process.env.MONGO_URI,
     {
         useNewUrlParser: true,
-        useUnifiedTopology: true
+        useUnifiedTopology: true,
+        useFindAndModify: false
     },
     () => {
         console.log('Successfully connected to MongoDB')
@@ -52,7 +52,9 @@ app.use('/settings', mvc.settings);
 app.use(express.json())
 app.use('/api/settings', api.settings);
 app.use('/api/h', api.habitica);
-app.use('/api/calbit', api.calbitCalendar);
+app.use('/api/calbit', api.calbit);
+app.use('/api/cal', api.calendar);
+app.use('/api/auth', api.auth);
 
 // Error handling portion
 app.use(apiErrorHandler);

@@ -1,8 +1,8 @@
 /**
  * Middleware to check if user is logged in
  */
-const oauth2Client = require('../config/google-setup');
-const crypt = require('../util/crypt');
+const JWTUtil = require('../util/jwt');
+let authController = require('../controllers/auth-controller');
 
 /**
  * Is the user logged in? No -> Redirect to login page
@@ -11,14 +11,21 @@ const crypt = require('../util/crypt');
  * @param {*} next 
  */
 const authCheckMustLogin = (req, res, next) => {
-    if (!req.session.user || !req.session.access_token)
+    if (!req.session.user) {
+        req.session = null;
         res.redirect('/auth/login')
-    else {
-        // make the access token available to the G client
-        oauth2Client.setCredentials({
-            access_token: crypt.decrypt(req.session.access_token)
-        });
-        next();
+    } else {
+        JWTUtil.verifyCalbiticaJWT(req.session.user)
+            .then(decodedJWT => {
+                authController.setHnGCredentials(decodedJWT)
+                req.body.decodedJWT = decodedJWT;
+                next();
+            })
+            .catch(err => {
+                console.log("ERROR in AUTH-CHECK", err);
+                req.session = null;
+                res.redirect('/auth/login');
+            });
     }
 }
 
@@ -29,7 +36,7 @@ const authCheckMustLogin = (req, res, next) => {
  * @param {*} next 
  */
 const authCheckIsLoggedin = (req, res, next) => {
-    (!req.session.user || !req.session.access_token)
+    (!req.session.user)
         ? next()
         : res.redirect('/dashboard');
 }

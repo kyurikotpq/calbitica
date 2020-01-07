@@ -6,7 +6,6 @@ const Schema = mongoose.Schema;
 
 // Define fields and data types
 let fields = {
-    calbitAPI: String, // using our own APIs
     googleIDs: [String],
     habiticaID: String,
     habiticaAPI: String,
@@ -18,7 +17,7 @@ let fields = {
 };
 
 // Create a new Schema (data structure)
-const userSchema = new Schema(fields);
+const userSchema = new Schema(fields, { typeKey: '$type' });
 
 // create the model
 const User = mongoose.model('user', userSchema);

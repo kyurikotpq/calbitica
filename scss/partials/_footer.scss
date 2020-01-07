@@ -1,0 +1,38 @@
+@import "_variables";
+@import "_mixins";
+
+
+// input[type=date]::-webkit-inner-spin-button,
+// input[type=time]::-webkit-inner-spin-button {
+//     -webkit-appearance: none;
+//     display: none;
+// }
+
+// .modifyEvents {
+//     color: $fff;
+//     border-radius: 8px;
+//     padding: 10px;
+//     margin-left: auto;
+//     margin-right: auto;
+// }
+
+// #add, #edit {
+//     background-color: $c-dblue-1;
+
+//     &:hover{
+//         @include modifyEvents;
+//     }
+// }
+
+// #delete {
+//     background-color: $c-red-1;
+
+//     &:hover{
+//         @include modifyEvents;
+//     }
+// }
+
+// #fields {
+//     color: $red-2;
+//     display: none;
+// }

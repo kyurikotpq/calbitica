@@ -1,75 +1,124 @@
+/**
+ * Routes for the CRUD of Calbits
+ */
 const router = require('express').Router();
 const apiCheck = require('../../middleware/api-check');
-const db = require('../../controllers/calbit');
-const habitica = require('../../controllers/habitica');
+const calbitController = require('../../controllers/calbit-controller');
+const gcalImporter = require('../../controllers/gcal-import');
+const habitica = require('../../controllers/h-controller');
 
-// Calendar Get All Events
+/**
+ * [GET] Get all Calbits belonging to the user
+ * @query {isDump} Boolean (true/false/all)
+ */
 router.get('/', apiCheck, function (req, res) {
-    db.getAllEvents()
-        .then((events) => {
-            res.status(200).send(events);
+    let userID = req.body.decodedJWT.sub;
+    let firstDate = !req.body.start ? new Date() : req.body.start;
+    let lastDate = !req.body.end ? null : req.body.end;
+    let fullSync = !req.query.fullSync ? false : req.query.fullSync;
+
+    // CONSIDER: putting the google import and habitica import here 
+    // so one less API call from client to our Calbitica API
+    gcalImporter(userID, fullSync, firstDate, lastDate)
+        .then(result => {
+            calbitController.getAllCalbits(userID, req.query.isDump, true)
+                .then((events) => {
+                    res.status(200).json(events);
+                })
+                .catch(err => {
+                    console.log(err);
+                    res.status(500).json({ message: err });
+                });
         })
         .catch(err => {
-            console.log(err);
-            res.status(500).send(err);
+            console.log('import error', err);
+            res.status(err.status).json({ message: err.message });
         });
+
 });
 
-// Calendar Save Event
+/**
+ * [POST] Save a Calbit to Habitica and then to MongoDB
+ */
 router.post('/', apiCheck, function (req, res) {
-    let data = req.body;
+    let data = req.body,
+        jwt = data.decodedJWT;
+
+    delete data.decodedJWT;
 
     habitica.saveToHabitica({
         text: data.title,
-        type: 'todo'
-    }).then((response) => {
-        console.log(data)
-        db.saveEvent(data)
-            .then(event => {
-                res.status(200).send(event);
-            })
-            .catch(err => {
-                res.status(500).send("Unable to add a new event");
-
-            })
+        type: 'todo' // add support for habits & dailies in future
+    }).then((axiosResponse) => {
+        let hResponse = axiosResponse.data;
+        if (hResponse.success) {
+            data.habiticaID = hResponse.data.id;
+            calbitController.createCalbit(data, jwt.sub, 'mvc')
+                .then(resultCode => {
+                    res.status(200).json({ message: `Event ${data.title} created.`});
+                })
+                .catch(err => {
+                    res.status(500).json({ message: err });
+                })
+        }
     }).catch(err => {
         console.log(err)
-
     })
 });
 
-// Calendar Update Event by _id
-router.put('/:id', apiCheck, function (req, res) {
-    var id = req.params.id;
-    var data = req.body;
-    db.updateEventById(id, data)
-        .then((events) => {
-            if (events.n == 0) {
-                res.status(200).send("No events were updated");
-            } else {
-                res.status(200).send("Events successfully updated");
-            }
+
+/**
+ * [PUT] Update the completion status of the
+ * specified Calbit
+ */
+router.put('/:id/complete', apiCheck, (req, res) => {
+    let id = req.params.id;
+    let status = !req.body.status ? false : req.body.status == 'true';
+    let complete = (status) ? "completed" : "incomplete";
+
+    calbitController.updateCompletion(id, status)
+        .then((result) => {
+            res.status(200).json({ 
+                message: `${result.summary} is now ${complete}`,
+                stats: result.stats
+            });
         })
         .catch(err => {
             console.log(err);
-            res.status(500).send("Unable to update the events");
+            res.status(500).json({ message: `Unable to ${complete} the event` });
+        });
+})
+
+/**
+ * [PUT] Update the specified Calbit
+ * @param {id} String
+ */
+router.put('/:id', apiCheck, function (req, res) {
+    let id = req.params.id;
+    let data = req.body;
+    calbitController.updateCalbit(id, data, 'mvc')
+        .then((resultCode) => {
+            console.log(resultCode);
+            res.status(200).json({ message: "Event updated." });
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ message: "Unable to update the event" });
         });
 });
 
-// Calendar Delete Event by _id
+/**
+ * [DELETE] Delete the specified Calbit
+ */
 router.delete('/:id', apiCheck, function (req, res) {
-    var id = req.params.id;
-    db.deleteEventById(id)
+    let id = req.params.id;
+    calbitController.deleteInMongo(id, true)
         .then((event) => {
-            if (event.n == 0) {
-                res.status(200).send("No event were deleted");
-            } else {
-                res.status(200).send("Event from " + id + " have been successfully deleted.");
-            }
+            res.status(200).json({ message: `Event ${event.summary} deleted.` });
         })
         .catch(err => {
             console.log(err);
-            res.status(500).send("Unable to delete event");
+            res.status(500).json({ message: "Unable to delete event" });
         })
 });
 

@@ -1,42 +1,77 @@
 const router = require('express').Router();
-const habitica = require('../../controllers/habitica');
+const habitica = require('../../controllers/h-controller');
+const hImporter = require('../../controllers/h-import');
+
 const apiCheck = require('../../middleware/api-check');
+const habiticaCheck = require('../../middleware/h-check');
 
 const allowedTypes = ["habits", "dailys", "todos", "rewards", "completedTodos"];
 
 /**
- * Import a user's tasks from 
- * Habitica as Calbits
+ * [GET] Import a user's tasks from 
+ * Habitica as Calbits into MongoDB
  */
-router.get('/sync', apiCheck, (req, res) => {
+router.get('/sync', [apiCheck, habiticaCheck], (req, res) => {
     let type = req.params.type;
     if (!allowedTypes.includes(type))
         type = null;
 
-    habitica.importToMongo(type, req.body.userID)
+    let jwt = req.body.decodedJWT;
+    hImporter(type, jwt.sub)
         .then(result => {
             // return a success message
             res.status(200).json(result);
         })
         .catch(err => {
             console.log(err);
-            res.status(400).json({ message: "Could not import Habitica items into Calbitica" });
+            res.status(err.status).json({ message: err.message });
         });
 });
 
-router.get('/profile', apiCheck, (req, res) => {
-    habitica.getProfile(req.body.habiticaID)
-        .then(result => {
-            let profile = result.data; // this is the axios object
-            let status = (profile.success) ? 200 : 400;
-            let data = (profile.success) ? profile.data
-                : { message: "Could not get Habitica profile" };
-
-            res.status(status).json(data);
+/**
+ * [GET] Get a user's Profile (displayName, stats, etc.)
+ * from Habitica
+ */
+router.get('/profile', [apiCheck, habiticaCheck], (req, res) => {
+    let jwt = req.body.decodedJWT;
+    habitica.getProfile(jwt.habiticaID)
+        .then(profile => {
+            res.status(200).json(profile);
         })
         .catch(err => {
             console.log(err);
-            res.status(400).json({ message: "Could not get Habitica profile" });
+            res.status(err.status).json({ message: err.message });
         });
+});
+
+
+/**
+ * [POST] Accept/Decline a Quest invitation
+ */
+router.post('/quest', [apiCheck, habiticaCheck], (req, res) => {
+    let acceptQuest = req.body.accept == 'true',
+        groupID = req.body.groupID;
+
+    habitica.respondToQuest(acceptQuest, groupID)
+        .then(quest => {
+            res.status(200).json(quest);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(err.status).json({ message: err.message });
+        })
+});
+
+/**
+ * [GET] Rest in the Tavern
+ */
+router.get('/sleep', [apiCheck, habiticaCheck], (req, res) => {
+    habitica.toggleSleep()
+        .then(result => res.status(200).json(result))
+        .catch(err => {
+            console.log(err);
+            res.status(err.status).json({ message: err.message });
+        })
 })
+
 module.exports = router;

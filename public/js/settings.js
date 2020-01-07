@@ -1,11 +1,11 @@
 $(window).on('load', function() {
     $("#saveSettings").on("click", function() {
-        const userID = $("#userID").val();
+        const hUserID = $("#hUserID").val();
         const apiKey = $('#apiKey').val();
         let data = { };
 
-        if(userID) data.userID = userID;
-        if(apiKey) data.apiKey = apiKey;
+        if(hUserID) data.hUserID = hUserID.replace(/[<>!*&^%$/.,'"=?`~|\\/; ]/g, "");
+        if(apiKey) data.apiKey = apiKey.replace(/[<>!*&^%$/.,'"=?`~|\\/; ]/g, "");
         
         $.ajax({
             url: "/api/settings/habitica",
@@ -14,10 +14,11 @@ $(window).on('load', function() {
         }) // create toasts
         .done((result) => {
             console.log(result);
-            
+            createToast('success', result.message);
         })
         .fail((err) => {
             console.log(err);
+            createToast('danger', err.responseJSON.message);
         })
     })
 })

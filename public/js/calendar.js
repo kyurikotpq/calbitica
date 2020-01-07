@@ -103,7 +103,7 @@ $(document).ready(function () {
 
             setCalendarModalPosition(start._d.toString());
 
-            $("#myModal").modal({ backdrop: false });
+            // $("#myModal").modal({ backdrop: false });
             $("#myModal").draggable({ handle: ".modal-header" });
             $("#myModal .modal-title").text("Adding a new Event");
             $("#myModal .modal-body").html('<p id="fields"></p>' +

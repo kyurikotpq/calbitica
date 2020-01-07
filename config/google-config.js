@@ -8,7 +8,7 @@ const G_CONFIG = {
     scopes: [
         'profile',
         'https://www.googleapis.com/auth/calendar.readonly',
-        'https://www.googleapis.com/auth/calendar.events.readonly'
+        'https://www.googleapis.com/auth/calendar.events'
     ]
 };
 

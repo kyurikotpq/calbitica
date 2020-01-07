@@ -1,37 +1,40 @@
-@import "_variables";
-@import "_mixins";
+@import 'partials/nav';
+@import 'partials/footer';
+@import 'partials/event-modal';
+@import 'components/modal';
+@import 'components/buttons';
+@import 'components/form-group-row';
 
-body {
-    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
-    background: $fff;
-    overflow: hidden;
-}
-
-#container{
+#container {
+    display        : flex;
     justify-content: space-between;
-    display: flex;
-    max-width: 100%;
+    max-width      : 100%;
+    padding        : 1rem;
 
     main {
-        max-width: max-content;
-        padding: 1em;
-        border: 2px solid $gray-6;
-        border-radius: 8px;
+        max-width  : max-content;
+        margin-left: 2rem;
+
         justify-content: space-between;
     }
 
-    #small {
+    #big {
+        max-width: 80%;
+    }
+
+    // Sidebar
+    aside {
         max-width: 20%;
-        border-color: $c-orange-1;
-    
-        .fc-left h2{
+
+        .fc-left h2 {
             font-size: 17px;
         }
+
         .fc-right button {
             font-size: 13px;
         }
 
-        .fc-widget-content{
+        .fc-widget-content {
             min-height: max-content;
 
             .fc-scroller {
@@ -39,9 +42,98 @@ body {
             }
         }
     }
-    
-    #big {
-        max-width: 80%;
-        border-color: $c-dgreen-1;
+
+    // Sidebar Calendar
+    #sidebar-calendar {
+        margin-bottom: 2rem;
+
+        td,
+        th {
+            border    : none;
+            text-align: center;
+        }
+
+        .fc-day-number {
+            float: none;
+        }
+
+        .fc-bg .fc-today {
+            border-radius: 50%;
+        }
+    }
+
+    // Big calendar
+    #main-calendar {
+        .fc-time-grid .fc-slats .fc-minor td {
+            border: none;
+        }
+        .fc-time-grid-event.fc-short .fc-time:after {
+            content: "";
+        }
+        .fc-title {
+            font-weight: bold;
+        }
+    }
+
+    // Habitica stats
+    .stats-bar-container {
+        display    : flex;
+        align-items: center;
+
+        // Icons
+        #health-icon {
+            fill: $red-3;
+        }
+
+        #exp-icon {
+            fill: $yellow-3;
+        }
+
+        #mana-icon {
+            fill: $blue-3;
+        }
+
+        .bar {
+            margin: 0 .5rem;
+            height: 15px;
+            flex  : 1;
+
+            .progress-bar {
+                height: 100%;
+            }
+        }
+
+        #health-bar {
+            border: 1px solid $red-3;
+
+            .progress-bar {
+                background-color: $red-3;
+            }
+        }
+
+        #exp-bar {
+            border: 1px solid $yellow-3;
+
+            .progress-bar {
+                background-color: $yellow-3;
+            }
+        }
+
+        #mana-bar {
+            border: 1px solid $blue-3;
+
+            .progress-bar {
+                background-color: $blue-3;
+            }
+        }
+
+        .label {
+            width: 20%;
+        }
+    }
+
+    // Labels for Habitica stats
+    .label {
+        font-size: 12px;
     }
 }

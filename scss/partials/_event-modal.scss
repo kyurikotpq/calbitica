@@ -1,0 +1,46 @@
+@import "./variables";
+
+// Modal event details elements
+.modal {
+    .icon {
+        fill  : $fff;
+        margin-right: 5px;
+    }
+
+    .checkbox-container,
+    .action-container {
+        position: absolute;
+        top     : 1.25rem;
+
+    }
+
+    .checkbox-container {
+        left: 1rem;
+    }
+
+    .action-container {
+        right: 3rem;
+    }
+
+    .event-details {
+        display: none;
+    }
+
+    .event-details-calendar {
+        display: flex;
+    }
+
+    // Modal Dialog Form elements
+    .event-form {
+
+        #event-form-title {
+            width    : calc(100% - 6rem);
+            font-size: 1.15rem;
+        }
+
+        .calendar-icon {
+            margin-bottom: 2rem;
+            margin-left  : 2rem;
+        }
+    }
+}

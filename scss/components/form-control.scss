@@ -1,0 +1,74 @@
+// Styles for forms and inputs
+// follows material design style
+@import "../partials/variables";
+
+/* form group */
+.form-group {
+    position: relative;
+    margin  : 3rem 0 2rem;
+
+    .form-control {
+        border-top   : none;
+        border-left  : none;
+        border-right : none;
+        border-bottom: 2px solid $gray-4;
+        border-radius: 0px;
+
+        color     : $fff;
+        padding   : .375rem .5rem;
+        background: transparent;
+        transition: all .5s ease-out;
+        width: 100%;
+
+        &:focus,
+        &:valid {
+            border-bottom: 2px solid $blue-2;
+            transition   : all .5s ease-out;
+            outline      : none;
+
+            &+label {
+                top       : -1.5rem;
+                color     : $blue-2;
+                font-size : 12px;
+                transition: all .5s ease-out;
+            }
+        }
+    }
+
+    label {
+        position     : absolute;
+        left         : .5rem;
+        top          : .25rem;
+        margin-bottom: 0;
+        font-size    : 1rem;
+        transition   : all .5s ease-out;
+
+        .filled {
+            top       : -1.5rem;
+            color     : $blue-2;
+            font-size : 12px;
+            transition: all .5s ease-out;
+        }
+    }
+
+    input.typed:invalid+label {
+        top       : -1.5rem;
+        color     : $red-2;
+        font-size : 12px;
+        transition: all .5s ease-out;
+    }
+
+    // Specific input types
+    input.datepicker {
+        width: 100px;
+    }
+    .timepicker {
+        width: 80px;
+    }
+
+    select.form-control {
+        background-color: $gray-2;
+    }
+
+}
+

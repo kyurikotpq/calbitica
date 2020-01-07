@@ -1,20 +1,36 @@
 const router = require('express').Router();
-const habitica = require('../../controllers/habitica');
+const habitica = require('../../controllers/h-controller');
 const apiCheck = require('../../middleware/api-check');
+const JWTUtil = require('../../util/jwt');
 
 /**
  * Save a user's Habitica User ID
  * & API Key to MongoDB
  */
 router.post('/habitica', apiCheck, (req, res) => {
+    let decodedJWT = req.body.decodedJWT;
+    
     habitica.saveSettings(req.body)
-        .then(result => {
-            if(result.calbitAPI) {
-                // modify the data in the session
-                if(result.habiticaAPI) req.session.habiticaAPI = result.habiticaAPI;
-                if(result.habiticaID) req.session.habiticaID = result.habiticaID;
+        .then(user => {
+            if(user._id.toString() == decodedJWT.sub) {
+                let data = {
+                    access_token: decodedJWT.access_token,
+                    refresh_token: decodedJWT.access_token,
+                    profile: decodedJWT.profile,
+                    habiticaID: user.habiticaID,
+                    habiticaAPI: user.habiticaAPI,
+                };
 
-                res.status(200).json({ message: "Habitica settings saved successfully" });
+                // resign the JWT
+                let jwt = JWTUtil.signCalbiticaJWT(data, decodedJWT.sub); // MongoDB ID
+
+                if(req.session.user) // call is from MVC!
+                    req.session.user = jwt;
+                
+                res.status(200).json({ 
+                    jwt,
+                    message: "Habitica settings saved successfully" 
+                });
             } else 
                 res.status(400).json({ message: "Could not save Habitica settings" });
         }).catch(err => {

@@ -10,12 +10,8 @@ router.get('/login', authCheck.isLoggedin, (req, res) => {
     res.render('login');
 })
 router.get('/logout', (req, res) => {
-    req.session = null; // invalidate all sessions
-    
-    // invalidate tokens in DB!
-
-    // redirect back to home page
-    res.redirect('/');
+    req.session = null; // invalidate all MVC sessions
+    res.redirect('/'); // redirect back to home page
 })
 
 // redirect to google auth

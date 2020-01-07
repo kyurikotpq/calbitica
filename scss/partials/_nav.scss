@@ -1,0 +1,199 @@
+@import "_globals";
+@import "_variables";
+@import "_mixins";
+
+@import "../components/form-control";
+@import "../components/checkbox";
+@import "../components/toast";
+// @import "../components/badge-circle";
+
+.navbar {
+    display    : flex;
+    align-items: center;
+    padding    : 1rem;
+
+    // Brain Dump
+    .form-group {
+        margin: 0 1rem;
+        width : 100%;
+
+        .form-control {
+            width: 100%;
+        }
+    }
+
+    .brain-dump-label {
+        position: relative;
+
+        .brain-dump-amt {
+            position: absolute;
+            top     : -7px;
+            right   : -7px;
+        }
+    }
+
+    #brain-dump-toggle-svg {
+        fill: $gray-4;
+    }
+
+    #brain-dump-toggle:checked~.brain-dump-label {
+        #brain-dump-toggle-svg {
+            fill: $fff;
+        }
+    }
+
+
+    // User profile and sidebar
+    #user-profile-google-name {
+        position: absolute;
+
+        // parent width - pic width - total padding - total margin
+        max-width    : calc(100% - 50px - 2rem - 2rem);
+        left         : calc(50px + 2rem);
+        top          : calc(25px + .25rem);
+        margin-bottom: 0;
+    }
+
+    .user-profile {
+        flex-shrink: 0;
+        overflow   : hidden;
+
+        img {
+            border-radius: 50%;
+            width        : 50px;
+            height       : 50px;
+        }
+    }
+
+    .sidebar-nav {
+        position: fixed;
+        top     : 0;
+        left    : 0;
+        z-index : 100;
+        height  : 100vh;
+        width   : 100vw;
+
+        background-color: $dark-overlay;
+        color           : $fff;
+        display         : none;
+
+        // Calendar list items in sidebar
+        .calendar-item {
+            display    : flex;
+            align-items: center;
+            padding    : 1rem;
+
+            .checkedbox,
+            .checkbox {
+                flex        : 0 0 24px;
+                margin-right: 10px;
+            }
+
+            input.custom-checkbox {
+                ~.calendar-item-name {
+                    color: $gray-4;
+                }
+
+                // Checked state
+                &:checked {
+                    ~.checkbox {
+                        display: none;
+                    }
+
+                    ~.checkedbox {
+                        display: block;
+                    }
+
+                    ~.calendar-item-name {
+                        color: $fff;
+                    }
+                }
+            }
+
+            // Hover state
+            &:hover {
+                input[name="isSynced"] {
+
+                    // Not checked state
+                    ~.checkedbox,
+                    ~.checkbox {
+                        fill: $gray-1;
+                    }
+
+                    ~.calendar-item-name {
+                        color: $gray-1;
+                    }
+                }
+            }
+        }
+
+        // General Menu Items
+        ul {
+            display       : flex;
+            flex-direction: column;
+            margin        : 0;
+
+            padding: {
+                left : 0;
+                right: 0;
+            }
+
+            list-style      : none;
+            position        : relative;
+            background-color: $gray-1;
+
+            &:not(.submenu) {
+                padding  : calc(50px + 2rem) 0 0;
+                width    : 20%; // 20vw
+                height   : 100%; // 100vh
+                min-width: 200px;
+            }
+
+            li {
+                .submenu-header {
+                    padding   : 0 1rem;
+                    margin-top: 2rem;
+                }
+
+                &:not(.submenu):hover {
+                    background-color: $blue-3;
+
+                    a {
+                        color: $gray-1;
+                    }
+                }
+
+                a {
+                    padding        : 1rem;
+                    display        : block;
+                    color          : $gray-4;
+                    text-decoration: none;
+                }
+
+            }
+        }
+
+        .logout {
+            margin-top: auto;
+        }
+
+        // Close sidebar icon
+        .user-profile-close {
+            position: absolute;
+            right   : 1rem;
+            top     : 25px;
+            @include closeBtn;
+        }
+    }
+
+
+    #user-profile-toggle:checked {
+        &~.user-profile {
+            z-index: 101;
+        }
+
+        &~.sidebar-nav {
+            display: block;
+        }
+    }
+}

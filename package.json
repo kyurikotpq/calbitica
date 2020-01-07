@@ -12,6 +12,7 @@
   "scripts": {
     "start": "node index.js",
     "scss": "node-sass --watch scss -o public/css",
+    "test": "mocha --timeout 10000",
     "watch": "start npm run scss && start npm-watch"
   },
   "repository": {
@@ -30,9 +31,10 @@
     "dotenv": "^8.2.0",
     "ejs": "^2.7.1",
     "express": "^4.17.1",
+    "google-auth-library": "^5.7.0",
     "googleapis": "^45.0.0",
-    "mongoose": "^5.7.7",
-    "ws": "^7.2.0"
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.7.7"
   },
   "devDependencies": {
     "chai": "^4.2.0",

@@ -4,59 +4,31 @@
  * from elsewhere i.e. the mobile apps)
  * 
  * and regardless of the type of call, 
- * if it's a valid API key, allow access!
+ * if it's a valid JWT key, allow access!
  */
-
-const User = require('../models/user').model;
-const axiosInstance = require('../config/h-axios-setup');
-const crypt = require('../util/crypt');
+const JWTUtil = require('../util/jwt');
+const authController = require('../controllers/auth-controller');
 
 /**
- * Is the Calbitica API key provided valid?
+ * Is the Calbitica JWT provided valid?
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
  */
-const isExternal = (req, res, next) => {
-    let calbitAPI = null;
-    let internal = req.session.calbitAPI;
+const isValidCalbiticaJWT = (req, res, next) => {
+    let internal = req.session.user;
     let external = req.header("Authorization");
+    let jwt = (!internal) ? external.replace("Bearer ", '') : internal;
 
-    if (internal) {
-        // if internal-provided token exists, try to retrieve the API token
-        calbitAPI = internal;
-    } else if (external) {
-        external = external.replace("Bearer ", '');
-        calbitAPI = external;
-    }
-
-    User.find({ calbitAPI }).then(results => {
-        if (!calbitAPI || results.length != 1) {
-            next({ status: 401, message: "Invalid user" });
-        }
-
-        let user = results[0];
-
-        if (user.habiticaAPI && user.habiticaID) {
-            let plainHabiticaAPI = crypt.decrypt(user.habiticaAPI);
-
-            // QOTD: Will this affect when I have multiple users using the app?
-            axiosInstance.defaults.headers.common['x-api-key'] = plainHabiticaAPI;
-            axiosInstance.defaults.headers.common['x-api-user'] = user.habiticaID;
-            
-            req.body.habiticaID = user.habiticaID;
-            req.body.userID = user._id;
-            req.body.calbitAPI = calbitAPI;
-
+    JWTUtil.verifyCalbiticaJWT(jwt)
+        .then(decodedJWT => {
+            authController.setHnGCredentials(decodedJWT)
+            req.body.decodedJWT = decodedJWT;
             next();
-        } else
-            next({ status: 401, message: "Please enter your Habitica API Key to continue" });
-
-    }).catch(err => {
-        console.log(err);
-        next({ status: 500, message: err })
-    })
-
+        })
+        .catch(err => {
+            next({ status: 500, message: err });
+        });
 }
 
-module.exports = isExternal;
+module.exports = isValidCalbiticaJWT;

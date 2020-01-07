@@ -1,11 +1,10 @@
 <%# The Settings Page %>
 <% 
-    let styles = ["css/settings.css", "css/nav.css", "css/footer.css"],
+    let styles = ["css/settings.css"],
         title = "Settings",
         beforeJS = [
-            {
-                src: "/js/settings.js"
-            }
+            { src: "/js/settings.js" },
+            { src: "/js/dashboard/sync.js" }
         ];
 %>
 <%- include partials/header.ejs %>
@@ -14,13 +13,13 @@
         <section id="habitica-settings">
             <h2>Habitica Settings</h2>
             <div class="form-group">
-                <label for="userID">User ID</label>
-                <input type="text" id="userID" name="userID" class="form-control"
+                <input type="text" id="hUserID" name="hUserID" class="form-control"
                 value="<%= habiticaID %>">
+                <label for="hUserID">User ID</label>
             </div>
             <div class="form-group">
-                <label for="apiKey">API Key</label>
                 <input type="password" id="apiKey" name="apiKey" class="form-control">
+                <label for="apiKey">API Key</label>
             </div>
             <button class="btn btn-primary" id="saveSettings">Save Habitica Settings</button>
         </section>

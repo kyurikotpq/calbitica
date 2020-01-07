@@ -10,15 +10,17 @@ const Schema = mongoose.Schema;
 // Define fields and data types
 const fields = {
     userID: String, // MongoDB ID
-    googleID: String, // can be null - only exists on Habitica
+    calendarID: String, // MongoDB Calendar ID
+    googleID: String, // Google Event ID, can be null - only exists on Habitica
     
     // habiticaID CANNOT be null, cos they're gonna get imported to Habitica anyway
     // UNLESS: this item is a brain dump
     habiticaID: String,
     habiticaType: String, // Habit, Task, Daily
     isDump: Boolean, // true if brain dump or not assigned date time yet
+    display: Boolean, // false if you don't want it displayed
     
-    updated: Date, // when was this updated in GCal?
+    created: Date, // when was this first imported from GCal?
     summary: String, // Title
     description: String, // description
     location: String,
@@ -34,8 +36,13 @@ const fields = {
     },
     
     color: String,
-    completed: Boolean,
+    completed: {
+        status: Boolean,
+        date: Date
+    },
+    modifications: Array // Array of dates
     // tags: Array
+    // repeat: follow the rules
 };
 
 // Create new schema

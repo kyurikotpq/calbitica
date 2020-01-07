@@ -37,7 +37,7 @@ function add(date, type, amount) {
         date = new Date(date);
 
     let numMsToAdd = getMs(type, amount);
-    return newDate.setTime(date.getTime() + numMsToAdd);
+    return new Date(newDate.setTime(date.getTime() + numMsToAdd));
 }
 
 /**
@@ -57,7 +57,17 @@ function sub(date, type, amount) {
         date = new Date(date);
 
     let numMsToSub = getMs(type, amount);
-    return newDate.setTime(date.getTime() + numMsToSub);
+    return new Date(newDate.setTime(date.getTime() - numMsToSub));
 }
 
-module.exports = { add, sub }
+function halfHourIntervals() {
+    let intervals = [];
+    for(let i = 0; i < 24; i++) {
+        let start = ("0" + i).slice(-2);
+        intervals.push(`${start}:00`);
+        intervals.push(`${start}:30`);
+    }
+    return intervals;
+}
+
+module.exports = { getMs, add, sub, halfHourIntervals }

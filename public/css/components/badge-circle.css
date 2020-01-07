@@ -1,0 +1,59 @@
+/* Colors: 
+ * The higher the number,
+ * the lighter the color :)
+*/
+.badge-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+  border-radius: 50%; }
+
+.badge-success {
+  border: 2px solid #6FCF97;
+  background-color: #6FCF97;
+  color: #ffffff; }
+
+.badge-danger {
+  border: 2px solid #F05C61;
+  background-color: #F05C61;
+  color: #ffffff; }
+
+.badge-primary {
+  border: 2px solid #44D3FF;
+  background-color: #44D3FF;
+  color: #333333; }
+
+.badge-warning {
+  border: 2px solid #FFBE5D;
+  background-color: #FFBE5D;
+  color: #828282; }
+
+.badge-outline-success {
+  background-color: transparent;
+  border: 2px solid #6FCF97;
+  color: #6FCF97; }
+
+.badge-outline-danger {
+  background-color: transparent;
+  border: 2px solid #F05C61;
+  color: #F05C61; }
+
+.badge-outline-primary {
+  background-color: transparent;
+  border: 2px solid #44D3FF;
+  color: #44D3FF; }
+
+.badge-outline-secondary {
+  background-color: transparent;
+  border: 2px solid #E0E0E0;
+  color: #E0E0E0; }
+
+.badge-outline-warning {
+  background-color: transparent;
+  border: 2px solid #FFBE5D;
+  color: #FFBE5D; }
