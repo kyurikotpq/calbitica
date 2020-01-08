@@ -15,12 +15,13 @@ router.get('/', apiCheck, function (req, res) {
     let userID = req.body.decodedJWT.sub;
     let firstDate = !req.body.start ? new Date() : req.body.start;
     let lastDate = !req.body.end ? null : req.body.end;
-    let fullSync = !req.query.fullSync ? false : req.query.fullSync;
+    let fullSync = !req.query.fullSync ? true : req.query.fullSync;
 
     // CONSIDER: putting the google import and habitica import here 
     // so one less API call from client to our Calbitica API
     gcalImporter(userID, fullSync, firstDate, lastDate)
         .then(result => {
+            console.log("SHOULD HAVE IMPORTED", result)
             calbitController.getAllCalbits(userID, req.query.isDump, true)
                 .then((events) => {
                     res.status(200).json(events);

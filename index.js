@@ -1,17 +1,16 @@
 /**
  * REQUIRING STUFF
- * 
  */
 require('dotenv').config(); // env
 const express = require('express'); // EXPRESS
 const cookieSession = require('cookie-session'); // cookie
 const mongoose = require('mongoose'); // mongoose
 
-// Import route files and websocket controller
-let api = require('./routes/api/index');
-let mvc = require('./routes/mvc/index');
+// Import route files
+const api = require('./routes/api/index');
+const mvc = require('./routes/mvc/index');
 
-let apiErrorHandler = require('./middleware/api-error');
+const apiErrorHandler = require('./middleware/api-error');
 
 // Setup app, static assets, view engine, cookie
 let app = express();

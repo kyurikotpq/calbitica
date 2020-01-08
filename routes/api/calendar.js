@@ -31,7 +31,7 @@ router.get('/', apiCheck, (req, res) => {
 router.get('/import', apiCheck, (req, res) => {
     let firstDate = !req.body.firstDate ? new Date() : req.body.firstDate;
     let lastDate = !req.body.lastDate ? null : req.body.lastDate;
-    let fullSync = !req.query.fullSync ? false : req.query.fullSync;
+    let fullSync = !req.query.fullSync ? true : req.query.fullSync;
 
     let jwt = req.body.decodedJWT;
     gcalImporter(jwt.sub, fullSync, firstDate, lastDate)

@@ -16,9 +16,16 @@ const authCheckMustLogin = (req, res, next) => {
         res.redirect('/auth/login')
     } else {
         JWTUtil.verifyCalbiticaJWT(req.session.user)
-            .then(decodedJWT => {
-                authController.setHnGCredentials(decodedJWT)
-                req.body.decodedJWT = decodedJWT;
+            .then(result => {
+                authController.setHnGCredentials(result.decoded)
+
+                if (!result.newJWT) {
+                    req.body.decodedJWT = result.decoded;
+                } else {
+                    req.session.user = result.newJWT;
+                    req.body.decodedJWT = result.newDecodedJWT;
+                }
+
                 next();
             })
             .catch(err => {

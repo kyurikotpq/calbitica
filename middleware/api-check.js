@@ -21,13 +21,19 @@ const isValidCalbiticaJWT = (req, res, next) => {
     let jwt = (!internal) ? external.replace("Bearer ", '') : internal;
 
     JWTUtil.verifyCalbiticaJWT(jwt)
-        .then(decodedJWT => {
-            authController.setHnGCredentials(decodedJWT)
-            req.body.decodedJWT = decodedJWT;
+        .then(result => {
+            authController.setHnGCredentials(result.decoded)
+
+            if (!result.newJWT) {
+                req.body.decodedJWT = result.decoded;
+            } else {
+                req.body.decodedJWT = result.newDecodedJWT;
+            }
+
             next();
         })
         .catch(err => {
-            next({ status: 500, message: err });
+            next({ status: 400, message: err });
         });
 }
 

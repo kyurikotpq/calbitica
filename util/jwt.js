@@ -63,13 +63,35 @@ function verifyCalbiticaJWT(token) {
                     return;
                 }
 
-                resolve(decoded);
+                // Check expiry and resolve decoded JWT
+                // with a new JWT :)
+                let finalResponse = { decoded };
+                if(isExpiring(decoded.exp)) {
+                    let payload = {
+                        access_token: decoded.access_token,
+                        refresh_token: decoded.refresh_token,
+                        profile: decoded.profile,
+                        habiticaID: decoded.habiticaID,
+                        habiticaAPI: decoded.habiticaAPI,
+                    };
+                    finalResponse.newJWT = signCalbiticaJWT(payload, userID);
+                    finalResponse.newDecodedJWT = payload;
+                }
+
+                resolve(finalResponse);
             })
     })
 }
 
+function isExpiring(exp) {
+    let now = new Date().getTime();
+    let oneDayInMs = DateUtil.getMs("h", 24);
+
+    return (exp - now >= oneDayInMs);
+}
+
 function extendToken(token) {
-    
+
 }
 
 module.exports = { signCalbiticaJWT, verifyCalbiticaJWT };

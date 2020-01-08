@@ -93,9 +93,9 @@ function userExistsInMongo(idToken, refresh_token, access_token) {
                     .then(user => {
                         let cipherAccessToken = Crypt.encrypt(access_token);
 
-                        if(!refresh_token)
+                        if (!refresh_token)
                             refresh_token = '';
-                        
+
                         if (!user)
                             resolve(register(profile, refresh_token, cipherAccessToken));
                         else
@@ -136,14 +136,16 @@ function verifyGIDToken(idToken) {
     return new Promise((resolve, reject) => {
         client.verifyIdToken({
             idToken,
-            audience: process.env.GCLIENT_ID,
+            audience: [
+                process.env.GCLIENT_ID, // MVC
+                process.env.GCLIENT_iOS_ID, // iOS
+            ],
         })
             .then(ticket => {
                 const payload = ticket.getPayload();
 
-                // check: does the aud claim match my client ID?
                 // does the "sub" claim exist?
-                if (process.env.GCLIENT_ID != payload.aud || !payload.sub)
+                if (!payload.sub)
                     reject({ status: 400, message: "Invalid token" });
 
                 else {
@@ -162,10 +164,37 @@ function verifyGIDToken(idToken) {
     });
 }
 
+function tokensFromAuthCode(code) {
+    return new Promise((resolve, reject) => {
+        gCalOAuth2Client.getToken(code)
+            .then((data) => {
+                // retrieve the profile....
+                let tokens = data.tokens;
+
+                // If the user has authorized the app b4,
+                // refresh_token key will not exist -> don't do anything
+                // else store the refresh_token in DB
+                let refresh_token = (!tokens.refresh_token) ? "" : tokens.refresh_token;
+
+                // Set tokens on the oAuth client
+                gCalOAuth2Client.setCredentials(tokens);
+
+                userExistsInMongo(tokens.id_token, refresh_token, tokens.access_token)
+                    .then(jwt => resolve(jwt))
+                    .catch(err => reject(err));
+            })
+            .catch((err) => {
+                console.log(err)
+                next();
+            });
+    })
+}
+
 let authController = {
     verifyGIDToken,
     userExistsInMongo,
-    setHnGCredentials
+    setHnGCredentials,
+    tokensFromAuthCode
 }
 
 module.exports = authController;

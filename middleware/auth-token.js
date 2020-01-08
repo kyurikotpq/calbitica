@@ -26,50 +26,16 @@ const retrieveTokens = (req, res, next) => {
         return;
     }
 
-    // Automatically use refresh_tokens to get new access_tokens
-    oauth2Client.on('tokens', (tokens) => {
-        console.log(tokens);
-        if (tokens.refresh_token) {
-            // Set tokens on the oAuth client
-            oauth2Client.setCredentials(tokens);
-            // store the refresh_token in my database!
-        }
+    authController.tokensFromAuthCode(code)
+        .then(jwt => {
+            // store the JWT in the cookies
+            req.session.user = jwt;
 
-        authController.userExistsInMongo(tokens.id_token, tokens.refresh_token, tokens.access_token)
-            .then(jwt => {
-                // store the JWT in the cookies
-                req.session.user = jwt;
-                next();
-            })
-            .catch(err => next(err));
-        console.log(tokens.access_token);
-    });
+            
 
-    oauth2Client.getToken(code)
-        .then((data) => {
-            // retrieve the profile....
-            let tokens = data.tokens;
-
-            // If the user has authorized the app b4,
-            // refresh_token key will not exist -> don't do anything
-            // else store the refresh_token in DB
-            let refresh_token = (!tokens.refresh_token) ? "" : tokens.refresh_token;
-
-            // Set tokens on the oAuth client
-            oauth2Client.setCredentials(tokens);
-
-            authController.userExistsInMongo(tokens.id_token, refresh_token, tokens.access_token)
-                .then(jwt => {
-                    // store the JWT in the cookies
-                    req.session.user = jwt;
-                    next();
-                })
-                .catch(err => next(err));
-        })
-        .catch((err) => {
-            console.log(err)
             next();
-        });
+        })
+        .catch(err => next(err));
 }
 
 module.exports = retrieveTokens;

@@ -134,12 +134,11 @@ function getProfile(userID) {
                     let stats = processStats(allInfo.stats);
 
                     resolve({
-                        profile: allInfo.profile,
-                        stats,
-                        preferences: allInfo.preferences,
-                        party: allInfo.party
+                        profile: allInfo.profile, // display name
+                        stats, // hp, exp, mp, gp
+                        preferences: allInfo.preferences, // sleep, etc.
+                        party: allInfo.party // party id and quests
                     });
-                    // allInfo.preferences; // need this for sleeping soon
                 } else {
                     reject({
                         status: 400,
