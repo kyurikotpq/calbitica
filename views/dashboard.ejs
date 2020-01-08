@@ -17,7 +17,7 @@
 <div id="container">
     <aside id="small">
         <section id="sidebar-calendar"></section>
-        <section id="stats-container" class="mb-3">
+        <section id="h-profile-container" class="mb-3">
             <% if (!profile) { %>
             <h3>Connect your Habitica account</h3>
             <p class="mb-3">Google Calendar events won't show up until you've entered your Habitica User ID and API key.
@@ -80,15 +80,17 @@
                     </span>
                 </div>
             </div><!-- stats-bars-container -->
+            
+            <!-- Buttons for resting/leaving the tavern -->
+            <% let sleepBtnClass = (profile.preferences.sleep) ? "btn btn-danger" : "btn btn-primary",
+                    sleepBtnText = (profile.preferences.sleep) ? "Resume Damage" : "Pause Damage";
+            %>
+            <button id="sleep-btn" class="<%= sleepBtnClass %>">
+                <%= sleepBtnText %>
+            </button>
+
             <% } // end else [profile exists] %>
-        </section><!-- stats-container -->
-        <!-- Buttons for resting/leaving the tavern -->
-        <% let sleepBtnClass = (profile.preferences.sleep) ? "btn btn-danger" : "btn btn-primary",
-               sleepBtnText = (profile.preferences.sleep) ? "Resume Damage" : "Pause Damage";
-         %>
-        <button id="sleep-btn" class="<%= sleepBtnClass %>">
-            <%= sleepBtnText %>
-        </button>
+        </section><!-- h-profile-container -->
     </aside>
 
     <main id="big">
