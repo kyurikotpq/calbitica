@@ -17,8 +17,6 @@ function listCal(nextSyncToken = null) {
             showDeleted: false,
         };
     }
-    console.log("PARAMS", params)
-
     return cal.calendarList.list(params);
 }
 

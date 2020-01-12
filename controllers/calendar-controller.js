@@ -27,14 +27,10 @@ function listCal(userID, syncedOnly = false, importCal = true) {
 
                     importCalToMongo(userID, syncToken)
                         .then(result => resolve(Calendar.find(calendarFilter)))
-                        .catch(err => {
-                            console.log(err);
-                            reject(err);
-                        })
+                        .catch(err => { reject(err); })
                 } else resolve(calendars);
             })
             .catch(err => {
-                console.log(err);
                 reject({ status: 500, message: err });
             });
     });
@@ -57,7 +53,6 @@ function importCalToMongo(userID, storedSyncToken = null) {
                     Promise.all(handleCalendarList(userID, calendarList, storedSyncToken))
                         .then(calendars => resolve(1))
                         .catch(err => {
-                            console.log(err);
                             reject({
                                 status: 500,
                                 message: "Could not save Google Calendars"
@@ -66,7 +61,6 @@ function importCalToMongo(userID, storedSyncToken = null) {
                 } else resolve(1);
             })
             .catch(err => {
-                console.log("ERROR FROM LINE 74", err);
                 // if the token is expired, perform a full sync!
                 if (err.status == 410) {
                     gcalController.listCal().then((calendarListResult) => {
@@ -75,7 +69,6 @@ function importCalToMongo(userID, storedSyncToken = null) {
                                 resolve(calendars);
                             })
                             .catch(err => {
-                                console.log(err);
                                 reject({
                                     status: 500,
                                     message: "Could not save Google Calendars"
@@ -162,7 +155,6 @@ function changeSync(_id, sync = false) {
                             resolve(`Calendar ${cal.summary} is now ${syncedText}`)
                         })
                         .catch(err => {
-                            console.log(err);
                             reject({ 
                                 status: 500, 
                                 message: `Calendar ${cal.summary} could not be ${syncedText}.` 
@@ -170,14 +162,12 @@ function changeSync(_id, sync = false) {
                         })
                 })
                     .catch(err => {
-                        console.log(err);
                         reject({ 
                             status: 500, 
                             message: `Calendar ${cal.summary} could not be ${syncedText}.` 
                         });
                     })
             }).catch(err => {
-                console.log(err);
                 reject({ status: 404, message: "Could not find the specified calendar" });
             })
 

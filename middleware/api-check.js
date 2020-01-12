@@ -45,7 +45,6 @@ const isValidCalbiticaJWT = (req, res, next) => {
                     finalResponse = data;
                 }
 
-                console.log("FINAL RESPONSE IS:", finalResponse)
                 // Express 4.17: Use apply(), not call()
                 // also "this" is an empty obj lmao
                 jsonFunc.call(res, finalResponse);

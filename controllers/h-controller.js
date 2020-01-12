@@ -197,60 +197,6 @@ function saveSettings(body) {
     );
 }
 
-// function importToMongo(type = null, userID) {
-//     return new Promise((resolve, reject) => {
-//         getComplete()
-//             .then(axiosCompleteResp => {
-//                 let completed = axiosCompleteResp.data;
-
-//                 if (completed == undefined || axiosCompleteResp.status != 200) {
-//                     reject({
-//                         status: axiosCompleteResp.status,
-//                         message: "Could not get completed Habitica items"
-//                     });
-//                 }
-
-//                 getIncomplete(type)
-//                     .then(response => {
-//                         let d = response.data;
-//                         if (d == undefined || response.status != 200) {
-//                             reject({
-//                                 status: response.status,
-//                                 message: "Could not get incomplete Habitica items"
-//                             });
-//                         }
-
-//                         // Don't support rewards for now
-//                         let incomplete = d.data.filter(item => {
-//                             return item.type != "reward"
-//                                 && item.id != null // deleted items in Habitica have null ID
-//                         });
-
-//                         habiticaImporter(incomplete.concat(completed.data), userID)
-//                             .then((result) => { resolve(result); })
-//                             .catch(err => {
-//                                 reject({ status: 500, message: err })
-//                             });
-
-//                     }).catch(err => {
-//                         if (error.response) {
-//                             reject({ status: err.response.status, message: err.message });
-//                         } else {
-//                             console.log('Error', error.message);
-//                             reject({ status: 500, message: err.message });
-//                         }
-//                     })
-//             }).catch(error => {
-//                 if (error.response) {
-//                     reject({ status: err.response.status, message: err.message });
-//                 } else {
-//                     console.log('Error', error.message);
-//                     reject({ status: 500, message: err.message });
-//                 }
-//             })
-//     });
-// }
-
 let habiticaController = {
     saveSettings,
     getIncomplete,
@@ -260,8 +206,7 @@ let habiticaController = {
     respondToQuest,
     toggleSleep,
     processStats,
-
-    // importToMongo,
+    
     saveToHabitica,
     updateInHabitica,
     deleteInHabitica,

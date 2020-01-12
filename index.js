@@ -8,26 +8,11 @@ const mongoose = require('mongoose'); // mongoose
 
 // Import route files
 const api = require('./routes/api/index');
-const mvc = require('./routes/mvc/index');
 
 const apiErrorHandler = require('./middleware/api-error');
 
 // Setup app, static assets, view engine, cookie
 let app = express();
-app.use(express.static('public'));
-app.set('view engine', 'ejs');
-app.use(cookieSession({
-    name: 'calbitica',
-    keys: [process.env.COOKIE_KEY],
-
-    // Cookie Options
-    cookie: {
-        secure: true,
-        httpOnly: true,
-        domain: process.env.DOMAIN,
-        maxAge: 10 * 24 * 60 * 60 * 1000 // 10 days
-    }
-}));
 
 // connect to mongodb
 mongoose.connect(process.env.MONGO_URI,
@@ -40,11 +25,6 @@ mongoose.connect(process.env.MONGO_URI,
         console.log('Successfully connected to MongoDB')
     }
 );
-
-// Frontend portion
-app.use('/', mvc.dashboard);
-app.use('/auth', mvc.auth);
-app.use('/settings', mvc.settings);
 
 // API portion
 // Accept JSON only

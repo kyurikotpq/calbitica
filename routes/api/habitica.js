@@ -23,7 +23,6 @@ router.get('/sync', [apiCheck, habiticaCheck], (req, res) => {
             res.status(200).json(result);
         })
         .catch(err => {
-            console.log(err);
             res.status(err.status).json({ message: err.message });
         });
 });
@@ -39,7 +38,6 @@ router.get('/profile', [apiCheck, habiticaCheck], (req, res) => {
             res.status(200).json(profile);
         })
         .catch(err => {
-            console.log(err);
             res.status(err.status).json({ message: err.message });
         });
 });
@@ -57,7 +55,6 @@ router.post('/quest', [apiCheck, habiticaCheck], (req, res) => {
             res.status(200).json(quest);
         })
         .catch(err => {
-            console.log(err);
             res.status(err.status).json({ message: err.message });
         })
 });
@@ -69,7 +66,6 @@ router.get('/sleep', [apiCheck, habiticaCheck], (req, res) => {
     habiticaController.toggleSleep()
         .then(result => res.status(200).json(result))
         .catch(err => {
-            console.log(err);
             res.status(err.status).json({ message: err.message });
         })
 })

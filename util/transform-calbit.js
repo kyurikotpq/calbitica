@@ -10,7 +10,6 @@
  * @param {ObjectID} userID 
  */
 function prepMVCDataForMongo(body, userID = null) {
-    console.log("PREPPING FROM MVC DATA ");
     let start = {},
         end = {};
 
@@ -98,7 +97,6 @@ function prepHDataForMongo(item, userID = null) {
  * @param {ObjectID} userID 
  */
 function prepGCalDataForMongo(item, userID = null) {
-    console.log("PREPPING FROM GCAL DATA ");
     let data = {
         summary: item.summary,
         start: item.start,

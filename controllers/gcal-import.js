@@ -31,7 +31,6 @@ function listEventsFromGCal(calendars, startDate, endDate, fullSync = false) {
                 : (!c.nextSyncToken.events || !c.nextSyncToken.events.token)
                     ? null : c.nextSyncToken.events.token;
 
-            console.log("fullsync", fullSync, "next sync token", nextSyncToken)
             gcalController.listEvents(c.googleID, nextSyncToken, startDate, endDate)
                 .then(eventListResult => {
                     // store the nextSyncToken
@@ -45,12 +44,10 @@ function listEventsFromGCal(calendars, startDate, endDate, fullSync = false) {
                             }));
                         })
                         .catch(err => {
-                            console.log(err);
                             resolve({ status: 500, message: err }); // MongoDB err
                         });
                 })
                 .catch(err => {
-                    console.log(err);
                     resolve({
                         status: err.code,
                         message: err.errors[0].message,
@@ -94,7 +91,6 @@ function listSomeCalbitsAndCompare(events, userID) {
                 resolve(compareItems(events, calbits, userID));
             })
             .catch(err => {
-                console.log(err);
                 reject(err);
             });
     })
@@ -113,7 +109,6 @@ function listAllCalbitsAndCompare(events, userID) {
                 resolve(compareItems(events, calbits, userID));
             })
             .catch(err => {
-                console.log(err);
                 reject(err);
             });
     })
@@ -134,7 +129,6 @@ function compareItems(events, calbits, userID) {
         });
 
         let deletedPromises = [];
-        console.log("NOT IN CALBIT ARR", notInCalbitArr);
         notInCalbitArr.forEach(c => {
             deletedPromises.push(calbitController.deleteInMongo(c._id));
         });
@@ -160,9 +154,7 @@ function compareItems(events, calbits, userID) {
                             createdPromises.push(calbitController.createCalbit(gcalItem, userID, 'gcal'))
                         }
                     })
-                    .catch(err => {
-                        console.log(err)
-                    });
+                    .catch(err => { });
             }
         });
 
@@ -230,7 +222,6 @@ function gcalImporter(userID, fullSync, firstDate = new Date(), lastDate = null)
                                             ? secondResponse.failure[0].message
                                             : secondResponse.database[0];
 
-                                        console.log("SECOND RESP ERROR LINE 203", secondResponse);
                                         reject({ status: 500, message });
                                     } else {
                                         let finalArr = secondResponse.success.concat(response.success);
@@ -241,7 +232,6 @@ function gcalImporter(userID, fullSync, firstDate = new Date(), lastDate = null)
                                     }
                                 });
                         } else if (response.database.length > 0) {
-                            console.log("DB ERROR LINE 211", response.database);
                             reject({ status: 500, message: response.database[0] });
                         } else {
                             // no errors - return the successful calendar events
@@ -253,7 +243,6 @@ function gcalImporter(userID, fullSync, firstDate = new Date(), lastDate = null)
                     })
             })
             .catch(err => {
-                console.log(err);
                 reject({ status: err.code, message: err.errors[0].message });
             })
     });
