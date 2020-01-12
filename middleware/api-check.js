@@ -17,7 +17,7 @@ const authController = require('../controllers/auth-controller');
  * @param {*} next 
  */
 const isValidCalbiticaJWT = (req, res, next) => {
-    let internal = req.session.user;
+    let internal = (!req.session) ? false : req.session.user;
     let external = req.header("Authorization") || 'lmao';
     let jwt = (!internal) ? external.replace("Bearer ", '') : internal;
 

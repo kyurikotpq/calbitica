@@ -26,6 +26,10 @@ mongoose.connect(process.env.MONGO_URI,
     }
 );
 
+app.get("/", (req, res) => {
+    res.status(200).json({ "message": "lmao" })
+});
+
 // API portion
 // Accept JSON only
 app.use(express.json())
