@@ -21,8 +21,8 @@ function signCalbiticaJWT(payload, userID) {
         issuer: process.env.CALBITICA_ID,
         audience: `${userID}.${process.env.CALBITICA_SUBDOMAIN_ID}`,
         subject: userID,
-        expiresIn: DateUtil.getMs('d', 10) // expires in 10 days
-        // expiresIn: 1000 // expires in 1s
+        expiresIn: "10d" // expires in 10 days
+        // expiresIn: 60 // expires in 60s
     };
 
     // create a token
@@ -43,11 +43,10 @@ function verifyCalbiticaJWT(token) {
         audience: audRegex,
     };
 
-    console.log("JWT: ", token);
-    // You can't turn this into a promise :(
+    console.log("JWT: ", token)
     return new Promise((resolve, reject) => {
-        jwt.verify(token, process.env.COOKIE_KEY,
-            verifyOptions,
+        jwt.verify(token, process.env.COOKIE_KEY, verifyOptions,
+            // You can't turn this into a promise :(
             function (err, decoded) {
                 let userID = '';
                 if (decoded)
@@ -55,9 +54,7 @@ function verifyCalbiticaJWT(token) {
 
                 if (err || decoded.aud != `${userID}.${process.env.CALBITICA_SUBDOMAIN_ID}`) {
                     console.log("JWT DECODING ERROR", err);
-                    console.log("ORIGINAL TOKEN", token);
-                    console.log("VERIFY OPTIONS", verifyOptions);
-                    let reason = !err ? "Invalid audience and subject" : err;
+                    let reason = !err ? "Invalid audience and subject" : err.message;
 
                     reject(reason);
                     return;
@@ -66,7 +63,7 @@ function verifyCalbiticaJWT(token) {
                 // Check expiry and resolve decoded JWT
                 // with a new JWT :)
                 let finalResponse = { decoded };
-                if(isExpiring(decoded.exp)) {
+                if (isExpiring(decoded.exp)) {
                     let payload = {
                         access_token: decoded.access_token,
                         refresh_token: decoded.refresh_token,
@@ -76,6 +73,9 @@ function verifyCalbiticaJWT(token) {
                     };
                     finalResponse.newJWT = signCalbiticaJWT(payload, userID);
                     finalResponse.newDecodedJWT = payload;
+
+                    console.log("TRYNA NEW JWT: ", finalResponse);
+
                 }
 
                 resolve(finalResponse);
@@ -83,15 +83,15 @@ function verifyCalbiticaJWT(token) {
     })
 }
 
+/**
+ * Is the JWT expiring soon?
+ * @param {Number} exp Number of SECONDS since the epoch
+ */
 function isExpiring(exp) {
     let now = new Date().getTime();
     let oneDayInMs = DateUtil.getMs("h", 24);
 
-    return (exp - now >= oneDayInMs);
-}
-
-function extendToken(token) {
-
+    return ((exp * 1000) - now <= oneDayInMs);
 }
 
 module.exports = { signCalbiticaJWT, verifyCalbiticaJWT };

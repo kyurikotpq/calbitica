@@ -19,11 +19,9 @@ const authCheckMustLogin = (req, res, next) => {
             .then(result => {
                 authController.setHnGCredentials(result.decoded)
 
-                if (!result.newJWT) {
-                    req.body.decodedJWT = result.decoded;
-                } else {
+                req.body.decodedJWT = result.decoded;
+                if (result.newJWT) {
                     req.session.user = result.newJWT;
-                    req.body.decodedJWT = result.newDecodedJWT;
                 }
 
                 next();

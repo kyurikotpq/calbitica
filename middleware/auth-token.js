@@ -4,7 +4,6 @@
  * - retrieve access and [refresh tokens + store in DB]
  */
 
-const oauth2Client = require('../config/google-setup');
 const authController = require('../controllers/auth-controller');
 
 /**
@@ -30,9 +29,6 @@ const retrieveTokens = (req, res, next) => {
         .then(jwt => {
             // store the JWT in the cookies
             req.session.user = jwt;
-
-            
-
             next();
         })
         .catch(err => next(err));

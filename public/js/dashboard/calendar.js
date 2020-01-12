@@ -1,15 +1,31 @@
+// Keep track of the list of calendars
 let CALENDARARR = null;
 
 /**
  * v3 - helper functions
  */
+
+/**
+ * Convert Date string to suitable format
+ * @param {String} str any MomentJS-parseable format
+ */
 function toYmdThisZ(str) {
     return moment(str).utc().toISOString();
 }
 
+/**
+ * Calculate a suitable height of the calendar
+ */
 function getCalendarHeight() {
     return $(window).height() - $(".navbar").height() - (2 * 32);
 }
+
+/**
+ * Calculate + set the modal position
+ * and show it :)
+ * @param {*} day 
+ * @param {*} jsEvent 
+ */
 function openModal(day, jsEvent) {
     let columnWidth = $('.fc-axis.fc-time').width();
     let positionX = (day < 2) ? `left+${columnWidth}px` : `right-${columnWidth}px`;
@@ -37,6 +53,11 @@ function openModal(day, jsEvent) {
     }, 50);
 }
 
+/**
+ * Transform data from API to 
+ * suit the format of FullCalendar
+ * @param {*} event 
+ */
 function transformData(event) {
     return {
         _id: event._id,
@@ -60,22 +81,30 @@ function transformData(event) {
         completed: event.completed,
     };
 }
+
+/**
+ * Hide event details, show the event form
+ */
 function hideDetails() {
-    // Hide the details, show the form
     $("#myModal .event-details").hide();
     $("#myModal .modal-header").hide();
     $("#myModal .event-form").show();
     $("#myModal + .ui-dialog-buttonpane").show();
 }
 
+/**
+ * Show event details, hide the event form
+ */
 function showDetails() {
-    // Hide the form, show the details
     $("#myModal .event-form").hide();
     $("#myModal + .ui-dialog-buttonpane").hide();
     $("#myModal .event-details").show();
     $("#myModal .modal-header").show();
 }
 
+/**
+ * Refetch events from API and reset the form values
+ */
 function refreshCalendar() {
     $('#main-calendar').fullCalendar('refetchEvents');
 
@@ -92,32 +121,6 @@ function refreshCalendar() {
     $("#myModal #event-form-allDay").val("");
 }
 
-
-/**
- * Ajax functions
- */
-
-/**
- * Delete an event!
- */
-function deleteEvent() {
-    let id = $("#myModal #event-form-_id").val();
-    $.ajax({
-        url: `/api/calbit/${id}`,
-        method: "delete",
-    })
-        .done(result => {
-            $("#myModal").dialog("close");
-            refreshCalendar();
-            createToast("success", result.message);
-        })
-        .fail(err => {
-            console.log(err);
-            // Make a toast
-            createToast('danger', err.message);
-        })
-}
-
 /**
  * Interaction functions
  */
@@ -131,6 +134,7 @@ function deleteEvent() {
 function selectSection(start, end, jsEvent) {
     let allDay = !start.hasTime();
 
+    // Set form values
     $("#myModal #event-form-startDate").val(start.format("DD/MM/YYYY"));
     $("#myModal #event-form-startTime").val(start.format("HH:mm"));
     $("#myModal #event-form-endDate").val(end.format("DD/MM/YYYY"));
@@ -140,45 +144,20 @@ function selectSection(start, end, jsEvent) {
     $("#myModal #event-form-title").val("");
     $("#myModal #event-form-location").val("");
 
+    // Hide event details
     hideDetails();
 
+    // Open the modal
     openModal(start.day(), jsEvent);
-    // $("#myModal .modal-title").text("Adding a new Event");
-    // $("#myModal .modal-body").html('<p id="fields"></p>' +
-    //     'Title: <input type="text" id="title"><br/><br/>' +
-    //     'Start Date: <input type="date" id="startDate" value="' + $.fullCalendar.formatDate(start, "YYYY-MM-DD") + '">' +
-    //     '\tStart Time: <input type="time" id="startTime" value="' + $.fullCalendar.formatDate(start, "HH:mm") + '"><br/><br/>' +
-    //     'End Date: <input type="date" id="endDate" value="' + $.fullCalendar.formatDate(end, "YYYY-MM-DD") + '">' +
-    //     '\tEnd Time: <input type="time" id="endTime" value="' + $.fullCalendar.formatDate(end, "HH:mm") + '"><br/><br/>' +
-    //     'Choose your Color: <select id="color">' +
-    //     '<option value="">-Select Color-</option>' +
-    //     '<option value="#E68800" style="color: #E68800; background-color: black;"">Orange 1</option>' +
-    //     '<option value="#FFD699" style="color: #FFD699; background-color: black;"">Orange 2</option>' +
-    //     '<option value="#00D3E6" style="color: #00D3E6; background-color: black;"">Teal 1</option>' +
-    //     '<option value="#99F6FF" style="color: #99F6FF; background-color: black;"">Teal 2</option>' +
-    //     '<option value="#0088E6" style="color: #0088E6; background-color: black;"">Blue 1</option>' +
-    //     '<option value="#99D5FF" style="color: #99D5FF; background-color: black;"">Blue 2</option>' +
-    //     '<option value="#8600E6" style="color: #8600E6; background-color: black;"">Purple 1</option>' +
-    //     '<option value="#D499FF" style="color: #D499FF; background-color: black;"">Purple 2</option>' +
-    //     '<option value="#E600AC" style="color: #E600AC; background-color: black;"">Pink 1</option>' +
-    //     '<option value="#FF99E6" style="color: #FF99E6; background-color: black;"">Pink 2</option>' +
-    //     '<option value="#E60000" style="color: #E60000; background-color: black;"">Red 1</option>' +
-    //     '<option value="#FF9999" style="color: #FF9999; background-color: black;"">Red 2</option>' +
-    //     '<option value="#12E600" style="color: #12E600; background-color: black;"">Green 1</option>' +
-    //     '<option value="#A1FF99" style="color: #A1FF99; background-color: black;"">Green 2</option>' +
-    //     '</select>');
-    // $("#myModal .modal-footer").html("<button class='modifyEvents' id='add'>&nbsp&nbspOk&nbsp&nbsp</button>" +
-    //     "<button class='modifyEvents' id='delete'>Cancel</button>");
-
-    // $('.modifyEvents').on("click", function (e) {
-    //     if (e.target.id == "add") {
-
-    //     } else {
-    //         $('#myModal').modal('toggle');
-    //     }
-    // })
 }
 
+/**
+ * Called when an existing event is selected
+ * @param {*} event 
+ * @param {*} jsEvent 
+ * @param {*} view 
+ * @param {*} resourceObj 
+ */
 function clickOnEvent(event, jsEvent, view, resourceObj) {
     let start = event.start,
         end = event.end,
@@ -223,133 +202,45 @@ function clickOnEvent(event, jsEvent, view, resourceObj) {
     $("#myModal #event-form-_id").val(event._id);
     $("#myModal #event-form-googleID").val(event.googleID);
     $("#myModal #event-form-allDay").val(allDay);
-    
 
+    // show the event details
     showDetails();
 
     openModal(event.start.day(), jsEvent);
-    // setCalendarModalPosition(calEvent.start._d.toString());
-
-    // $("#myModal .modal-title").text("Title: " + calEvent.title);
-    // $("#myModal .modal-body").html("Start From : " + moment(calEvent.start).format("MMMM Do YYYY, h:mm a") +
-    //     "<br /><br />End From : " + moment(calEvent.end).format("MMMM Do YYYY, h:mm a"));
-    // $("#myModal .modal-footer").html("<button class='modifyEvents' id='edit'>Editing?</button>" +
-    //     "<button class='modifyEvents' id='delete'>Deleting?</button>");
-
-    // $('.modifyEvents').on("click", function (e) {
-    //     if (e.target.innerHTML == "Editing?") {
-    //         $("#myModal .modal-title").text("Editing Event");
-    //         // $("#myModal .modal-body").html('<p id="fields"></p>' +
-    //         //     'Title: <input type="text" id="title" value="' + calEvent.title + '"><br/><br/>' +
-    //         //     'Start Date: <input type="date" id="startDate" value="' + moment(calEvent.start).format("YYYY-MM-DD") + '">' +
-    //         //     '\tStart Time: <input type="time" id="startTime" value="' + moment(calEvent.start).format("HH:mm") + '"><br/><br/>' +
-    //         //     'End Date: <input type="date" id="endDate" value="' + moment(calEvent.end).format("YYYY-MM-DD") + '">' +
-    //         //     '\tEnd Time: <input type="time" id="endTime" value="' + moment(calEvent.end).format("HH:mm") + '"><br/><br/>' +
-    //         //     'Choose your Color: <select id="color" value="' + calEvent.color + '">' +
-    //         //     '<option value="">-Select Color-</option>' +
-    //         //     getCalendarColor(calEvent.color) +
-    //         //     '</select>');
-    //         // $("#myModal .modal-footer").html("<button class='modifyEvents' id='edit'>&nbsp&nbspOk&nbsp&nbsp</button>" +
-    //         //     "<button class='modifyEvents' id='delete'>Cancel</button>");
-
-    //         $('.modifyEvents').on("click", function (e) {
-    //             if (e.target.id == "edit") {
-    //                 var title = document.getElementById('title').value;
-
-    //                 var startDate = document.getElementById('startDate').value;
-    //                 var startTime = document.getElementById('startTime').value;
-    //                 var startDateTime = startDate.concat("T" + startTime);
-
-    //                 var endDate = document.getElementById('endDate').value;
-    //                 var endTime = document.getElementById('endTime').value;
-    //                 var endDateTime = endDate.concat("T" + endTime);
-
-    //                 var color = document.getElementById("color").value;
-
-    //                 if (title == "" || startDate == "" || startTime == "" || endDate == "" || endTime == "" || color == "") {
-    //                     $('#fields').show();
-    //                     $('#fields').text("Please fill in all the fields");
-    //                 } else if (moment(startDateTime).format("YYYY-MM-DD HH:mm:ss") == "Invalid date" || moment(endDateTime).format("YYYY-MM-DD HH:mm:ss") == "Invalid date") {
-    //                     $('#fields').show();
-    //                     $('#fields').text("Invalid Date and Time");
-    //                 } else if (moment(startDateTime).format("YYYY-MM-DD HH:mm:ss") >= moment(endDateTime).format("YYYY-MM-DD HH:mm:ss")) {
-    //                     $('#fields').show();
-    //                     $('#fields').text("Start Date&Time cannot be more than or equal to End Date&Time");
-    //                 } else {
-    //                     var id = calEvent._id;
-    //                     $.ajax({
-    //                         url: "/api/calbit/" + id,
-    //                         method: "put",
-    //                         data: {
-    //                             _id: id,
-    //                             title: title,
-    //                             start: moment(startDateTime).toDate(),
-    //                             end: moment(endDateTime).toDate(),
-    //                             color: color
-    //                         },
-    //                         success: function () {
-    //                             $('#myModal').modal('toggle');
-    //                             alert("Updated Successfully");
-    //                             $('#main-calendar').fullCalendar('refetchEvents');
-    //                         }
-    //                     }).fail(
-    //                         function (err) {
-    //                             alert(err.responseText);
-    //                         }
-    //                     )
-    //                 }
-    //             } else {
-    //                 $('#myModal').modal('toggle');
-    //             }
-    //         })
-    //     } else {
-    //         //When Deleting
-
-    //         var id = calEvent._id;
-    //         $.ajax({
-    //             url: "/api/calbit/" + id,
-    //             method: "delete",
-    //             data: { _id: id },
-    //             success: function () {
-    //                 $('#myModal').modal('toggle');
-    //                 alert("Deleted Successfully");
-    //                 $('#main-calendar').fullCalendar('refetchEvents');
-    //             }
-    //         }).fail(
-    //             function (err) {
-    //                 alert(err.responseText);
-    //             }
-    //         )
-    //     }
-    // })
 }
 
-function renderEvent(event, element, view) {
-    let diff = event.end.diff(event.start, "minutes");
-    
-    let start = (diff <= 30) ? event.start.format("ha") : event.start.format("h"),
-        startWithA = event.start.format("HH:mm A"),
-        end = event.end.format("ha"),
-        endWithA = event.end.format("HH:mm A"),
-        allDay = !event.start.hasTime();
+/**
+ * Ajax functions
+ */
 
-    let markup = `<div class="fc-content">
-                    <div class="fc-title">${event.title}</div>`;
-    if (!allDay) {
-        markup += `<div class="fc-time" data-start="${start}" data-full="${startWithA} - ${endWithA}">
-                        <span>${start} - ${end}</span>
-                    </div>`;
-    }
-    markup += "</div>";
-    if (!allDay)
-        markup += `<div class="fc-bg"></div>`;
-
-    markup += `<div class="fc-resizer fc-end-resizer"></div>`;
-
-    element[0].innerHTML = markup;
-    return element;
+/**
+ * Delete an event!
+ */
+function deleteEvent() {
+    let id = $("#myModal #event-form-_id").val();
+    $.ajax({
+        url: `/api/calbit/${id}`,
+        method: "delete",
+    })
+        .done(result => {
+            $("#myModal").dialog("close");
+            refreshCalendar();
+            createToast("success", result.message);
+        })
+        .fail(err => {
+            console.log(err);
+            // Make a toast
+            createToast('danger', err.message);
+        })
 }
 
+/**
+ * Called when event is resized & dragged.
+ * 
+ * Kinda falls under interaction functions as well
+ * but there's an ajax call :)
+ * @param {*} event 
+ */
 function modifyEvent(event) {
     let allDay = !event.start.hasTime(),
         start = (allDay)
@@ -384,6 +275,9 @@ function modifyEvent(event) {
         })
 }
 
+/**
+ * Called when saving a new or existing event (triggered by button press)
+ */
 function saveEvent() {
     let title = $('#event-form-title').val();
     let allDay = $('#event-form-allDay').val() == 'true';
@@ -456,12 +350,48 @@ function saveEvent() {
 }
 
 /**
+ * MISCELLANEOUS
+ */
+
+/**
+ * Modify the HTML markup of each event
+ * @param {*} event 
+ * @param {*} element 
+ * @param {*} view 
+ */
+function renderEvent(event, element, view) {
+    let diff = event.end.diff(event.start, "minutes");
+
+    let start = (diff <= 30) ? event.start.format("ha") : event.start.format("h"),
+        startWithA = event.start.format("HH:mm A"),
+        end = event.end.format("ha"),
+        endWithA = event.end.format("HH:mm A"),
+        allDay = !event.start.hasTime();
+
+    let markup = `<div class="fc-content">
+                    <div class="fc-title">${event.title}</div>`;
+    if (!allDay) {
+        markup += `<div class="fc-time" data-start="${start}" data-full="${startWithA} - ${endWithA}">
+                        <span>${start} - ${end}</span>
+                    </div>`;
+    }
+    markup += "</div>";
+    if (!allDay)
+        markup += `<div class="fc-bg"></div>`;
+
+    markup += `<div class="fc-resizer fc-end-resizer"></div>`;
+
+    element[0].innerHTML = markup;
+    return element;
+}
+
+/**
  * Initialise calendars on load
  */
 $(document).ready(function () {
     CALENDARARR = JSON.parse($('#calendarJSON').html());
 
-    // Event listeners on slepe buttons
+    // Event listeners on sleep buttons
     $('#sleep-btn').on("click", toggleSleep)
 
     $('#sidebar-calendar').fullCalendar({

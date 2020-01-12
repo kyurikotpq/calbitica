@@ -3,9 +3,10 @@
  */
 const router = require('express').Router();
 const apiCheck = require('../../middleware/api-check');
+const habiticaCheck = require('../../middleware/h-check');
 const calbitController = require('../../controllers/calbit-controller');
 const gcalImporter = require('../../controllers/gcal-import');
-const habitica = require('../../controllers/h-controller');
+const habiticaController = require('../../controllers/h-controller');
 
 /**
  * [GET] Get all Calbits belonging to the user
@@ -41,22 +42,22 @@ router.get('/', apiCheck, function (req, res) {
 /**
  * [POST] Save a Calbit to Habitica and then to MongoDB
  */
-router.post('/', apiCheck, function (req, res) {
+router.post('/', [apiCheck, habiticaCheck], function (req, res) {
     let data = req.body,
-        jwt = data.decodedJWT;
+        decodedJWT = data.decodedJWT;
 
     delete data.decodedJWT;
 
-    habitica.saveToHabitica({
+    habiticaController.saveToHabitica({
         text: data.title,
         type: 'todo' // add support for habits & dailies in future
     }).then((axiosResponse) => {
         let hResponse = axiosResponse.data;
         if (hResponse.success) {
             data.habiticaID = hResponse.data.id;
-            calbitController.createCalbit(data, jwt.sub, 'mvc')
+            calbitController.createCalbit(data, decodedJWT.sub, 'mvc')
                 .then(resultCode => {
-                    res.status(200).json({ message: `Event ${data.title} created.`});
+                    res.status(200).json({ message: `Event ${data.title} created.` });
                 })
                 .catch(err => {
                     res.status(500).json({ message: err });
@@ -72,14 +73,14 @@ router.post('/', apiCheck, function (req, res) {
  * [PUT] Update the completion status of the
  * specified Calbit
  */
-router.put('/:id/complete', apiCheck, (req, res) => {
+router.put('/:id/complete', [apiCheck, habiticaCheck], (req, res) => {
     let id = req.params.id;
     let status = !req.body.status ? false : req.body.status == 'true';
     let complete = (status) ? "completed" : "incomplete";
 
     calbitController.updateCompletion(id, status)
         .then((result) => {
-            res.status(200).json({ 
+            res.status(200).json({
                 message: `${result.summary} is now ${complete}`,
                 stats: result.stats
             });
@@ -94,7 +95,7 @@ router.put('/:id/complete', apiCheck, (req, res) => {
  * [PUT] Update the specified Calbit
  * @param {id} String
  */
-router.put('/:id', apiCheck, function (req, res) {
+router.put('/:id', [apiCheck, habiticaCheck], function (req, res) {
     let id = req.params.id;
     let data = req.body;
     calbitController.updateCalbit(id, data, 'mvc')
@@ -111,7 +112,7 @@ router.put('/:id', apiCheck, function (req, res) {
 /**
  * [DELETE] Delete the specified Calbit
  */
-router.delete('/:id', apiCheck, function (req, res) {
+router.delete('/:id', [apiCheck, habiticaCheck], function (req, res) {
     let id = req.params.id;
     calbitController.deleteInMongo(id, true)
         .then((event) => {

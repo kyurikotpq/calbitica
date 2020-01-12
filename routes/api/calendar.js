@@ -10,11 +10,10 @@ const apiCheck = require('../../middleware/api-check');
  * [GET] Get all of the user's GCals from MongoDB
  * includes non-synced calendars
  * 
- * NEEDS DOUBLE CHECKING
  */
 router.get('/', apiCheck, (req, res) => {
-    let jwt = req.body.decodedJWT;
-    calendarController.listCal(jwt.sub)
+    let decodedJWT = req.body.decodedJWT;
+    calendarController.listCal(decodedJWT.sub)
         .then(calendars => {
             res.status(200).json(calendars);
         })
@@ -33,8 +32,8 @@ router.get('/import', apiCheck, (req, res) => {
     let lastDate = !req.body.lastDate ? null : req.body.lastDate;
     let fullSync = !req.query.fullSync ? true : req.query.fullSync;
 
-    let jwt = req.body.decodedJWT;
-    gcalImporter(jwt.sub, fullSync, firstDate, lastDate)
+    let decodedJWT = req.body.decodedJWT;
+    gcalImporter(decodedJWT.sub, fullSync, firstDate, lastDate)
         .then(result => {
             res.status(200).json(result);
         })

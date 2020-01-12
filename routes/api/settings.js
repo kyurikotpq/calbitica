@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const habitica = require('../../controllers/h-controller');
+const habiticaController = require('../../controllers/h-controller');
 const apiCheck = require('../../middleware/api-check');
 const JWTUtil = require('../../util/jwt');
 
@@ -10,7 +10,7 @@ const JWTUtil = require('../../util/jwt');
 router.post('/habitica', apiCheck, (req, res) => {
     let decodedJWT = req.body.decodedJWT;
     
-    habitica.saveSettings(req.body)
+    habiticaController.saveSettings(req.body)
         .then(user => {
             if(user._id.toString() == decodedJWT.sub) {
                 let data = {
@@ -22,7 +22,7 @@ router.post('/habitica', apiCheck, (req, res) => {
                 };
 
                 // resign the JWT
-                let jwt = JWTUtil.signCalbiticaJWT(data, decodedJWT.sub); // MongoDB ID
+                let jwt = JWTUtil.signCalbiticaJWT(data, decodedJWT.sub);
 
                 if(req.session.user) // call is from MVC!
                     req.session.user = jwt;

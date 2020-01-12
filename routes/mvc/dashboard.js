@@ -14,24 +14,23 @@ router.get('/', authCheck.isLoggedin, (req, res) => {
 });
 
 router.get('/dashboard', [authCheck.mustLogin], (req, res) => {
-    let jwt = req.body.decodedJWT;
+    let decodedJWT = req.body.decodedJWT;
     let data = {
-        user: jwt.profile,
+        user: decodedJWT.profile,
         timeList: DateUtil.halfHourIntervals(),
         profile: null,
         calendars: null,
     };
     console.log("DATA IN THE ROUTE FUNCTION", data);
     
-    habiticaController.getProfile(jwt.habiticaID)
+    habiticaController.getProfile(decodedJWT.habiticaID)
         .then(profile => data.profile = profile)
         .catch(err => {
             // API key not set up or something
             console.log("Habitica Profile error", err);
         })
         .finally(() => {
-            console.log("getting gcal")
-            calendarController.listCal(jwt.sub)
+            calendarController.listCal(decodedJWT.sub)
                 .then(calendars => data.calendars = calendars)
                 .catch(err => {
                     // Calendar CMI

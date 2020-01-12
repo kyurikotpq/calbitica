@@ -138,7 +138,8 @@ function verifyGIDToken(idToken) {
             idToken,
             audience: [
                 process.env.GCLIENT_ID, // MVC
-                process.env.GCLIENT_iOS_ID, // iOS
+                process.env.GCLIENT_IOS_ID, // iOS
+                process.env.GCLIENT_ANDROID_ID, // Android
             ],
         })
             .then(ticket => {
@@ -192,7 +193,6 @@ function tokensFromAuthCode(code) {
 
 let authController = {
     verifyGIDToken,
-    userExistsInMongo,
     setHnGCredentials,
     tokensFromAuthCode
 }

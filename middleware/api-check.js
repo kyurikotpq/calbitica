@@ -9,6 +9,7 @@
 const JWTUtil = require('../util/jwt');
 const authController = require('../controllers/auth-controller');
 
+
 /**
  * Is the Calbitica JWT provided valid?
  * @param {*} req 
@@ -24,11 +25,32 @@ const isValidCalbiticaJWT = (req, res, next) => {
         .then(result => {
             authController.setHnGCredentials(result.decoded)
 
-            if (!result.newJWT) {
-                req.body.decodedJWT = result.decoded;
-            } else {
-                req.body.decodedJWT = result.newDecodedJWT;
-            }
+            req.body.decodedJWT = result.decoded;
+
+            if (internal)
+                req.session.user = result.newJWT;
+
+            let jsonFunc = res.json;
+            res.json = (data) => {
+                // data: whatever data you passed during .json(xxx)
+                let finalResponse = {};
+
+                if(!internal) {
+                    finalResponse.data = data;
+    
+                    if (result.newJWT && !data.jwt) {
+                        finalResponse.jwt = result.newJWT;
+                    }
+                } else {
+                    finalResponse = data;
+                }
+
+                console.log("FINAL RESPONSE IS:", finalResponse)
+                // Express 4.17: Use apply(), not call()
+                // also "this" is an empty obj lmao
+                jsonFunc.call(res, finalResponse);
+            };
+
 
             next();
         })
