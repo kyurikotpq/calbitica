@@ -53,7 +53,6 @@ function verifyCalbiticaJWT(token) {
                     userID = decoded.sub;
 
                 if (err || decoded.aud != `${userID}.${process.env.CALBITICA_SUBDOMAIN_ID}`) {
-                    console.log("JWT DECODING ERROR", err);
                     let reason = !err ? "Invalid audience and subject" : err.message;
 
                     reject(reason);
