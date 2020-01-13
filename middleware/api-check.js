@@ -27,7 +27,7 @@ const isValidCalbiticaJWT = (req, res, next) => {
 
             req.body.decodedJWT = result.decoded;
 
-            if (internal)
+            if (internal && result.newJWT != undefined)
                 req.session.user = result.newJWT;
 
             let jsonFunc = res.json;
@@ -38,6 +38,9 @@ const isValidCalbiticaJWT = (req, res, next) => {
                 if(!internal) {
                     finalResponse.data = data;
     
+                    // If there's a new JWT,
+                    // and you're not passing back a JWT already
+                    // (from /api/settings)
                     if (result.newJWT && !data.jwt) {
                         finalResponse.jwt = result.newJWT;
                     }
