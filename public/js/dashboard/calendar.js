@@ -62,9 +62,9 @@ function transformData(event) {
     return {
         _id: event._id,
         id: event._id,
-        habiticaID: event.habiticaID,
         title: event.summary,
         description: event.description,
+        location: event.location,
         isDump: event.isDump,
         calendarID: event.calendarID,
         googleID: event.googleID,
@@ -115,7 +115,10 @@ function refreshCalendar() {
     $("#myModal #event-form-startTime").val("");
     $("#myModal #event-form-endDate").val("");
     $("#myModal #event-form-endTime").val("");
-    $("#myModal #event-form-calendarID").val("");
+
+    if (CALENDARARR.length > 0 && CALENDARARR[0].googleID != undefined)
+        $("#myModal #event-form-calendarID").val(CALENDARARR[0].googleID);
+
     $("#myModal #event-form-_id").val("");
     $("#myModal #event-form-googleID").text("");
     $("#myModal #event-form-allDay").val("");
@@ -217,21 +220,25 @@ function clickOnEvent(event, jsEvent, view, resourceObj) {
  * Delete an event!
  */
 function deleteEvent() {
-    let id = $("#myModal #event-form-_id").val();
-    $.ajax({
-        url: `/api/calbit/${id}`,
-        method: "delete",
-    })
-        .done(result => {
-            $("#myModal").dialog("close");
-            refreshCalendar();
-            createToast("success", result.message);
+    let confirm = prompt("Are you sure you want to delete the event?");
+
+    if (confirm) {
+        let id = $("#myModal #event-form-_id").val();
+        $.ajax({
+            url: `/api/calbit/${id}`,
+            method: "delete",
         })
-        .fail(err => {
-            console.log(err);
-            // Make a toast
-            createToast('danger', err.message);
-        })
+            .done(result => {
+                $("#myModal").dialog("close");
+                refreshCalendar();
+                createToast("success", result.message);
+            })
+            .fail(err => {
+                console.log(err);
+                // Make a toast
+                createToast('danger', err.message);
+            })
+    }
 }
 
 /**
@@ -251,10 +258,8 @@ function modifyEvent(event) {
             : toYmdThisZ(event.end.format("YYYY-MM-DD HH:mm:ss"));
 
     let data = {
-        _id: event._id,
         googleID: event.googleID,
         calendarID: event.calendarID,
-        title: event.title,
         allDay,
         start,
         end,
@@ -271,7 +276,7 @@ function modifyEvent(event) {
             refreshCalendar();
         })
         .fail((err) => {
-            createToast('danger', err.responseText);
+            createToast('danger', err.responseJSON.message);
         })
 }
 
@@ -300,7 +305,7 @@ function saveEvent() {
     let display = (calendar) ? calendar.sync : false;
 
     if (!title || !startDate || !startTime || !endDate || !endTime) {
-        alert("Please fill in the fields");
+        alert("Please fill all fields");
         return;
 
     } else if (moment(startDateTime).format("YYYY-MM-DD HH:mm:ss") == "Invalid date"
@@ -450,7 +455,11 @@ $(document).ready(function () {
     });
 
     $(".datepicker").datepicker({
-        dateFormat: "dd/mm/yy"
+        dateFormat: "dd/mm/yy",
+        defaultDate: 0,
+        dayNamesMin: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+        prevText: "←",
+        nextText: "→",
     });
 
     // Event listeners on calendar icons

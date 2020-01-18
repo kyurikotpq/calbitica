@@ -3,7 +3,7 @@
 // Modal event details elements
 .modal {
     .icon {
-        fill  : $fff;
+        fill        : $fff;
         margin-right: 5px;
     }
 
@@ -32,7 +32,6 @@
 
     // Modal Dialog Form elements
     .event-form {
-
         #event-form-title {
             width    : calc(100% - 6rem);
             font-size: 1.15rem;
@@ -41,6 +40,52 @@
         .calendar-icon {
             margin-bottom: 2rem;
             margin-left  : 2rem;
+        }
+    }
+}
+
+// jQuery datepicker
+.ui-datepicker {
+    background: $gray-1;
+    @include box-shadow;
+    padding: 1rem;
+
+    .ui-datepicker-header {
+        display        : flex;
+        justify-content: space-between;
+        flex-wrap      : wrap;
+    }
+
+    .ui-datepicker-next,
+    .ui-datepicker-prev {
+        cursor: pointer;
+    }
+
+    .ui-datepicker-title {
+        flex      : 1 0 100%;
+        text-align: center;
+        position  : relative;
+        top       : -1.25rem;
+        z-index   : -1;
+    }
+
+    .ui-datepicker-calendar {
+        text-align: center;
+    }
+
+    .ui-datepicker-current-day a.ui-state-active {
+        font-weight: bold;
+        color      : $yellow-3;
+    }
+
+    a.ui-state-default {
+        text-decoration: none;
+        color          : $gray-4;
+        padding        : .25rem;
+
+        &:hover {
+            color          : $blue-3;
+            text-decoration: underline;
         }
     }
 }

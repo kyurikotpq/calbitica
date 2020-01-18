@@ -25,7 +25,31 @@
             <a class="btn btn-primary" href="/settings">Go to Settings</a>
 
             <% } else { // profile exists! %>
-            <h3 class="mb-0"><%= profile.profile.name %></h3>
+            <section id="h-profile-header">
+                <h3 class="mb-0"><%= profile.profile.name %></h3>
+
+                <!-- Toggle display of quest information -->
+                <input class="hidden custom-checkbox" type="checkbox" name="display-quest" id="display-quest-toggle">
+                <label class="ml-3 checkbox-container" for="display-quest-toggle">
+                    <!-- Checkbox -->
+                    <svg class="checkbox icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                        viewBox="0 0 24 24">
+                        <path fill="none" d="M0 0h24v24H0V0z" />
+                        <path
+                            d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z" />
+                    </svg>
+
+                    <!-- Checkedbox -->
+                    <svg class="checkedbox" width="24" height="24" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+                        </svg>
+
+                </label>
+                <!-- quest "pop up" -->
+                <%- include partials/quest-modal %>
+            </section>
 
             <p class="label mb-3">Level
                 <span class="level"><%= profile.stats.lvl %></span>&nbsp;&bull;&nbsp;<span
@@ -80,7 +104,7 @@
                     </span>
                 </div>
             </div><!-- stats-bars-container -->
-            
+
             <!-- Buttons for resting/leaving the tavern -->
             <% let sleepBtnClass = (profile.preferences.sleep) ? "btn btn-danger" : "btn btn-primary",
                     sleepBtnText = (profile.preferences.sleep) ? "Resume Damage" : "Pause Damage";

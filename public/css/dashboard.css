@@ -36,8 +36,20 @@ h6 {
 .mb-3 {
   margin-bottom: 1rem; }
 
+.ml-3 {
+  margin-left: 1rem; }
+
+.ml-auto {
+  margin-left: auto; }
+
 .hidden {
   display: none; }
+
+.d-flex {
+  display: flex; }
+
+.a-items-center {
+  align-items: center; }
 
 .a-self-center {
   align-self: center; }
@@ -110,18 +122,18 @@ label, .icon {
   .form-group select.form-control {
     background-color: #4F4F4F; }
 
-input.custom-checkbox ~ .checkedbox {
+.custom-checkbox + .checkbox-container .checkedbox {
   display: none;
   fill: #ffffff; }
 
-input.custom-checkbox ~ .checkbox {
+.custom-checkbox + .checkbox-container .checkbox {
   display: block;
   fill: #BDBDBD; }
 
-input.custom-checkbox:checked ~ .checkbox {
+.custom-checkbox:checked + .checkbox-container .checkbox {
   display: none; }
 
-input.custom-checkbox:checked ~ .checkedbox {
+.custom-checkbox:checked + .checkbox-container .checkedbox {
   display: block; }
 
 /* Colors: 
@@ -202,6 +214,10 @@ input.custom-checkbox:checked ~ .checkedbox {
     background-color: rgba(0, 0, 0, 0.5);
     color: #ffffff;
     display: none; }
+    .navbar .sidebar-nav .custom-checkbox + .checkbox-container .calendar-item-name {
+      color: #BDBDBD; }
+    .navbar .sidebar-nav .custom-checkbox:checked + .checkbox-container:not(:hover) .calendar-item-name {
+      color: #ffffff; }
     .navbar .sidebar-nav .calendar-item {
       display: flex;
       align-items: center;
@@ -210,59 +226,53 @@ input.custom-checkbox:checked ~ .checkedbox {
       .navbar .sidebar-nav .calendar-item .checkbox {
         flex: 0 0 24px;
         margin-right: 10px; }
-      .navbar .sidebar-nav .calendar-item input.custom-checkbox ~ .calendar-item-name {
-        color: #BDBDBD; }
-      .navbar .sidebar-nav .calendar-item input.custom-checkbox:checked ~ .checkbox {
-        display: none; }
-      .navbar .sidebar-nav .calendar-item input.custom-checkbox:checked ~ .checkedbox {
-        display: block; }
-      .navbar .sidebar-nav .calendar-item input.custom-checkbox:checked ~ .calendar-item-name {
-        color: #ffffff; }
-      .navbar .sidebar-nav .calendar-item:hover input[name="isSynced"] ~ .checkedbox,
-      .navbar .sidebar-nav .calendar-item:hover input[name="isSynced"] ~ .checkbox {
+      .navbar .sidebar-nav .calendar-item:hover .checkedbox,
+      .navbar .sidebar-nav .calendar-item:hover .checkbox {
         fill: #333333; }
-      .navbar .sidebar-nav .calendar-item:hover input[name="isSynced"] ~ .calendar-item-name {
+      .navbar .sidebar-nav .calendar-item:hover .calendar-item-name {
         color: #333333; }
-    .navbar .sidebar-nav ul {
-      display: flex;
-      flex-direction: column;
-      margin: 0;
-      padding-left: 0;
-      padding-right: 0;
-      list-style: none;
-      position: relative;
-      background-color: #333333; }
-      .navbar .sidebar-nav ul:not(.submenu) {
-        padding: calc(50px + 2rem) 0 0;
-        width: 20%;
-        height: 100%;
-        min-width: 200px; }
-      .navbar .sidebar-nav ul li .submenu-header {
-        padding: 0 1rem;
-        margin-top: 2rem; }
-      .navbar .sidebar-nav ul li:not(.submenu):hover {
-        background-color: #44D3FF; }
-        .navbar .sidebar-nav ul li:not(.submenu):hover a {
-          color: #333333; }
-      .navbar .sidebar-nav ul li a {
-        padding: 1rem;
-        display: block;
-        color: #BDBDBD;
-        text-decoration: none; }
-    .navbar .sidebar-nav .logout {
-      margin-top: auto; }
-    .navbar .sidebar-nav .user-profile-close {
-      position: absolute;
-      right: 1rem;
-      top: 25px;
-      font-weight: bold;
-      font-size: 30px;
-      line-height: 1;
-      cursor: pointer; }
-  .navbar #user-profile-toggle:checked ~ .user-profile {
-    z-index: 101; }
-  .navbar #user-profile-toggle:checked ~ .sidebar-nav {
-    display: block; }
+  .navbar ul {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding-left: 0;
+    padding-right: 0;
+    list-style: none;
+    position: relative;
+    background-color: #333333; }
+    .navbar ul:not(.submenu) {
+      padding: calc(50px + 2rem) 0 0;
+      width: 20%;
+      height: 100%;
+      min-width: 200px; }
+    .navbar ul li .submenu-header {
+      padding: 0 1rem;
+      margin-top: 2rem; }
+    .navbar ul li:not(.submenu):hover {
+      background-color: #44D3FF; }
+      .navbar ul li:not(.submenu):hover a {
+        color: #333333; }
+    .navbar ul li a {
+      padding: 1rem;
+      display: block;
+      color: #BDBDBD;
+      text-decoration: none; }
+  .navbar .logout {
+    margin-top: auto; }
+  .navbar .user-profile-close {
+    position: absolute;
+    right: 1rem;
+    top: 25px;
+    font-weight: bold;
+    font-size: 30px;
+    line-height: 1;
+    cursor: pointer; }
+
+#user-profile-toggle:checked ~ .user-profile {
+  z-index: 101; }
+
+#user-profile-toggle:checked ~ .sidebar-nav {
+  display: block; }
 
 /* Colors: 
  * The higher the number,
@@ -301,12 +311,53 @@ input.custom-checkbox:checked ~ .checkedbox {
   margin-bottom: 2rem;
   margin-left: 2rem; }
 
+.ui-datepicker {
+  background: #333333;
+  box-shadow: 0 2px 15px #333333;
+  padding: 1rem; }
+  .ui-datepicker .ui-datepicker-header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap; }
+  .ui-datepicker .ui-datepicker-next,
+  .ui-datepicker .ui-datepicker-prev {
+    cursor: pointer; }
+  .ui-datepicker .ui-datepicker-title {
+    flex: 1 0 100%;
+    text-align: center;
+    position: relative;
+    top: -1.25rem;
+    z-index: -1; }
+  .ui-datepicker .ui-datepicker-calendar {
+    text-align: center; }
+  .ui-datepicker .ui-datepicker-current-day a.ui-state-active {
+    font-weight: bold;
+    color: #FFBE5D; }
+  .ui-datepicker a.ui-state-default {
+    text-decoration: none;
+    color: #BDBDBD;
+    padding: .25rem; }
+    .ui-datepicker a.ui-state-default:hover {
+      color: #44D3FF;
+      text-decoration: underline; }
+
+/* Colors: 
+ * The higher the number,
+ * the lighter the color :)
+*/
+#questModal {
+  width: 200px;
+  max-width: 40vw;
+  position: absolute;
+  left: calc(100% + 1rem);
+  text-align: center; }
+
 /* Colors: 
  * The higher the number,
  * the lighter the color :)
 */
 .modal {
-  padding: 0 !important; }
+  padding: 0; }
   .modal .modal-body {
     padding: 2rem 0 0; }
     .modal .modal-body .form-group {
@@ -492,6 +543,14 @@ a.btn {
     content: ""; }
   #container #main-calendar .fc-title {
     font-weight: bold; }
+  #container #h-profile-header {
+    position: relative;
+    display: flex;
+    justify-content: space-between; }
+  #container #display-quest-toggle ~ #questModal {
+    display: none; }
+  #container #display-quest-toggle:checked ~ #questModal {
+    display: block; }
   #container .stats-bar-container {
     display: flex;
     align-items: center; }

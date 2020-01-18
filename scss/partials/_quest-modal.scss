@@ -1,0 +1,10 @@
+@import "./variables";
+
+#questModal {
+    width: 200px;
+    max-width: 40vw;
+    position: absolute;
+    left: calc(100% + 1rem);
+
+    text-align: center;
+}

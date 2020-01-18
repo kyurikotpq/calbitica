@@ -3,7 +3,7 @@
 @import "../partials/mixins";
 
 .modal {
-    padding   : 0 !important;
+    padding: 0;
 
     .modal-body {
         padding: 2rem 0 0;
@@ -19,7 +19,7 @@
     z-index         : 4;
     background-color: $gray-2;
     padding         : 1rem;
-    box-shadow      : 0 2px 15px $gray-1;
+    @include box-shadow;
 }
 
 .ui-dialog-titlebar,

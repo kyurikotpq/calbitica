@@ -1,6 +1,7 @@
 @import 'partials/nav';
 @import 'partials/footer';
 @import 'partials/event-modal';
+@import 'partials/quest-modal';
 @import 'components/modal';
 @import 'components/buttons';
 @import 'components/form-group-row';
@@ -72,6 +73,23 @@
         }
         .fc-title {
             font-weight: bold;
+        }
+    }
+
+    // Habitica profile
+    #h-profile-header {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    #display-quest-toggle {
+        ~ #questModal {
+            display: none;
+        }
+
+        &:checked ~ #questModal {
+            display: block;
         }
     }
 

@@ -106,6 +106,10 @@
     background-color: $gray-2;
 }
 
+@mixin box-shadow {
+    box-shadow: 0 2px 15px $gray-1;
+}
+
 //Useful for Calendar to give a same size in this function
 //By giving how many columns(numbers) and margin(with %)
 @mixin grid($cols, $mgn) {

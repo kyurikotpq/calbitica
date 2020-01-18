@@ -17,7 +17,6 @@ function listCal(nextSyncToken = null) {
             showDeleted: false,
         };
     }
-    console.log("PARAMS", params)
 
     return cal.calendarList.list(params);
 }
@@ -90,15 +89,12 @@ function saveEvent(calendarId, body, eventId = null) {
 
 
 /**
- * 
+ * Delete an event from Google Calendar
  * @param {GoogleID} calendarId 
  * @param {GoogleID} eventId 
  */
 function deleteEvent(calendarId, eventId) {
-    return cal.events.delete({
-        calendarId,
-        eventId
-    });
+    return cal.events.delete({ calendarId, eventId });
 }
 
 /**

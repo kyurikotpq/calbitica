@@ -3,7 +3,7 @@
  * the lighter the color :)
 */
 .modal {
-  padding: 0 !important; }
+  padding: 0; }
   .modal .modal-body {
     padding: 2rem 0 0; }
     .modal .modal-body .form-group {

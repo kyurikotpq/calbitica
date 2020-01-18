@@ -22,7 +22,6 @@ router.get('/', apiCheck, function (req, res) {
     // so one less API call from client to our Calbitica API
     gcalImporter(userID, fullSync, firstDate, lastDate)
         .then(result => {
-            console.log("SHOULD HAVE IMPORTED", result)
             calbitController.getAllCalbits(userID, req.query.isDump, true)
                 .then((events) => {
                     res.status(200).json(events);
@@ -64,7 +63,7 @@ router.post('/', [apiCheck, habiticaCheck], function (req, res) {
                 })
         }
     }).catch(err => {
-        console.log(err)
+        res.status(400).json({ message: err });
     })
 });
 

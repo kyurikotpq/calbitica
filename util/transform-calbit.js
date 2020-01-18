@@ -10,7 +10,6 @@
  * @param {ObjectID} userID 
  */
 function prepMVCDataForMongo(body, userID = null) {
-    console.log("PREPPING FROM MVC DATA ");
     let start = {},
         end = {};
 
@@ -24,16 +23,20 @@ function prepMVCDataForMongo(body, userID = null) {
 
     let data = {
         habiticaType: 'todo', // add support for habit and daily in future
-        summary: body.title,
         start,
         end,
         calendarID: body.calendarID,
-
         // future: add support for tags
         // tags: Array
         // todo: HANDLE DAILIES, REPETITION!
         // new property?
     }
+
+    if(body.description)
+        data.description = body.description;
+
+    if(body.title)
+        data.summary = body.title;
 
     if (body.isDump && acceptedDumpTypes.includes(`${body.isDump}`))
         data.isDump = body.isDump;
@@ -41,9 +44,12 @@ function prepMVCDataForMongo(body, userID = null) {
     if (body.completed != undefined) {
         data.completed = { status: body.completed };
 
-        if (body.completed == 'true')
+        if (body.completed == "true")
             data.completed.date = new Date();
     }
+
+    if(body.display)
+        data.display = body.display == "true";
 
     // Creating calbit
     if (userID) {

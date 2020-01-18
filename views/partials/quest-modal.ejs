@@ -1,0 +1,10 @@
+<!-- Modal to accept/reject quests, if not already accepted -->
+<div id="questModal" class="modal ui-dialog">
+    <% if(profile != undefined && profile.party != undefined
+    && profile.party.quest.RSVPNeeded) { %>
+        <h3>Quest Invitation</h3>
+        <button class="btn quest-response">Reject</button>
+        <button class="btn btn-primary">Accept</button>
+    <% } %>
+    <!--  -->
+</div>

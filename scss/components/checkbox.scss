@@ -1,25 +1,29 @@
 // Checkbox
-input.custom-checkbox {
+.custom-checkbox {
     // Not checked state
-    ~.checkedbox {
-        display: none;
-        fill   : $fff;
-    }
+    +.checkbox-container {
+        .checkedbox {
+            display: none;
+            fill   : $fff;
+        }
 
-    ~.checkbox {
-        display: block;
-        fill   : $gray-4;
+        .checkbox {
+            display: block;
+            fill   : $gray-4;
+        }
     }
 
     // Checked state
-    &:checked {
-        ~.checkbox {
+    &:checked+.checkbox-container {
+        .checkbox {
             display: none;
         }
 
-        ~.checkedbox {
+        .checkedbox {
             display: block;
         }
     }
 
-} // input checkbox
+}
+
+// input checkbox
