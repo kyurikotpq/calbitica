@@ -29,11 +29,12 @@ function getAllCalbits(userID, isDump = null, displayOnly = null, others = null)
     // string comparison is required to protect against non-Boolean-castable values
     // thus, 'null' or 'lmao' are treated as false values
     if (isDump != null)
-        searchCriteria.isDump = `${isDump}` == 'true';
+        searchCriteria.isDump = `${isDump}` == "true";
 
     if (displayOnly != null)
-        searchCriteria.display = `${displayOnly}` == 'true';
+        searchCriteria.display = `${displayOnly}` == "true";
 
+    // NOTE: location, description are optional and may not be in the field list.
     let fields = "_id summary description isDump calendarID googleID "
             + "completed start end location";
             

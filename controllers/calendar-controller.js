@@ -150,7 +150,7 @@ function changeSync(_id, sync = false) {
     return new Promise((resolve, reject) => {
         Calendar.findOne({ _id })
             .then(cal => {
-                let syncedText = (`${sync}` == 'true') ? "synced" : "unsynced";
+                let syncedText = (`${sync}` == "true") ? "synced" : "unsynced";
                 cal.sync = sync;
 
                 cal.save().then(result => {

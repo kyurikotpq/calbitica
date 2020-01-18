@@ -59,6 +59,23 @@ function openModal(day, jsEvent) {
  * @param {*} event 
  */
 function transformData(event) {
+    
+    let start = event.start.dateTime
+            ? moment(event.start.dateTime)
+            : moment(event.start.date),
+        end = event.end.dateTime
+            ? moment(event.end.dateTime)
+            : moment(event.end.date);
+
+    let allDay = event.start.date != undefined 
+              || start.format("D") != end.format("D")
+
+    // if it's all day with time
+    if(allDay && event.end.dateTime) {
+        // TODO
+    }
+    console.log(start.local(), end.local())
+
     return {
         _id: event._id,
         id: event._id,
@@ -69,15 +86,10 @@ function transformData(event) {
         calendarID: event.calendarID,
         googleID: event.googleID,
 
-        start: event.start.dateTime
-            ? moment(event.start.dateTime).local()
-            : moment(event.start.date).local(),
+        start: start.local(),
+        end: end.local(),
 
-        end: event.end.dateTime
-            ? moment(event.end.dateTime).local()
-            : moment(event.end.date).local(),
-
-        allDay: event.start.date != undefined,
+        allDay,
         completed: event.completed,
     };
 }
@@ -189,7 +201,7 @@ function clickOnEvent(event, jsEvent, view, resourceObj) {
     if (!allDay) {
         $("#myModal #event-details-startTime").show();
         $("#myModal #event-details-endTime").show();
-    } else {
+    } else if(end.format("HH:mm") != start.format("HH:mm") != "00:00") {
         $("#myModal #event-details-startTime").hide();
         $("#myModal #event-details-endTime").hide();
     }
@@ -285,7 +297,7 @@ function modifyEvent(event) {
  */
 function saveEvent() {
     let title = $('#event-form-title').val();
-    let allDay = $('#event-form-allDay').val() == 'true';
+    let allDay = $('#event-form-allDay').val() == "true";
 
     let startDate = $('#event-form-startDate').val().split("/").reverse().join("-");
     let startTime = $('#event-form-startTime').val();

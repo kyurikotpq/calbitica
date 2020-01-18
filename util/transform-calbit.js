@@ -14,15 +14,15 @@ function prepMVCDataForMongo(body, userID = null) {
         end = {};
 
     // why is allDay a string?? JSON encoding?
-    let allDay = body.allDay == 'true';
+    let allDay = (body.allDay + "") == "true";
     let dateKey = (allDay) ? "date" : "dateTime";
     start[dateKey] = body.start;
     end[dateKey] = body.end;
 
-    let acceptedDumpTypes = ['true', 'false'];
+    let acceptedDumpTypes = ["true", "false"];
 
     let data = {
-        habiticaType: 'todo', // add support for habit and daily in future
+        habiticaType: "todo", // add support for habit and daily in future
         start,
         end,
         calendarID: body.calendarID,
@@ -44,12 +44,12 @@ function prepMVCDataForMongo(body, userID = null) {
     if (body.completed != undefined) {
         data.completed = { status: body.completed };
 
-        if (body.completed == "true")
+        if ((body.completed + "") == "true")
             data.completed.date = new Date();
     }
 
     if(body.display)
-        data.display = body.display == "true";
+        data.display = (body.display + "") == "true";
 
     // Creating calbit
     if (userID) {

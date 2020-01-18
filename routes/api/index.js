@@ -1,3 +1,13 @@
+/**
+ * @apiDefine BodyParam Body Parameters
+ */
+/**
+ * @apiDefine PathParam Path Parameters
+ */
+/**
+ * @apiDefine QueryParam Query Parameters
+ */
+
 let settings = require("./settings");
 let habitica = require("./habitica");
 let calbit = require("./calbit");
