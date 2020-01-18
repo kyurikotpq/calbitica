@@ -34,7 +34,10 @@ function getAllCalbits(userID, isDump = null, displayOnly = null, others = null)
     if (displayOnly != null)
         searchCriteria.display = `${displayOnly}` == 'true';
 
-    return Calbit.find(searchCriteria);
+    let fields = "_id summary description isDump calendarID googleID "
+        + "completed start end location";
+
+    return Calbit.find(searchCriteria, fields);
 }
 
 function createInMongo(data) {
@@ -199,7 +202,7 @@ function updateCompletion(_id, status) {
                             resolve({
                                 stats: habiticaController.processStats(axiosData.data, true), // send back the profile!
                                 summary: calbit.summary
-                            }); 
+                            });
                         }
                     })
                     .catch(err => {

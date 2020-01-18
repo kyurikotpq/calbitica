@@ -40,6 +40,17 @@ const fields = {
         status: Boolean,
         date: Date
     },
+    
+    /** 
+     * REMINDER OBJECT
+     * {
+     *      $type: String ['email', 'popup'],
+     *      minutes: Number,
+     * }
+     * 
+     */
+    reminders: Array,
+
     modifications: Array // Array of dates
     // tags: Array
     // repeat: follow the rules

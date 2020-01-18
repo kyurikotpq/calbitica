@@ -15,7 +15,9 @@ const JWTUtil = require('../util/jwt');
 const Crypt = require('../util/crypt');
 
 
-function login(user, profile, refresh_token, access_token) {
+function login(user, profile, oAuthData) {
+    let { refresh_token, access_token, expiry_date } = oAuthData;
+    
     return new Promise((resolve, reject) => {
         // update the refresh token if necessary
         // get indexof the googleID & retrieve the token in the same index
@@ -34,6 +36,7 @@ function login(user, profile, refresh_token, access_token) {
 
         let data = {
             access_token,
+            expiry_date,
             refresh_token: newRefreshToken,
             profile: user.profile,
             habiticaID: (!user.habiticaID) ? null : user.habiticaID,
@@ -49,7 +52,9 @@ function login(user, profile, refresh_token, access_token) {
 }
 
 
-function register(profile, refresh_token, access_token) {
+function register(profile, oAuthData) {
+    let { refresh_token, access_token, expiry_date } = oAuthData;
+    
     let cipherRefreshToken = Crypt.encrypt(refresh_token);
     return new Promise((resolve, reject) => {
         new User.model({
@@ -65,6 +70,7 @@ function register(profile, refresh_token, access_token) {
             .then((newUserObj) => {
                 let data = {
                     access_token,
+                    expiry_date,
                     refresh_token: cipherRefreshToken,
                     profile: newUserObj.profile,
                     habiticaID: null,
@@ -77,6 +83,7 @@ function register(profile, refresh_token, access_token) {
                 resolve(jwt);
             })
             .catch((err) => {
+                console.log(err);
                 reject(err);
             });
 
@@ -84,7 +91,9 @@ function register(profile, refresh_token, access_token) {
 }
 
 
-function userExistsInMongo(idToken, refresh_token, access_token) {
+function userExistsInMongo(oAuthData) {
+    let { idToken, access_token, refresh_token } = oAuthData;
+
     return new Promise((resolve, reject) => {
         verifyGIDToken(idToken)
             .then(profile => {
@@ -95,10 +104,16 @@ function userExistsInMongo(idToken, refresh_token, access_token) {
                         if (!refresh_token)
                             refresh_token = '';
 
+                        let newOAuthData = {
+                            refresh_token,
+                            access_token: cipherAccessToken,
+                            expiry_date: oAuthData.expiry_date
+                        };
+
                         if (!user)
-                            resolve(register(profile, refresh_token, cipherAccessToken));
+                            resolve(register(profile, newOAuthData));
                         else
-                            resolve(login(user, profile, refresh_token, cipherAccessToken));
+                            resolve(login(user, profile, newOAuthData));
                     })
             })
             .catch(err => {
@@ -118,7 +133,8 @@ function setHnGCredentials(decodedJWT) {
 
     gCalOAuth2Client.setCredentials({
         access_token: Crypt.decrypt(decodedJWT.access_token),
-        refresh_token: Crypt.decrypt(decodedJWT.refresh_token)
+        refresh_token: Crypt.decrypt(decodedJWT.refresh_token),
+        expiry_date: decodedJWT.expiry_date
     });
 }
 
@@ -158,6 +174,7 @@ function verifyGIDToken(idToken) {
                 }
             })
             .catch(err => {
+                console.log("GOOGLE AUTH ERROR", err);
                 reject({ status: 400, message: "Invalid token" });
             });
     });
@@ -178,11 +195,19 @@ function tokensFromAuthCode(code) {
                 // Set tokens on the oAuth client
                 gCalOAuth2Client.setCredentials(tokens);
 
-                userExistsInMongo(tokens.id_token, refresh_token, tokens.access_token)
+                let oAuthData = {
+                    refresh_token,
+                    idToken: tokens.id_token,
+                    access_token: tokens.access_token,
+                    expiry_date: tokens.expiry_date
+                };
+
+                userExistsInMongo(oAuthData)
                     .then(jwt => resolve(jwt))
                     .catch(err => reject(err));
             })
             .catch((err) => {
+                console.log(err)
                 reject(err);
             });
     })

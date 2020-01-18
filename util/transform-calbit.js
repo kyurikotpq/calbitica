@@ -23,7 +23,6 @@ function prepMVCDataForMongo(body, userID = null) {
 
     let data = {
         habiticaType: 'todo', // add support for habit and daily in future
-        summary: body.title,
         start,
         end,
         calendarID: body.calendarID,
@@ -34,6 +33,12 @@ function prepMVCDataForMongo(body, userID = null) {
         // new property?
     }
 
+    if(body.description)
+        data.description = body.description;
+
+    if(body.title)
+        data.summary = body.title;
+
     if (body.isDump && acceptedDumpTypes.includes(`${body.isDump}`))
         data.isDump = body.isDump;
 
@@ -43,6 +48,9 @@ function prepMVCDataForMongo(body, userID = null) {
         if (body.completed == 'true')
             data.completed.date = new Date();
     }
+
+    if(body.display)
+        data.display = body.display == "true";
 
     // Creating calbit
     if (userID) {
