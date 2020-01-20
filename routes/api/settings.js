@@ -24,7 +24,7 @@ router.post('/habitica', apiCheck, (req, res) => {
                 // resign the JWT
                 let jwt = JWTUtil.signCalbiticaJWT(data, decodedJWT.sub);
 
-                if(req.session.user) // call is from MVC!
+                if(req.session != undefined) // call is from MVC!
                     req.session.user = jwt;
                 
                 res.status(200).json({ 
