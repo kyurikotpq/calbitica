@@ -24,9 +24,14 @@ const JWTUtil = require('../../util/jwt');
  *       }
  *     }
  * 
- * @apiError SomeError TODO
+ * @apiError DatabaseError Happens when input is malformed
  * @apiErrorExample Error Response:
- *     WILL BE DOCUMENTED SOON
+ *     400 Bad Request
+ *     {
+ *       "data": {
+ *         "message": "Could not save Habitica settings"
+ *       }
+ *     }
  */
 router.post('/habitica', apiCheck, (req, res) => {
     let decodedJWT = req.body.decodedJWT;
@@ -45,7 +50,7 @@ router.post('/habitica', apiCheck, (req, res) => {
                 // resign the JWT
                 let jwt = JWTUtil.signCalbiticaJWT(data, decodedJWT.sub);
 
-                if(req.session.user) // call is from MVC!
+                if(req.session != undefined) // call is from MVC!
                     req.session.user = jwt;
                 
                 res.status(200).json({ 

@@ -1066,15 +1066,15 @@
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "SomeError",
-            "description": "<p>TODO</p>"
+            "field": "DatabaseError",
+            "description": "<p>Happens when input is malformed</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "Error Response:",
-          "content": "WILL BE DOCUMENTED SOON",
+          "content": "400 Bad Request\n{\n  \"data\": {\n    \"message\": \"Could not save Habitica settings\"\n  }\n}",
           "type": "json"
         }
       ]
