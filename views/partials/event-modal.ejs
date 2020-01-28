@@ -42,6 +42,10 @@
             <span id="event-details-endDate"></span>
             <span id="event-details-endTime"></span>
         </div>
+        <div>
+            <i class="material-icons">&#xe7f4;</i>
+            <span id="event-details-reminders"></span>
+        </div><br/>
         <div class="event-details-location">
             <svg class="location-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                 <path fill="none" d="M0 0h24v24H0V0z" />
@@ -112,6 +116,29 @@
         </div>
         <div class="form-group-row">
             <div class="form-group">
+                <i class="material-icons">&#xe7f4;</i>
+
+                <label class="switch">
+                    <input id="switch" onclick="changeSwitchState()" type="checkbox"><span class="slider round"></span>
+                </label>
+            </div>
+            <div class="form-group" style="display: none;" id="remindersDate">
+                <input type="text" id="event-form-remindersDate" name="remindersDate" class="datepicker form-control">
+            </div>            
+            <div class="form-group" style="display: none;" id="remindersTime">
+                <select name="remindersTime" id="event-form-remindersTime" class="form-control timepicker">
+                    <% if(timeList != undefined) {
+                  timeList.forEach(time => {
+                %>
+                    <option value="<%= time %>"><%= time %></option>
+                    <%
+                  })
+                } %>
+                </select>
+            </div>
+        </div>
+        <div class="form-group-row">
+            <div class="form-group">
                 <input type="text" id="event-form-location" name="location" class="form-control" placeholder="Location">
             </div>
             <svg class="calendar-icon icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -137,3 +164,24 @@
 </div>
 
 </div>
+
+<!-- Switch Button -->
+<script>
+    var states = ["Disable","Enable"], // your possible states
+    current_state = 0; // your flag
+
+    function changeSwitchState() {
+        current_state=!current_state; // switch
+        document.getElementById('switch').value=states[current_state?1:0]; // default will be Disable
+
+        if(document.getElementById("switch").checked == true) {
+            document.getElementById("remindersDate").style.display = "block";
+            document.getElementById("remindersTime").style.display = "block";
+        } else {
+            document.getElementById("remindersDate").style.display = "none";
+            document.getElementById("remindersTime").style.display = "none";
+            document.getElementById("event-form-remindersDate").value = null;
+            document.getElementById("event-form-remindersTime").value = "00:00";
+        }
+    }
+</script>

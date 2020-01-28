@@ -89,3 +89,53 @@
         }
     }
 }
+
+// Javascript Switch
+.switch {
+    margin-left: 30px;
+    width: 30px;
+    height: 17px;
+
+    input:checked + .slider {
+        background-color: #2196F3;
+
+        &:before {
+            -webkit-transform: translateX(14px);
+            -ms-transform: translateX(14px);
+            transform: translateX(14px);
+        }
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+
+        &:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+    }
+
+     /* Rounded sliders */
+    .slider.round {
+        border-radius: 34px;
+
+        &:before {
+            border-radius: 50%;
+        }
+    }
+  }
