@@ -450,7 +450,7 @@
       "examples": [
         {
           "title": "Success Response:",
-          "content": "200 OK\n{\n  \"message\": \"Event updated\"\n}",
+          "content": "200 OK\n{\n  \"data\": {\n    \"message\": \"Event updated\"\n  }\n}",
           "type": "json"
         }
       ]
@@ -1055,7 +1055,7 @@
       "examples": [
         {
           "title": "Success Response:",
-          "content": "200 OK\n{\n  \"data\": {\n    \"message\": \"Habitica settings saved successfully.\",\n    \"jwt\": \"xxx.xxx.xxx\"\n  }\n}",
+          "content": "200 OK\n{\n  \"message\": \"Successfully signed in to Calbitica.\",\n  \"jwt\": \"xxx.xxx.xxx\"\n}",
           "type": "json"
         }
       ]
@@ -1066,12 +1066,23 @@
           {
             "group": "Error 4xx",
             "optional": false,
+            "field": "ParseError",
+            "description": "<p>Happens when jwt is malformed/invalid</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
             "field": "DatabaseError",
             "description": "<p>Happens when input is malformed</p>"
           }
         ]
       },
       "examples": [
+        {
+          "title": "Error Response:",
+          "content": "400 Bad Request\n{\n  \"message\": \"jwt malformed\"\n}",
+          "type": "json"
+        },
         {
           "title": "Error Response:",
           "content": "400 Bad Request\n{\n  \"data\": {\n    \"message\": \"Could not save Habitica settings\"\n  }\n}",

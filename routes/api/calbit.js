@@ -182,7 +182,9 @@ router.put('/:id/complete', [apiCheck, habiticaCheck], (req, res) => {
  * @apiSuccessExample Success Response:
  *     200 OK
  *     {
- *       "message": "Event updated"
+ *       "data": {
+ *         "message": "Event updated"
+ *       }
  *     }
  * 
  * @apiError SomeError TODO

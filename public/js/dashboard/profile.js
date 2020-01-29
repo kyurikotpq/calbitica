@@ -1,3 +1,8 @@
+/**
+ * Update the HTML markup for the stats bars
+ * @param {*} stats 
+ * @param {*} scoreTask 
+ */
 function updateStats(stats, scoreTask = false) {
     let maxHealth = (!scoreTask) ? stats.maxHealth : $(".label .max-health").text(),
         toNextLevel = (!scoreTask) ? stats.toNextLevel : $(".label .max-exp").text(),
@@ -39,6 +44,9 @@ function getProfile() {
     })
 }
 
+/**
+ * Toggles the user's sleep status
+ */
 function toggleSleep() {
     $.ajax({
         url: '/api/h/sleep',
@@ -56,6 +64,32 @@ function toggleSleep() {
             $('#sleep-btn').text(btnText);
         })
         .fail(err => {
-            createToast("err", err.responseJSON.message);
+            createToast("danger", err.responseJSON.message);
         })
+}
+
+/**
+ * Respond to a quest
+ */
+function respondToQuest(e) {
+    console.log(e.target);
+    let accept = e.target.dataset.response != undefined
+                && e.target.dataset.response == "accept";
+    let groupID = $("#party-groupID").text()
+
+    $.ajax({
+        method: "POST",
+        url: "/api/h/quest",
+        data: { accept, groupID }
+    }).done(result => {
+        let verb = e.target.dataset.response + "ed";
+
+        // Show success messages
+        createToast("success", `You have ${verb} the quest.`)
+        $(".quest-response-text").html(verb);
+        $(".quest-response").hide();
+    }).fail(err => {
+        createToast("danger", err.responseJSON.message);
+    })
+
 }

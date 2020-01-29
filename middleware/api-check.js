@@ -17,9 +17,9 @@ const authController = require('../controllers/auth-controller');
  * @param {*} next 
  */
 const isValidCalbiticaJWT = (req, res, next) => {
-    let internal = req.session.user;
+    let internal = (req.session != undefined && req.session.user != undefined);
     let external = req.header("Authorization") || 'lmao';
-    let jwt = (!internal) ? external.replace("Bearer ", '') : internal;
+    let jwt = (!internal) ? external.replace("Bearer ", '') : req.session.user;
 
     JWTUtil.verifyCalbiticaJWT(jwt)
         .then(result => {
@@ -35,25 +35,23 @@ const isValidCalbiticaJWT = (req, res, next) => {
                 // data: whatever data you passed during .json(xxx)
                 let finalResponse = {};
 
-                if(!internal) {
+                // If you're not passing back a JWT
+                // (from /api/settings or /auth/code)
+                // then park the data in data key
+                if (!internal && !data.jwt) {
                     finalResponse.data = data;
-    
-                    // If there's a new JWT,
-                    // and you're not passing back a JWT already
-                    // (from /api/settings)
-                    if (result.newJWT && !data.jwt) {
-                        finalResponse.jwt = result.newJWT;
-                    }
-                } else {
-                    finalResponse = data;
-                }
 
-                console.log("FINAL RESPONSE IS:", finalResponse)
+                    // there's a new JWT because the old
+                    // one is expired!
+                    if (result.newJWT)
+                        finalResponse.jwt = result.newJWT;
+                } else // flatten the structure
+                    finalResponse = data;
+
                 // Express 4.17: Use apply(), not call()
                 // also "this" is an empty obj lmao
                 jsonFunc.call(res, finalResponse);
             };
-
 
             next();
         })
