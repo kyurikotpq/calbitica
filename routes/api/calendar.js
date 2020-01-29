@@ -59,12 +59,10 @@ router.get('/', apiCheck, (req, res) => {
  *     WILL BE DOCUMENTED SOON
  */
 router.get('/import', apiCheck, (req, res) => {
-    let firstDate = !req.query.firstDate ? new Date() : req.query.firstDate;
-    let lastDate = !req.query.lastDate ? null : req.query.lastDate;
     let fullSync = !req.query.fullSync ? true : req.query.fullSync;
 
     let decodedJWT = req.body.decodedJWT;
-    gcalImporter(decodedJWT.sub, fullSync, firstDate, lastDate)
+    gcalImporter(decodedJWT.sub, fullSync)
         .then(result => {
             res.status(200).json(result);
         })

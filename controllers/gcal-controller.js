@@ -25,11 +25,9 @@ function listCal(nextSyncToken = null) {
  * List all events in the specified Google Calendar.
  * 
  * @param {GoogleID} calendarId 
- * @param {String} syncToken 
- * @param {Date|null} startDate 
- * @param {Date|null} endDate 
+ * @param {String} syncToken
  */
-function listEvents(calendarId, syncToken, startDate = null, endDate = null) {
+function listEvents(calendarId, syncToken = null) {
     let params = {
         calendarId,
         maxResults: 300,
@@ -37,17 +35,8 @@ function listEvents(calendarId, syncToken, startDate = null, endDate = null) {
         // I need to know what's deleted so can delete from Habitica too
         // Deleted events' status = cancelled
         showDeleted: true,
+        syncToken
     };
-
-    if (!syncToken) {
-        if (startDate != null && startDate.getTime() > 0)
-            params.timeMin = startDate.toISOString();
-
-        if (endDate != null && endDate.getTime() > 0)
-            params.timeMax = endDate.toISOString();
-    } else {
-        params.syncToken = syncToken;
-    }
 
     return cal.events.list(params)
 }
