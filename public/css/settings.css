@@ -25,10 +25,14 @@ h5,
 h6 {
   font-family: "Open Sans Condensed", "Arial", sans-serif;
   font-weight: bold;
+  color: #ffffff;
   text-transform: uppercase;
   margin-top: 0;
   margin-bottom: 1rem;
   letter-spacing: .5px; }
+
+.p-3 {
+  padding: 1rem; }
 
 .mb-0 {
   margin-bottom: 0; }
@@ -54,7 +58,8 @@ h6 {
 .a-self-center {
   align-self: center; }
 
-label, .icon {
+label,
+.icon {
   cursor: pointer; }
 
 *::-webkit-scrollbar {

@@ -59,7 +59,12 @@
         }
 
         .fc-bg .fc-today {
-            border-radius: 50%;
+            border-radius   : 50%;
+            background-color: $blue-1;
+        }
+
+        .fc-today .fc-day-number {
+            color: $fff;
         }
     }
 
@@ -68,9 +73,11 @@
         .fc-time-grid .fc-slats .fc-minor td {
             border: none;
         }
+
         .fc-time-grid-event.fc-short .fc-time:after {
             content: "";
         }
+
         .fc-title {
             font-weight: bold;
         }
@@ -78,17 +85,17 @@
 
     // Habitica profile
     #h-profile-header {
-        position: relative;
-        display: flex;
+        position       : relative;
+        display        : flex;
         justify-content: space-between;
     }
 
     #display-quest-toggle {
-        ~ #questModal {
+        ~#questModal {
             display: none;
         }
 
-        &:checked ~ #questModal {
+        &:checked~#questModal {
             display: block;
         }
     }

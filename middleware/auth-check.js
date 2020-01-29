@@ -11,7 +11,7 @@ let authController = require('../controllers/auth-controller');
  * @param {*} next 
  */
 const authCheckMustLogin = (req, res, next) => {
-    if (!req.session.user) {
+    if (req.session == undefined || req.session.user == undefined) {
         req.session = null;
         res.redirect('/auth/login')
     } else {

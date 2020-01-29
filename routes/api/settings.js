@@ -18,12 +18,16 @@ const JWTUtil = require('../../util/jwt');
  * @apiSuccessExample Success Response:
  *     200 OK
  *     {
- *       "data": {
- *         "message": "Habitica settings saved successfully.",
- *         "jwt": "xxx.xxx.xxx"
- *       }
+ *       "message": "Successfully signed in to Calbitica.",
+ *       "jwt": "xxx.xxx.xxx"
  *     }
  * 
+ * @apiError ParseError Happens when jwt is malformed/invalid
+ * @apiErrorExample Error Response:
+ *     400 Bad Request
+ *     {
+ *       "message": "jwt malformed"
+ *     }
  * @apiError DatabaseError Happens when input is malformed
  * @apiErrorExample Error Response:
  *     400 Bad Request

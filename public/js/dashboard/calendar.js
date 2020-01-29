@@ -74,7 +74,7 @@ function transformData(event) {
             : [];
 
     let allDay = event.start.date != undefined
-        || start.format("D") != end.format("D")
+        || start.format("D") != end.format("D");
 
     if(reminders.length != 0) {
         reminders.forEach(reminder => {
@@ -146,6 +146,7 @@ function showDetails() {
  * Refetch events from API and reset the form values
  */
 function refreshCalendar() {
+    // Refetch events
     $('#main-calendar').fullCalendar('refetchEvents');
 
     // reset values in form
@@ -511,8 +512,11 @@ function renderEvent(event, element, view) {
 $(document).ready(function () {
     CALENDARARR = JSON.parse($('#calendarJSON').html());
 
-    // Event listeners on sleep buttons
+    // Event listeners on sleep button
     $('#sleep-btn').on("click", toggleSleep)
+
+    // Event listener on Quest Acceptance button
+    $(".quest-response").on("click", respondToQuest)
 
     $('#sidebar-calendar').fullCalendar({
         header: {
