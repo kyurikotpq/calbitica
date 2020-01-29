@@ -1,6 +1,9 @@
 // Keep track of the list of calendars
 let CALENDARARR = null;
 
+// Keep track of the reminders
+var REMINDERS = [];
+
 /**
  * v3 - helper functions
  */
@@ -59,19 +62,42 @@ function openModal(day, jsEvent) {
  * @param {*} event 
  */
 function transformData(event) {
-    
     let start = event.start.dateTime
-            ? moment(event.start.dateTime)
-            : moment(event.start.date),
+        ? moment(event.start.dateTime)
+        : moment(event.start.date),
         end = event.end.dateTime
             ? moment(event.end.dateTime)
-            : moment(event.end.date);
+            : moment(event.end.date),
 
-    let allDay = event.start.date != undefined 
-              || start.format("D") != end.format("D");
+        reminders = (event.reminders != undefined)
+            ? event.reminders.map(r => moment(r).local())
+            : [];
+
+    let allDay = event.start.date != undefined
+        || start.format("D") != end.format("D");
+
+    if(reminders.length != 0) {
+        reminders.forEach(reminder => {
+            let reminderDate = new Date(reminder).getTime();
+            let now = new Date().getTime();
+            let milliseconds;
+
+            // Will not get the past date here...
+            if(reminderDate > now) {
+                // Calculated when the actual reminders Date & Time reach on present
+                milliseconds = reminderDate - now;
+
+                let timeout = setTimeout(() => {
+                    alert("Your Event: " + event.summary + " is happening at " + reminders);            
+                }, milliseconds)
+    
+                REMINDERS.push(timeout);
+            }
+        })
+    }
 
     // if it's all day with time
-    if(allDay && event.end.dateTime) {
+    if (allDay && event.end.dateTime) {
         // TODO
     }
     console.log(start.local(), end.local())
@@ -88,6 +114,8 @@ function transformData(event) {
 
         start: start.local(),
         end: end.local(),
+
+        reminders,
 
         allDay,
         completed: event.completed,
@@ -159,6 +187,16 @@ function selectSection(start, end, jsEvent) {
 
     $("#myModal #event-form-title").val("");
     $("#myModal #event-form-location").val("");
+    $("#myModal #event-form-_id").val("");
+
+    $("#switch").prop("checked", false);
+    $("#switch").val("Disable");
+
+    $("#remindersDate").css("display", "none");
+    $("#remindersTime").css("display", "none");
+
+    $("#event-form-remindersDate").val(null);
+    $("#event-form-remindersTime").val("00:00");
 
     // Hide event details
     hideDetails();
@@ -180,6 +218,15 @@ function clickOnEvent(event, jsEvent, view, resourceObj) {
         allDay = !start.hasTime(),
         calendar = CALENDARARR.find(c => c.googleID == event.calendarID);
 
+    let notificationText = "";
+
+    if (event.reminders.length > 0) {
+        notificationText = "Yes";
+    }
+    else {
+        notificationText = "No";
+    }
+
     $("#myModal #completed").val(event._id);
 
     if (event.completed != undefined && event.completed.status != undefined)
@@ -190,6 +237,7 @@ function clickOnEvent(event, jsEvent, view, resourceObj) {
     $("#myModal #event-details-startTime").text(start.format("HH:mm"));
     $("#myModal #event-details-endDate").text(end.format("MMM D, YYYY"));
     $("#myModal #event-details-endTime").text(end.format("HH:mm"));
+    $("#myModal #event-details-reminders").text(notificationText);
     $("#myModal #event-details-calendarID").text(calendar.summary);
 
     if (!event.location)
@@ -202,9 +250,30 @@ function clickOnEvent(event, jsEvent, view, resourceObj) {
     if (!allDay) {
         $("#myModal #event-details-startTime").show();
         $("#myModal #event-details-endTime").show();
-    } else if(end.format("HH:mm") != start.format("HH:mm") != "00:00") {
+    } else if (end.format("HH:mm") != start.format("HH:mm") != "00:00") {
         $("#myModal #event-details-startTime").hide();
         $("#myModal #event-details-endTime").hide();
+    }
+
+    // Set notification values in the form!
+    if (notificationText == "Yes") {
+        $("#switch").prop("checked", true);
+        $("#switch").val("Enable");
+
+        $("#remindersDate").css("display", "block");
+        $("#remindersTime").css("display", "block");
+
+        $("#event-form-remindersDate").val(event.reminders[0].format("DD/MM/YYYY"));
+        $("#event-form-remindersTime").val(event.reminders[0].format("HH:mm"));
+    } else {
+        $("#switch").prop("checked", false);
+        $("#switch").val("Disable");
+
+        $("#remindersDate").css("display", "none");
+        $("#remindersTime").css("display", "none");
+
+        $("#event-form-remindersDate").val(null);
+        $("#event-form-remindersTime").val("00:00");
     }
 
     // Set values in the form!
@@ -233,9 +302,9 @@ function clickOnEvent(event, jsEvent, view, resourceObj) {
  * Delete an event!
  */
 function deleteEvent() {
-    let confirm = prompt("Are you sure you want to delete the event?");
+    let confirmDelete = confirm("Are you sure you want to delete the event?");
 
-    if (confirm) {
+    if (confirmDelete) {
         let id = $("#myModal #event-form-_id").val();
         $.ajax({
             url: `/api/calbit/${id}`,
@@ -317,27 +386,61 @@ function saveEvent() {
     let calendar = CALENDARARR.find(c => c.googleID == calendarID);
     let display = (calendar) ? calendar.sync : false;
 
-    if (!title || !startDate || !startTime || !endDate || !endTime) {
-        alert("Please fill all fields");
-        return;
+    let switchTrigger = $("#switch").val();
+    let remindersDate = $("#event-form-remindersDate").val().split("/").reverse().join("-");
+    let remindersTime = $('#event-form-remindersTime').val();
 
-    } else if (moment(startDateTime).format("YYYY-MM-DD HH:mm:ss") == "Invalid date"
-        || moment(endDateTime).format("YYYY-MM-DD HH:mm:ss") == "Invalid date") {
-        alert("Invalid Date and Time");
-        return;
+    let remindersDateTime = `${remindersDate}T${remindersTime}:00`;
+    let reminders = (allDay) ? remindersDate : toYmdThisZ(remindersDateTime);
 
-    } else if (moment(startDateTime) >= moment(endDateTime)) {
-        alert("Start Date & Time must be before End Date & Time");
-        return;
+    let data = {};
 
-    }
+    if (switchTrigger == "Enable") {
+        if (!title || !startDate || !startTime || !endDate || !endTime || !remindersDate || !remindersTime) {
+            alert("Please fill all fields");
+            return;
 
-    // Compile the data!
-    let data = {
-        title, location,
-        allDay, calendarID,
-        start, end, display,
-        isDump: false
+        } else if (moment(startDateTime).format("YYYY-MM-DD HH:mm:ss") == "Invalid date"
+            || moment(endDateTime).format("YYYY-MM-DD HH:mm:ss") == "Invalid date"
+            || moment(remindersDateTime).format("YYYY-MM-DD HH:mm:ss") == "Invalid date") {
+            alert("Invalid Date and Time");
+            return;
+
+        } else if (moment(startDateTime) >= moment(endDateTime)) {
+            alert("Start Date & Time must be before End Date & Time");
+            return;
+        }
+
+        // Compile the data!
+        data = {
+            title, location,
+            allDay, calendarID,
+            start, end,
+            reminders, display,
+            isDump: false
+        }
+    } else {
+        if (!title || !startDate || !startTime || !endDate || !endTime) {
+            alert("Please fill all fields");
+            return;
+
+        } else if (moment(startDateTime).format("YYYY-MM-DD HH:mm:ss") == "Invalid date"
+            || moment(endDateTime).format("YYYY-MM-DD HH:mm:ss") == "Invalid date") {
+            alert("Invalid Date and Time");
+            return;
+
+        } else if (moment(startDateTime) >= moment(endDateTime)) {
+            alert("Start Date & Time must be before End Date & Time");
+            return;
+        }
+
+        // Compile the data!
+        data = {
+            title, location,
+            allDay, calendarID,
+            start, end, display,
+            isDump: false
+        }
     }
 
     // Are we updating an event?

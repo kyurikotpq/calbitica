@@ -36,7 +36,7 @@ function getAllCalbits(userID, isDump = null, displayOnly = null, others = null)
 
     // NOTE: location, description are optional and may not be in the field list.
     let fields = "_id summary description isDump calendarID googleID "
-            + "completed start end location";
+            + "completed start end location reminders";
             
     return Calbit.find(searchCriteria, fields);
 }

@@ -11,7 +11,8 @@
  */
 function prepMVCDataForMongo(body, userID = null) {
     let start = {},
-        end = {};
+        end = {},
+        reminders = [];
 
     // why is allDay a string?? JSON encoding?
     let allDay = (body.allDay + "") == "true";
@@ -32,10 +33,10 @@ function prepMVCDataForMongo(body, userID = null) {
         // new property?
     }
 
-    if(body.description)
+    if (body.description)
         data.description = body.description;
 
-    if(body.title)
+    if (body.title)
         data.summary = body.title;
 
     if (body.isDump && acceptedDumpTypes.includes(`${body.isDump}`))
@@ -48,8 +49,13 @@ function prepMVCDataForMongo(body, userID = null) {
             data.completed.date = new Date();
     }
 
-    if(body.display)
+    if (body.display)
         data.display = (body.display + "") == "true";
+
+    if (body.reminders != undefined) {
+        reminders.push(body.reminders);
+        data.reminders = reminders;
+    }
 
     // Creating calbit
     if (userID) {
@@ -137,7 +143,7 @@ function prepGCalDataForMongo(item, userID = null) {
 
 function prepData(body, userID, dataFrom) {
     let data = null;
-    
+
     switch (dataFrom) {
         case 'mvc':
             data = prepMVCDataForMongo(body, userID);
@@ -150,7 +156,7 @@ function prepData(body, userID, dataFrom) {
             data = prepGCalDataForMongo(body, userID);
             break;
     }
-    
+
     return data;
 }
 
