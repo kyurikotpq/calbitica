@@ -4,8 +4,38 @@ const apiCheck = require('../../middleware/api-check');
 const JWTUtil = require('../../util/jwt');
 
 /**
- * Save a user's Habitica User ID
- * & API Key to MongoDB
+ * @api {post} /settings/habitica Save Habitica Settings
+ * @apiGroup Settings
+ * @apiDescription Saves the user's Habitica API Key and/or User ID into the database.
+ * The database field will only be updated if a non-empty value is passed.<br><br>
+ * <strong>Store the new JSON Web Token (JWT)</strong> returned by this endpoint.
+ * 
+ * @apiParam (BodyParam) {String} [apiKey] User's Habitica API Key
+ * @apiParam (BodyParam) {String} [hUserID] User's Habitica UserID
+ * 
+ * @apiSuccess {String} message Success message confirming the deletion of the Calbit
+ * @apiSuccess {String} jwt JWT for access to the rest of the Calbitica API
+ * @apiSuccessExample Success Response:
+ *     200 OK
+ *     {
+ *       "message": "Successfully signed in to Calbitica.",
+ *       "jwt": "xxx.xxx.xxx"
+ *     }
+ * 
+ * @apiError ParseError Happens when jwt is malformed/invalid
+ * @apiErrorExample Error Response:
+ *     400 Bad Request
+ *     {
+ *       "message": "jwt malformed"
+ *     }
+ * @apiError DatabaseError Happens when input is malformed
+ * @apiErrorExample Error Response:
+ *     400 Bad Request
+ *     {
+ *       "data": {
+ *         "message": "Could not save Habitica settings"
+ *       }
+ *     }
  */
 router.post('/habitica', apiCheck, (req, res) => {
     let decodedJWT = req.body.decodedJWT;

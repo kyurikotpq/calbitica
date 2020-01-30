@@ -40,7 +40,6 @@ const fields = {
         status: Boolean,
         date: Date
     },
-    
     /** 
      * REMINDER OBJECT
      * {
@@ -49,7 +48,7 @@ const fields = {
      * }
      * 
      */
-    reminders: Array,
+    reminders: [Date],
 
     modifications: Array // Array of dates
     // tags: Array

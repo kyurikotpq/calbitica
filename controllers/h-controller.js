@@ -206,7 +206,6 @@ let habiticaController = {
     respondToQuest,
     toggleSleep,
     processStats,
-    
     saveToHabitica,
     updateInHabitica,
     deleteInHabitica,

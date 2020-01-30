@@ -23,7 +23,7 @@ const calbitController = require('./calbit-controller');
 const calendarController = require('./calendar-controller');
 const gcalController = require('./gcal-controller');
 
-function listEventsFromGCal(calendars, startDate, endDate, fullSync = false) {
+function listEventsFromGCal(calendars, fullSync = false) {
     let gcalEventsPromises = calendars.map(c => {
         return new Promise((resolve, reject) => {
             let nextSyncToken = fullSync
@@ -31,7 +31,7 @@ function listEventsFromGCal(calendars, startDate, endDate, fullSync = false) {
                 : (!c.nextSyncToken.events || !c.nextSyncToken.events.token)
                     ? null : c.nextSyncToken.events.token;
 
-            gcalController.listEvents(c.googleID, nextSyncToken, startDate, endDate)
+            gcalController.listEvents(c.googleID, nextSyncToken)
                 .then(eventListResult => {
                     // store the nextSyncToken
                     let eventList = eventListResult.data;
@@ -192,29 +192,16 @@ function compareItems(events, calbits, userID) {
  * 
  * @param {ObjectID} userID
  * @param {Boolean} fullSync
- * @param {Date} firstDate 
- * @param {Date|null} lastDate 
  */
-function gcalImporter(userID, fullSync, firstDate = new Date(), lastDate = null) {
-    // retrieve events from [firstDate - 30days] 
-    // to +-30 days or until lastDate
-    let startDate = DateUtil.sub(firstDate, "d", 30);
-
-    if (typeof (lastDate) == "string")
-        lastDate = new Date(lastDate);
-
-    let endDate = (!lastDate)
-        ? DateUtil.add(firstDate, "d", 30)
-        : lastDate;
-
+function gcalImporter(userID, fullSync) {
     return new Promise((resolve, reject) => {
         calendarController.listCal(userID, true, true)
             .then(calendars => {
-                listEventsFromGCal(calendars, startDate, endDate, fullSync)
+                listEventsFromGCal(calendars, fullSync)
                     .then(response => {
                         if (response.failure.length > 0) {
                             let errorCals = response.failure.map(errorCal => errorCal.calendar);
-                            listEventsFromGCal(errorCals, startDate, endDate, true)
+                            listEventsFromGCal(errorCals, true)
                                 .then(secondResponse => {
                                     if (secondResponse.failure.length > 0
                                         || secondResponse.database.length > 0) {

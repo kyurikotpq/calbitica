@@ -30,9 +30,7 @@ function listCal(userID, syncedOnly = false, importCal = true) {
                         .catch(err => { reject(err); })
                 } else resolve(calendars);
             })
-            .catch(err => {
-                reject({ status: 500, message: err });
-            });
+            .catch(err => { reject({ status: 500, message: err }); });
     });
 }
 
@@ -143,7 +141,7 @@ function changeSync(_id, sync = false) {
     return new Promise((resolve, reject) => {
         Calendar.findOne({ _id })
             .then(cal => {
-                let syncedText = (`${sync}` == 'true') ? "synced" : "unsynced";
+                let syncedText = (`${sync}` == "true") ? "synced" : "unsynced";
                 cal.sync = sync;
 
                 cal.save().then(result => {

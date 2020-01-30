@@ -83,7 +83,6 @@ function register(profile, oAuthData) {
                 resolve(jwt);
             })
             .catch((err) => {
-                console.log(err);
                 reject(err);
             });
 
@@ -174,7 +173,6 @@ function verifyGIDToken(idToken) {
                 }
             })
             .catch(err => {
-                console.log("GOOGLE AUTH ERROR", err);
                 reject({ status: 400, message: "Invalid token" });
             });
     });
@@ -207,7 +205,6 @@ function tokensFromAuthCode(code) {
                     .catch(err => reject(err));
             })
             .catch((err) => {
-                console.log(err)
                 reject(err);
             });
     })
