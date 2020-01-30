@@ -64,7 +64,6 @@ router.post('/habitica', apiCheck, (req, res) => {
             } else 
                 res.status(400).json({ message: "Could not save Habitica settings" });
         }).catch(err => {
-            console.log(err);
             res.status(400).json({ message: "Could not save Habitica settings" });
         });
 

@@ -43,7 +43,6 @@ function verifyCalbiticaJWT(token) {
         audience: audRegex,
     };
 
-    console.log("JWT: ", token)
     return new Promise((resolve, reject) => {
         jwt.verify(token, process.env.COOKIE_KEY, verifyOptions,
             // You can't turn this into a promise :(
@@ -72,8 +71,6 @@ function verifyCalbiticaJWT(token) {
                     };
                     finalResponse.newJWT = signCalbiticaJWT(payload, userID);
                     finalResponse.newDecodedJWT = payload;
-
-                    console.log("TRYNA NEW JWT: ", finalResponse);
 
                 }
 

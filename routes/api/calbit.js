@@ -45,12 +45,10 @@ router.get('/', apiCheck, function (req, res) {
                     res.status(200).json(events);
                 })
                 .catch(err => {
-                    console.log(err);
                     res.status(500).json({ message: err });
                 });
         })
         .catch(err => {
-            console.log('import error', err);
             res.status(err.status).json({ message: err.message });
         });
 
@@ -150,7 +148,6 @@ router.put('/:id/complete', [apiCheck, habiticaCheck], (req, res) => {
             });
         })
         .catch(err => {
-            console.log(err);
             res.status(500).json({ message: `Unable to ${complete} the event` });
         });
 })
@@ -194,11 +191,9 @@ router.put('/:id', [apiCheck, habiticaCheck], function (req, res) {
     let data = req.body;
     calbitController.updateCalbit(id, data, 'mvc')
         .then((resultCode) => {
-            console.log(resultCode);
             res.status(200).json({ message: "Event updated." });
         })
         .catch(err => {
-            console.log(err);
             res.status(500).json({ message: "Unable to update the event" });
         });
 });
@@ -230,7 +225,6 @@ router.delete('/:id', [apiCheck, habiticaCheck], function (req, res) {
             res.status(200).json({ message: `Event ${event.summary} deleted.` });
         })
         .catch(err => {
-            console.log(err);
             res.status(500).json({ message: "Unable to delete event" });
         })
 });

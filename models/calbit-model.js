@@ -40,7 +40,6 @@ const fields = {
         status: Boolean,
         date: Date
     },
-
     /** 
      * REMINDER OBJECT
      * {

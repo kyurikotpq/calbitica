@@ -110,7 +110,6 @@ function prepHDataForMongo(item, userID = null) {
  * @param {ObjectID} userID 
  */
 function prepGCalDataForMongo(item, userID = null) {
-    console.log("PREPPING FROM GCAL DATA ");
     let data = {
         summary: item.summary,
         start: item.start,

@@ -199,7 +199,7 @@ function updateCompletion(_id, status) {
                             resolve({
                                 stats: habiticaController.processStats(axiosData.data, true), // send back the profile!
                                 summary: calbit.summary
-                            }); 
+                            });
                         }
                     })
                     .catch(err => {

@@ -110,14 +110,14 @@ function hImporter(type = null, userID) {
                             });
 
                     }).catch(err => {
-                        if (error.response) {
+                        if (err.response) {
                             reject({ status: err.response.status, message: err.message });
                         } else {
                             reject({ status: 500, message: err.message });
                         }
                     })
-            }).catch(error => {
-                if (error.response) {
+            }).catch(err => {
+                if (err.response) {
                     reject({ status: err.response.status, message: err.message });
                 } else {
                     reject({ status: 500, message: err.message });

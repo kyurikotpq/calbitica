@@ -31,7 +31,6 @@ function listEventsFromGCal(calendars, fullSync = false) {
                 : (!c.nextSyncToken.events || !c.nextSyncToken.events.token)
                     ? null : c.nextSyncToken.events.token;
 
-            console.log("fullsync", fullSync, "next sync token", nextSyncToken)
             gcalController.listEvents(c.googleID, nextSyncToken)
                 .then(eventListResult => {
                     // store the nextSyncToken
@@ -45,12 +44,10 @@ function listEventsFromGCal(calendars, fullSync = false) {
                             }));
                         })
                         .catch(err => {
-                            console.log(err);
                             resolve({ status: 500, message: err }); // MongoDB err
                         });
                 })
                 .catch(err => {
-                    console.log(err);
                     resolve({
                         status: err.code,
                         message: err.errors[0].message,
@@ -94,7 +91,6 @@ function listSomeCalbitsAndCompare(events, userID) {
                 resolve(compareItems(events, calbits, userID));
             })
             .catch(err => {
-                console.log(err);
                 reject(err);
             });
     })
@@ -113,7 +109,6 @@ function listAllCalbitsAndCompare(events, userID) {
                 resolve(compareItems(events, calbits, userID));
             })
             .catch(err => {
-                console.log(err);
                 reject(err);
             });
     })
@@ -159,9 +154,7 @@ function compareItems(events, calbits, userID) {
                             createdPromises.push(calbitController.createCalbit(gcalItem, userID, 'gcal'))
                         }
                     })
-                    .catch(err => {
-                        console.log(err)
-                    });
+                    .catch(err => { });
             }
         });
 
@@ -237,7 +230,6 @@ function gcalImporter(userID, fullSync) {
                     })
             })
             .catch(err => {
-                console.log(err);
                 reject({ status: err.code, message: err.errors[0].message });
             })
     });
