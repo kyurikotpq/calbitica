@@ -55,6 +55,9 @@ function prepMVCDataForMongo(body, userID = null) {
     if (body.reminders != undefined) {
         reminders.push(body.reminders);
         data.reminders = reminders;
+    } else {
+        reminders.push(body.reminders);
+        data.reminders = null;
     }
 
     // Creating calbit
