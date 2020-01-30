@@ -2,7 +2,9 @@
 let CALENDARARR = null;
 
 // Keep track of the reminders
-var REMINDERS = [];
+let REMINDERS = [];
+let reminderTrigger = false;
+let alertReminders = [];
 
 /**
  * v3 - helper functions
@@ -77,30 +79,42 @@ function transformData(event) {
         || start.format("D") != end.format("D");
 
     if(reminders.length != 0) {
-        reminders.forEach(reminder => {
-            let reminderDate = new Date(reminder).getTime();
-            let now = new Date().getTime();
-            let milliseconds;
+        let reminderDate = new Date(reminders).getTime();
+        let now = new Date().getTime();
+        let milliseconds;
 
-            // Will not get the past date here...
-            if(reminderDate > now) {
-                // Calculated when the actual reminders Date & Time reach on present
-                milliseconds = reminderDate - now;
+        // Will not get the past date here...
+        if(reminderDate > now) {
+            // When there is actual reminders that have not notify
+            alertReminders.push(true);
 
-                let timeout = setTimeout(() => {
-                    alert("Your Event: " + event.summary + " is happening at " + reminders);            
-                }, milliseconds)
+            if(reminderTrigger == false) {
+                new Promise((resolve, reject) => {
+                    // Calculated when the actual reminders Date & Time reach on present
+                    milliseconds = reminderDate - now;
     
-                REMINDERS.push(timeout);
+                    var timeout = setTimeout(() => {
+                        alert("Your Event: " + event.summary + " is happening at " + reminders);
+                    }, milliseconds);
+    
+                    REMINDERS.push(timeout);
+                    resolve(REMINDERS);
+                }).then(input => {
+                    reminderTrigger = true;
+                });
             }
-        })
+        } else {
+            alertReminders.push(false);
+        }
     }
+
+    console.log(REMINDERS);
 
     // if it's all day with time
     if (allDay && event.end.dateTime) {
         // TODO
     }
-    console.log(start.local(), end.local())
+    // console.log(start.local(), end.local())
 
     return {
         _id: event._id,
@@ -163,6 +177,13 @@ function refreshCalendar() {
     $("#myModal #event-form-_id").val("");
     $("#myModal #event-form-googleID").text("");
     $("#myModal #event-form-allDay").val("");
+
+    // Discard the notification that alert before
+    var allData = (currentValue) => currentValue == false;
+    if(alertReminders.every(allData)) {
+        REMINDERS.forEach(time => clearTimeout(time));
+        REMINDERS = [];
+    }
 }
 
 /**
@@ -386,16 +407,15 @@ function saveEvent() {
     let calendar = CALENDARARR.find(c => c.googleID == calendarID);
     let display = (calendar) ? calendar.sync : false;
 
-    let switchTrigger = $("#switch").val();
+    let switchTrigger = $("#switch").prop("checked");
     let remindersDate = $("#event-form-remindersDate").val().split("/").reverse().join("-");
     let remindersTime = $('#event-form-remindersTime').val();
 
     let remindersDateTime = `${remindersDate}T${remindersTime}:00`;
-    let reminders = (allDay) ? remindersDate : toYmdThisZ(remindersDateTime);
-
+    let reminders = toYmdThisZ(remindersDateTime);
     let data = {};
 
-    if (switchTrigger == "Enable") {
+    if (switchTrigger == true) {
         if (!title || !startDate || !startTime || !endDate || !endTime || !remindersDate || !remindersTime) {
             alert("Please fill all fields");
             return;
@@ -438,8 +458,8 @@ function saveEvent() {
         data = {
             title, location,
             allDay, calendarID,
-            start, end, display,
-            isDump: false
+            start, end,
+            display, isDump: false
         }
     }
 
