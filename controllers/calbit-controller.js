@@ -46,11 +46,7 @@ function createInMongo(data) {
         let code = -1;
         new Calbit(data).save()
             .then(result => code = 1)
-            .catch(err => {
-                console.log("------------")
-                console.log("MONGO CREATE ERROR")
-                console.log(err);
-            })
+            .catch(err => { })
             .finally(() => resolve(code))
     })
 }
@@ -68,7 +64,6 @@ function createCalbit(body, userID, dataFrom) {
         if (dataFrom == 'mvc') {
             gcalController.saveEvent(body.calendarID, data)
                 .then((gcalEvent) => {
-                    console.log("GCAL EVENT CREATED", gcalEvent);
                     let gcalData = gcalEvent.data;
                     data.googleID = gcalData.id;
                     data.created = gcalData.created;
@@ -83,7 +78,6 @@ function createCalbit(body, userID, dataFrom) {
                         })
                 })
                 .catch(err => {
-                    console.log(err);
                     (dataFrom == 'mvc') ? reject(-1) : resolve(-1);
                 });
         } else {
@@ -107,11 +101,7 @@ function updateInMongo(_id, data, mvc = false) {
                 code = 1;
                 updatedCalbit = calbit;
             })
-            .catch(err => {
-                console.log("------------")
-                console.log("UPDATE ERROR")
-                console.log(err);
-            })
+            .catch(err => { })
             .finally(() => {
                 (mvc && code != -1) ? resolve(updatedCalbit) : resolve(code);
             })
@@ -144,13 +134,11 @@ function updateCalbit(_id, body, dataFrom) {
                                     resolve(1);
                                 })
                                 .catch(err => {
-                                    console.log(err)
                                     reject(-1);
                                 });
                         })
                 })
                 .catch(err => {
-                    console.log(err);
                     (dataFrom == 'mvc') ? reject(-1) : resolve(-1);
                 });
         } else {
@@ -184,19 +172,9 @@ function deleteInMongo(_id, mvc = false) {
                                 });
                             });
                     })
-                    .catch(err => {
-                        console.log("------------")
-                        console.log("DELETE ERROR")
-                        console.log(err);
-                        (mvc) ? reject(-1) : resolve(-1);
-                    })
+                    .catch(err => { (mvc) ? reject(-1) : resolve(-1); })
             })
-            .catch(err => {
-                console.log("------------")
-                console.log("DELETE ERROR")
-                console.log(err);
-                (mvc) ? reject(-1) : resolve(-1);
-            })
+            .catch(err => { (mvc) ? reject(-1) : resolve(-1); })
     });
 }
 
@@ -231,12 +209,7 @@ function updateCompletion(_id, status) {
                         });
                     });
             })
-            .catch(err => {
-                console.log("------------")
-                console.log("UPDATE COMPLETION ERROR")
-                console.log(err);
-                reject(err);
-            })
+            .catch(err => { reject(err); })
     })
 }
 

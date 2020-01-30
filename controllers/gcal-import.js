@@ -134,7 +134,6 @@ function compareItems(events, calbits, userID) {
         });
 
         let deletedPromises = [];
-        console.log("NOT IN CALBIT ARR", notInCalbitArr);
         notInCalbitArr.forEach(c => {
             deletedPromises.push(calbitController.deleteInMongo(c._id));
         });
@@ -217,7 +216,6 @@ function gcalImporter(userID, fullSync) {
                                             ? secondResponse.failure[0].message
                                             : secondResponse.database[0];
 
-                                        console.log("SECOND RESP ERROR LINE 203", secondResponse);
                                         reject({ status: 500, message });
                                     } else {
                                         let finalArr = secondResponse.success.concat(response.success);
@@ -228,7 +226,6 @@ function gcalImporter(userID, fullSync) {
                                     }
                                 });
                         } else if (response.database.length > 0) {
-                            console.log("DB ERROR LINE 211", response.database);
                             reject({ status: 500, message: response.database[0] });
                         } else {
                             // no errors - return the successful calendar events

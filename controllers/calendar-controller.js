@@ -27,16 +27,10 @@ function listCal(userID, syncedOnly = false, importCal = true) {
 
                     importCalToMongo(userID, syncToken)
                         .then(result => resolve(Calendar.find(calendarFilter)))
-                        .catch(err => {
-                            console.log(err);
-                            reject(err);
-                        })
+                        .catch(err => { reject(err); })
                 } else resolve(calendars);
             })
-            .catch(err => {
-                console.log(err);
-                reject({ status: 500, message: err });
-            });
+            .catch(err => { reject({ status: 500, message: err }); });
     });
 }
 
