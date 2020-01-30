@@ -62,7 +62,7 @@ function sub(date, type, amount) {
 
 function halfHourIntervals() {
     let intervals = [];
-    for(let i = 0; i < 24; i++) {
+    for (let i = 0; i < 24; i++) {
         let start = ("0" + i).slice(-2);
         intervals.push(`${start}:00`);
         intervals.push(`${start}:30`);
@@ -70,4 +70,19 @@ function halfHourIntervals() {
     return intervals;
 }
 
-module.exports = { getMs, add, sub, halfHourIntervals }
+/**
+ * Calbit-specific helper function
+ * @param {*} startDateObj 
+ * @param {*} endDateObj 
+ * @returns boolean
+ */
+function isAllDay(startDateObj, endDateObj) {
+    let allDay = startDateObj.date != undefined;
+
+    let start = new Date(allDay ? startDateObj.date : startDateObj.dateTime),
+        end = new Date(allDay ? endDateObj.date : endDateObj.dateTime);
+
+    return allDay || start.getDate() != end.getDate();
+}
+
+module.exports = { getMs, add, sub, halfHourIntervals, isAllDay }

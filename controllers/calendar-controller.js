@@ -17,25 +17,36 @@ function listCal(userID, syncedOnly = false, importCal = true) {
         if (syncedOnly)
             calendarFilter.sync = syncedOnly;
 
-        Calendar.find(calendarFilter)
-            .then(calendars => {
-                if (importCal) {
+        // TODO: CLean this up
+        new Promise((innerResolve, innerReject) => {
+            if (!importCal)
+                innerResolve("Not importing")
+
+            Calendar.find(calendarFilter)
+                .then(calendars => {
                     let syncToken = (calendars.length == 0)
                         ? null
-                        : (!calendars[0].nextSyncToken.calendars || !calendars[0].nextSyncToken.calendars.token)
+                        : (!calendars[0].nextSyncToken.calendars
+                            || !calendars[0].nextSyncToken.calendars.token)
                             ? null : calendars[0].nextSyncToken.calendars.token;
 
                     importCalToMongo(userID, syncToken)
-                        .then(result => resolve(Calendar.find(calendarFilter)))
+                        .then(result => { innerResolve(result) })
                         .catch(err => {
                             console.log(err);
                             reject(err);
                         })
-                } else resolve(calendars);
-            })
-            .catch(err => {
-                console.log(err);
-                reject({ status: 500, message: err });
+                })
+                .catch(err => {
+                    console.log(err);
+                    reject({ status: 500, message: err });
+                });
+        })
+            .finally(() => {
+                resolve(Calendar.find(
+                    calendarFilter,
+                    "_id userID googleID summary description sync defaultReminders"
+                ))
             });
     });
 }
@@ -67,7 +78,7 @@ function importCalToMongo(userID, storedSyncToken = null) {
             })
             .catch(err => {
                 console.log("ERROR FROM LINE 74", err);
-                // if the token is expired, perform a full sync!
+                // if the CALENDAR SYNC token is expired, perform a full sync!
                 if (err.status == 410) {
                     gcalController.listCal().then((calendarListResult) => {
                         Promise.all(handleCalendarList(userID, calendarListResult.data))
@@ -83,6 +94,8 @@ function importCalToMongo(userID, storedSyncToken = null) {
                             })
                     })
                 } else {
+                    // TODO: Most likely is the access token expired
+                    // so need to refresh it!
                     reject({
                         status: 500,
                         message: "Could not retrieve Google Calendars"
@@ -148,32 +161,24 @@ function handleCalendarList(userID, calendarList, storedSyncToken) {
  */
 function changeSync(_id, sync = false) {
     return new Promise((resolve, reject) => {
-        Calendar.findOne({ _id })
+        Calendar.findOneAndUpdate({ _id }, { sync }, { new: true })
             .then(cal => {
                 let syncedText = (`${sync}` == "true") ? "synced" : "unsynced";
-                cal.sync = sync;
 
-                cal.save().then(result => {
-                    Calbit.updateMany(
-                        { calendarID: cal.googleID }, // googleID = calendar's googleID
-                        { display: sync }
-                    )
-                        .then((result) => {
-                            resolve(`Calendar ${cal.summary} is now ${syncedText}`)
-                        })
-                        .catch(err => {
-                            console.log(err);
-                            reject({ 
-                                status: 500, 
-                                message: `Calendar ${cal.summary} could not be ${syncedText}.` 
-                            });
-                        })
-                })
+                Calbit.updateMany(
+                    { calendarID: cal.googleID }, // googleID = calendar's googleID
+                    { display: sync }
+                )
+                    .then((result) => {
+                        resolve(`Calendar ${cal.summary} is now ${syncedText}`)
+
+                        Calendar.find().then(c => { console.log("cal sync result:", c) })
+                    })
                     .catch(err => {
                         console.log(err);
-                        reject({ 
-                            status: 500, 
-                            message: `Calendar ${cal.summary} could not be ${syncedText}.` 
+                        reject({
+                            status: 500,
+                            message: `Calendar ${cal.summary} could not be ${syncedText}.`
                         });
                     })
             }).catch(err => {

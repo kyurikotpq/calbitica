@@ -75,8 +75,7 @@ function transformData(event) {
             ? event.reminders.map(r => moment(r).local())
             : [];
 
-    let allDay = event.start.date != undefined
-        || start.format("D") != end.format("D");
+    // allDay is now returned by API
 
     if(reminders.length != 0) {
         let reminderDate = new Date(reminders).getTime();
@@ -111,7 +110,7 @@ function transformData(event) {
     console.log(REMINDERS);
 
     // if it's all day with time
-    if (allDay && event.end.dateTime) {
+    if (event.allDay && event.end.dateTime) {
         // TODO
     }
     // console.log(start.local(), end.local())
@@ -131,7 +130,7 @@ function transformData(event) {
 
         reminders,
 
-        allDay,
+        allDay: event.allDay,
         completed: event.completed,
     };
 }
