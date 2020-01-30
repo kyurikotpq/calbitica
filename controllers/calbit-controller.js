@@ -6,6 +6,7 @@ const habiticaController = require('./h-controller');
 const gcalController = require('./gcal-controller');
 
 const TransformCalbitUtil = require('../util/transform-calbit');
+const DateUtil = require('../util/date');
 
 /**
  * Gets the user's calbits.
@@ -36,9 +37,20 @@ function getAllCalbits(userID, isDump = null, displayOnly = null, others = null)
 
     // NOTE: location, description are optional and may not be in the field list.
     let fields = "_id summary description isDump calendarID googleID "
-            + "completed start end location reminders";
-            
-    return Calbit.find(searchCriteria, fields);
+        + "completed start end location reminders";
+
+    return new Promise((resolve, reject) => {
+        Calbit.find(searchCriteria, fields)
+            .then(calbits => {
+                resolve(
+                    calbits.map(c => {
+                        c = c.toObject();
+                        c.allDay = DateUtil.isAllDay(c.start, c.end);
+                        return c
+                    })
+                )
+            });
+    });
 }
 
 function createInMongo(data) {
@@ -221,7 +233,7 @@ function updateCompletion(_id, status) {
                             resolve({
                                 stats: habiticaController.processStats(axiosData.data, true), // send back the profile!
                                 summary: calbit.summary
-                            }); 
+                            });
                         }
                     })
                     .catch(err => {
