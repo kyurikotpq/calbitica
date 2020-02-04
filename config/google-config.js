@@ -5,6 +5,9 @@ const G_CONFIG = {
     clientID: process.env.GCLIENT_ID,
     clientSecret: process.env.GCLIENT_SECRET,
     callbackURL: process.env.GCLIENT_REDIRECT,
+
+    // Scopes required for our app to work -
+    // we need access to the user's calendar
     scopes: [
         'profile',
         'https://www.googleapis.com/auth/calendar.readonly',

@@ -53,34 +53,34 @@ function getAllCalbits(userID, isDump = null, displayOnly = null, others = null)
     });
 }
 
+/***
+ * Save the event into MongoDB
+ * @param {Calbit} data
+ */
 function createInMongo(data) {
     return new Promise((resolve, reject) => {
         let code = -1;
         new Calbit(data).save()
             .then(result => code = 1)
-            .catch(err => {
-                console.log("------------")
-                console.log("MONGO CREATE ERROR")
-                console.log(err);
-            })
+            .catch(err => { })
             .finally(() => resolve(code))
     })
 }
 
 /**
- * 
+ * Create the event in Google Calendar (if from MVC/API call)
+ * and then create the document in MongoDB
  * @param {Request} body 
  * @param {ObjectID} userID MongoDB ID
- * @param {String} dataFrom 
+ * @param {String} dataFrom Where is this being called from?
  */
 function createCalbit(body, userID, dataFrom) {
-    let data = TransformCalbitUtil.prepData(body, userID, dataFrom);
+    let data = TransformCalbitUtil(body, userID, dataFrom);
 
     return new Promise((resolve, reject) => {
         if (dataFrom == 'mvc') {
             gcalController.saveEvent(body.calendarID, data)
                 .then((gcalEvent) => {
-                    console.log("GCAL EVENT CREATED", gcalEvent);
                     let gcalData = gcalEvent.data;
                     data.googleID = gcalData.id;
                     data.created = gcalData.created;
@@ -95,7 +95,6 @@ function createCalbit(body, userID, dataFrom) {
                         })
                 })
                 .catch(err => {
-                    console.log(err);
                     (dataFrom == 'mvc') ? reject(-1) : resolve(-1);
                 });
         } else {
@@ -111,6 +110,11 @@ function createCalbit(body, userID, dataFrom) {
     });
 }
 
+
+/***
+ * Update the event into MongoDB
+ * @param {Calbit} data
+ */
 function updateInMongo(_id, data, mvc = false) {
     return new Promise((resolve, reject) => {
         let code = -1, updatedCalbit = null;
@@ -119,19 +123,23 @@ function updateInMongo(_id, data, mvc = false) {
                 code = 1;
                 updatedCalbit = calbit;
             })
-            .catch(err => {
-                console.log("------------")
-                console.log("UPDATE ERROR")
-                console.log(err);
-            })
+            .catch(err => { })
             .finally(() => {
                 (mvc && code != -1) ? resolve(updatedCalbit) : resolve(code);
             })
     })
 }
 
+
+/**
+ * Update the event in Google Calendar (if from MVC/API call)
+ * and then update the document in MongoDB
+ * @param {Request} body 
+ * @param {ObjectID} userID MongoDB ID
+ * @param {String} dataFrom Where is this being called from?
+ */
 function updateCalbit(_id, body, dataFrom) {
-    let data = TransformCalbitUtil.prepData(body, null, dataFrom);
+    let data = TransformCalbitUtil(body, null, dataFrom);
 
     return new Promise((resolve, reject) => {
         if (dataFrom == 'mvc') {
@@ -156,13 +164,11 @@ function updateCalbit(_id, body, dataFrom) {
                                     resolve(1);
                                 })
                                 .catch(err => {
-                                    console.log(err)
                                     reject(-1);
                                 });
                         })
                 })
                 .catch(err => {
-                    console.log(err);
                     (dataFrom == 'mvc') ? reject(-1) : resolve(-1);
                 });
         } else {
@@ -178,6 +184,11 @@ function updateCalbit(_id, body, dataFrom) {
     });
 }
 
+/**
+ * Delete the event from Google, Habitica, and MongoDB
+ * @param {ObjectID} _id MongoDB ObjectID of the Calbit
+ * @param {Boolean} mvc Is this call from MVC?
+ */
 function deleteInMongo(_id, mvc = false) {
     return new Promise((resolve, reject) => {
         // Delete from habitica AND google calendar
@@ -197,22 +208,21 @@ function deleteInMongo(_id, mvc = false) {
                             });
                     })
                     .catch(err => {
-                        console.log("------------")
-                        console.log("DELETE ERROR")
-                        console.log(err);
                         (mvc) ? reject(-1) : resolve(-1);
                     })
             })
             .catch(err => {
-                console.log("------------")
-                console.log("DELETE ERROR")
-                console.log(err);
                 (mvc) ? reject(-1) : resolve(-1);
             })
     });
 }
 
-// Update in Habitica too to score points!
+/**
+ * Complete the status of the event.
+ * Update in Habitica too to score points!
+ * @param {ObjectID} _id MongoDB ObjectID of the Calbit
+ * @param {Boolean} status Completion status of the event
+ */
 function updateCompletion(_id, status) {
     return new Promise((resolve, reject) => {
         Calbit.findOneAndUpdate({ _id },
@@ -222,7 +232,7 @@ function updateCompletion(_id, status) {
                     date: new Date()
                 }
             },
-            { new: true }
+            { new: true } // Return the new, updated document
         )
             .then(calbit => {
                 let direction = status ? "up" : "down";
@@ -244,15 +254,15 @@ function updateCompletion(_id, status) {
                     });
             })
             .catch(err => {
-                console.log("------------")
-                console.log("UPDATE COMPLETION ERROR")
-                console.log(err);
                 reject(err);
             })
     })
 }
 
 
+/**
+ * Compile functions for export
+ */
 let calbitController = {
     getAllCalbits,
     createCalbit,

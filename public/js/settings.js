@@ -1,3 +1,4 @@
+// Save settings onclick
 $(window).on('load', function() {
     $("#saveSettings").on("click", function() {
         const hUserID = $("#hUserID").val();

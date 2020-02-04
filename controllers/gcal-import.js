@@ -23,6 +23,11 @@ const calbitController = require('./calbit-controller');
 const calendarController = require('./calendar-controller');
 const gcalController = require('./gcal-controller');
 
+/**
+ * List events from all of the users' Google Calendars
+ * @param {*} calendars Google Calendars
+ * @param {*} fullSync Whether to perform a full sync or use an existing nextSyncToken
+ */
 function listEventsFromGCal(calendars, fullSync = false) {
     let gcalEventsPromises = calendars.map(c => {
         return new Promise((resolve, reject) => {
@@ -31,10 +36,10 @@ function listEventsFromGCal(calendars, fullSync = false) {
                 : (!c.nextSyncToken.events || !c.nextSyncToken.events.token)
                     ? null : c.nextSyncToken.events.token;
 
-            console.log("fullsync", fullSync, "next sync token", nextSyncToken)
+            // Get events from Google Calendar
             gcalController.listEvents(c.googleID, nextSyncToken)
                 .then(eventListResult => {
-                    // store the nextSyncToken
+                    // store the nextSyncToken for a particular Calendar's events
                     let eventList = eventListResult.data;
                     calendarController.saveSyncToken(c.googleID, eventList.nextSyncToken)
                         .then(result => {
@@ -45,12 +50,10 @@ function listEventsFromGCal(calendars, fullSync = false) {
                             }));
                         })
                         .catch(err => {
-                            console.log(err);
                             resolve({ status: 500, message: err }); // MongoDB err
                         });
                 })
                 .catch(err => {
-                    console.log(err);
                     resolve({
                         status: err.code,
                         message: err.errors[0].message,
@@ -63,6 +66,7 @@ function listEventsFromGCal(calendars, fullSync = false) {
     return new Promise((resolve, reject) => {
         Promise.all(gcalEventsPromises)
             .then(promiseResults => {
+                // Compile the results of the previous operation
                 let errorCals = promiseResults.filter(r => r.status && r.status == 410);
                 let mongoErrors = promiseResults.filter(r => r.status && r.status == 500);
                 let correctCals = promiseResults.filter(r =>
@@ -101,7 +105,7 @@ function listSomeCalbitsAndCompare(events, userID) {
 }
 
 /**
- * Get all calbits belonging to the user and compare
+ * Get ALL calbits belonging to the user and compare
  * calbits with the gcal events (full sync)
  * @param {Event[]} events 
  * @param {ObjectID} userID MongoDB ID
@@ -217,7 +221,6 @@ function gcalImporter(userID, fullSync) {
                                             ? secondResponse.failure[0].message
                                             : secondResponse.database[0];
 
-                                        console.log("SECOND RESP ERROR LINE 203", secondResponse);
                                         reject({ status: 500, message });
                                     } else {
                                         let finalArr = secondResponse.success.concat(response.success);
@@ -228,7 +231,6 @@ function gcalImporter(userID, fullSync) {
                                     }
                                 });
                         } else if (response.database.length > 0) {
-                            console.log("DB ERROR LINE 211", response.database);
                             reject({ status: 500, message: response.database[0] });
                         } else {
                             // no errors - return the successful calendar events
@@ -240,8 +242,13 @@ function gcalImporter(userID, fullSync) {
                     })
             })
             .catch(err => {
-                console.log(err);
-                reject({ status: err.code, message: err.errors[0].message });
+                // If you're here, the errors most likely
+                // involve the access_token or refresh_token
+                let message = (err.errors != undefined && err.errors[0])
+                    ? err.errors[0] : err.message;
+                let status = (err.code != undefined) ? err.code : err.status;
+
+                reject({ status, message });
             })
     });
 }

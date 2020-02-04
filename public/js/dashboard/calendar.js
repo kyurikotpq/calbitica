@@ -48,8 +48,11 @@ function openModal(day, jsEvent) {
         "position",
         {
             my: positionX + " " + positionY,
-            at: "center",
-            of: jsEvent.target
+            at: positionY,
+            of: jsEvent.target,
+
+            // prevent dialog from going out of the window
+            collision: "fit"
         }
     );
 
@@ -107,7 +110,6 @@ function transformData(event) {
         }
     }
 
-    console.log(REMINDERS);
 
     // if it's all day with time
     if (event.allDay && event.end.dateTime) {
@@ -469,8 +471,10 @@ function saveEvent() {
     let url = '/api/calbit';
     if (id != '') url += `/${id}`;
 
-    if (id != '')
+    if (id != '') {
         data.googleID = $('#event-form-googleID').val();
+        data.originalCalendarID = $('#event-form-originalCalendarID').val();
+    }
 
     $.ajax({
         url,
@@ -506,9 +510,10 @@ function renderEvent(event, element, view) {
         startWithA = event.start.format("HH:mm A"),
         end = event.end.format("ha"),
         endWithA = event.end.format("HH:mm A"),
-        allDay = !event.start.hasTime();
+        allDay = !event.start.hasTime(),
+        completed = event.completed.status;
 
-    let markup = `<div class="fc-content">
+    let markup = `<div class="fc-content ${(completed) ? "completed" : ""}">
                     <div class="fc-title">${event.title}</div>`;
     if (!allDay) {
         markup += `<div class="fc-time" data-start="${start}" data-full="${startWithA} - ${endWithA}">

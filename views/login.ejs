@@ -6,70 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Login - Calbitica</title>
-    <style>
-        body {
-            font-family: arial;
-            margin: 0;
-        }
-
-        nav {
-            background: #ff5353;
-            padding: 20px 10px;
-        }
-
-        nav ul {
-            max-width: 960px;
-            margin: 0 auto;
-            padding: 0;
-        }
-
-        nav li {
-            list-style-type: none;
-            display: inline-block;
-            margin: 0 10px 0 0;
-        }
-
-        nav a {
-            color: #fff;
-            font-size: 18px;
-            background: rgba(255, 255, 255, 0.2);
-            text-decoration: none;
-            padding: 10px;
-            display: block;
-        }
-
-        main,
-        header {
-            max-width: 960px;
-            margin: 30px auto;
-            padding: 0 10px;
-            color: #333;
-        }
-
-        .google-btn {
-            color: #fff;
-            text-decoration: none;
-            font-size: 18px;
-            padding: 10px;
-            background: #ff5353;
-        }
-    </style>
-
+    <link rel="stylesheet" href="/css/home.css">
 </head>
 
 <body>
-    <nav>
-        <ul>
-            <li><a href="/auth/logout">Logout</a></li>
-            <li><a href="/auth/login">Login</a></li>
-            <li><a href="/">Homepage</a></li>
-        </ul>
-    </nav>
-    <header>
-        <h1>Login using...</h1>
-    </header>
     <main>
-        <a class="google-btn" href="/auth/google">Google+</a>
+        <img id="logo" src="/images/brand/logo/white_logo_3x.png" alt="Calbitica Logo">
+        <h2 class="cta">Nice to see you again! Ready to be producitive?</h2>
+        <p class="quote">"If you don't schedule it, you're not going to do it."<br>
+            <span class="quote-person">- Brendon Burchard, World's First High Performance Coach</span>
+        </p>
+        <a class="btn btn-primary" href="/auth/google">Continue with Google</a>
     </main>
 </body>
 

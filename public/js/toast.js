@@ -1,6 +1,8 @@
 // Simple JS toasts
 let TOASTS = [];
 let TOAST_COUNT = -2;
+
+// Create a toast
 function createToast(type, message) {
     let markup = `<div class="toast toast-${type}">
                     <span>${message}<span>
@@ -27,6 +29,7 @@ function createToast(type, message) {
     TOAST_COUNT--;
 }
 
+// Remove the Toast
 function destroyToast(count, closeBtn) {
     let index = TOASTS.indexOf(parseInt(count));
 

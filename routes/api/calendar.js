@@ -67,7 +67,6 @@ router.get('/import', apiCheck, (req, res) => {
             res.status(200).json(result);
         })
         .catch(err => {
-            console.log('import error', err);
             res.status(err.status).json({ message: err.message });
         });
 });
@@ -106,7 +105,6 @@ router.get('/sync/:id', apiCheck, (req, res) => {
             res.status(200).json({ message });
         })
         .catch(err => {
-            console.log(err);
             res.status(err.status).json({ message: err.message });
         });
 });

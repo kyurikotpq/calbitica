@@ -6,9 +6,12 @@ const oauth2Client = require('../../config/google-setup');
 const authCheck = require('../../middleware/auth-check');
 const authToken = require('../../middleware/auth-token');
 
+// MVC Login
 router.get('/login', authCheck.isLoggedin, (req, res) => {
     res.render('login');
 })
+
+// MVC Logout
 router.get('/logout', (req, res) => {
     req.session = null; // invalidate all MVC sessions
     res.redirect('/'); // redirect back to home page

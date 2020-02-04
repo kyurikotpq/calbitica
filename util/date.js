@@ -60,6 +60,10 @@ function sub(date, type, amount) {
     return new Date(newDate.setTime(date.getTime() - numMsToSub));
 }
 
+/**
+ * Generate 30-min intervals for
+ * a dropdown list
+ */
 function halfHourIntervals() {
     let intervals = [];
     for (let i = 0; i < 24; i++) {
@@ -85,4 +89,22 @@ function isAllDay(startDateObj, endDateObj) {
     return allDay || start.getDate() != end.getDate();
 }
 
-module.exports = { getMs, add, sub, halfHourIntervals, isAllDay }
+/**
+ * Calculate the amount of milliseconds between now and the specified date.
+ * Returns negative values if the time has passed.
+ * 
+ * @param {Number} timeInDateMs Milliseconds from a Date.getTime()
+ */
+function timeFromNow(timeInDateMs) {
+    let now = new Date().getTime()
+    return timeInDateMs - now
+}
+
+let DateUtil = { 
+    getMs, add, sub, 
+    halfHourIntervals, 
+    isAllDay,
+    timeFromNow
+};
+
+module.exports = DateUtil

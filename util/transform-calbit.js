@@ -26,11 +26,7 @@ function prepMVCDataForMongo(body, userID = null) {
         habiticaType: "todo", // add support for habit and daily in future
         start,
         end,
-        calendarID: body.calendarID,
-        // future: add support for tags
-        // tags: Array
-        // todo: HANDLE DAILIES, REPETITION!
-        // new property?
+        calendarID: body.calendarID
     }
 
     if (body.description)
@@ -83,11 +79,6 @@ function prepHDataForMongo(item, userID = null) {
         completed: {
             status: item.completed || false,
         }
-
-        // future: add support for tags
-        // tags: Array
-        // todo: HANDLE DAILIES, REPETITION!
-        // new property?
     };
 
     if (item.description)
@@ -108,7 +99,7 @@ function prepHDataForMongo(item, userID = null) {
 }
 
 /**
- * Not done ya
+ * Prep Google Calendar Data for MongoDB saving
  * @param {Event} item 
  * @param {ObjectID} userID 
  */
@@ -117,16 +108,14 @@ function prepGCalDataForMongo(item, userID = null) {
     let data = {
         summary: item.summary,
         start: item.start,
-        end: item.end,
-
-        // future: add support for tags
-        // tags: Array
-        // todo: HANDLE DAILIES, REPETITION!
-        // new property?
+        end: item.end
     };
 
     if (item.description)
-        data.description = item.notes;
+        data.description = item.description;
+
+    if (item.location)
+        data.location = item.location;
 
     // Creating calbit
     if (userID) {
@@ -144,6 +133,12 @@ function prepGCalDataForMongo(item, userID = null) {
     return data;
 }
 
+/**
+ * Entry point for this transformer
+ * @param {Request} body request body
+ * @param {ObjectID} userID 
+ * @param {String} dataFrom Where is this being called from?
+ */
 function prepData(body, userID, dataFrom) {
     let data = null;
 
@@ -163,11 +158,4 @@ function prepData(body, userID, dataFrom) {
     return data;
 }
 
-let TransformCalbitUtil = {
-    prepHDataForMongo,
-    prepMVCDataForMongo,
-    prepGCalDataForMongo,
-    prepData,
-}
-
-module.exports = TransformCalbitUtil;
+module.exports = prepData;

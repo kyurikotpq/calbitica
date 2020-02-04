@@ -39,8 +39,8 @@ router.post('/code', (req, res) => {
             message: "Successfully signed in to Calbitica.",
             jwt
         }))
-        .catch(err => res.status(400).json({ 
-            message: "Could not sign in to Calbitica" 
+        .catch(err => res.status(400).json({
+            message: "Could not sign in to Calbitica"
         }));
 })
 
