@@ -354,9 +354,9 @@ label,
   .switch input:checked + .slider {
     background-color: #2196F3; }
     .switch input:checked + .slider:before {
-      -webkit-transform: translateX(14px);
-      -ms-transform: translateX(14px);
-      transform: translateX(14px); }
+      -webkit-transform: translateX(12px);
+      -ms-transform: translateX(12px);
+      transform: translateX(12px); }
   .switch .slider {
     position: absolute;
     cursor: pointer;
@@ -373,7 +373,7 @@ label,
       height: 14px;
       width: 14px;
       left: 2px;
-      bottom: 2px;
+      bottom: 1.75px;
       background-color: white;
       -webkit-transition: .4s;
       transition: .4s; }
@@ -581,6 +581,10 @@ a.btn {
       background-color: #0067AE; }
     #container #sidebar-calendar .fc-today .fc-day-number {
       color: #ffffff; }
+  #container #main-calendar .fc-event {
+    background-color: #0067AE; }
+  #container #main-calendar .fc-content.completed {
+    opacity: 0.5; }
   #container #main-calendar .fc-time-grid .fc-slats .fc-minor td {
     border: none; }
   #container #main-calendar .fc-time-grid-event.fc-short .fc-time:after {

@@ -4,36 +4,43 @@
  *    sent by the app and sending back the required JWT for
  *    app access to the Calbitica API
  */
-
-const { OAuth2Client } = require('google-auth-library');
-
 const axiosInstance = require('../config/h-axios-setup');
-const gCalOAuth2Client = require('../config/google-setup');
+const googleOAuth2Client = require('../config/google-setup');
 
 const User = require('../models/user-model');
 const JWTUtil = require('../util/jwt');
+const DateUtil = require('../util/date');
 const Crypt = require('../util/crypt');
 
 
+/**
+ * Log the user in, saving new refresh_token if any
+ * And returning a signed JWT containing auth tokens
+ * @param {User} user MongoDB User Object
+ * @param {GoogleProfile} profile Google Profile object returned from verifyIDToken()
+ * @param {Object} oAuthData contains refresh_token, access_token and expiry_date minimally
+ */
 function login(user, profile, oAuthData) {
     let { refresh_token, access_token, expiry_date } = oAuthData;
-    
+
     return new Promise((resolve, reject) => {
         // update the refresh token if necessary
         // get indexof the googleID & retrieve the token in the same index
         let index = user.googleIDs.indexOf(profile.id);
-        let cipherRefreshToken = user.refresh_tokens[index];
-        let plainRefreshToken = Crypt.decrypt(cipherRefreshToken);
-        let newRefreshToken = cipherRefreshToken;
+        let cipherStoredRefreshToken = user.refresh_tokens[index];
+        let plainStoredRefreshToken = Crypt.decrypt(cipherStoredRefreshToken);
+        let newRefreshToken = cipherStoredRefreshToken;
 
-        if (refresh_token != '' && plainRefreshToken != refresh_token) {
-            // old refresh token is different
+        // stored refresh token is different from incoming refresh token
+        if (refresh_token != '' && plainStoredRefreshToken != refresh_token) {
             let newCipherRefreshToken = Crypt.encrypt(refresh_token);
             user.refresh_tokens[index] = newCipherRefreshToken;
+            user.save(); // Save the encrypted version of the new refresh_token
+
             newRefreshToken = newCipherRefreshToken;
-            user.save();
         }
 
+        // Prepare the data for JWT signing
         let data = {
             access_token,
             expiry_date,
@@ -44,17 +51,21 @@ function login(user, profile, oAuthData) {
         };
 
         let jwt = JWTUtil.signCalbiticaJWT(data, user._id.toString()); // MongoDB ID
-
-        // data.user = jwt;
         resolve(jwt);
-
     })
 }
 
 
+/**
+ * Register the user into MongoDB
+ * And returning a signed JWT containing auth tokens
+ * @param {GoogleProfile} profile Google Profile object returned from verifyIDToken()
+ * @param {Object} oAuthData contains refresh_token, access_token and expiry_date minimally
+ */
 function register(profile, oAuthData) {
     let { refresh_token, access_token, expiry_date } = oAuthData;
-    
+
+    // Remember to encrypt the JWT!
     let cipherRefreshToken = Crypt.encrypt(refresh_token);
     return new Promise((resolve, reject) => {
         new User.model({
@@ -68,6 +79,7 @@ function register(profile, oAuthData) {
             },
         }).save()
             .then((newUserObj) => {
+                // Prepare the data for JWT signing
                 let data = {
                     access_token,
                     expiry_date,
@@ -78,12 +90,9 @@ function register(profile, oAuthData) {
                 };
 
                 let jwt = JWTUtil.signCalbiticaJWT(data, newUserObj._id.toString()); // MongoDB ID
-
-                // data.user = jwt;
                 resolve(jwt);
             })
             .catch((err) => {
-                console.log(err);
                 reject(err);
             });
 
@@ -91,8 +100,13 @@ function register(profile, oAuthData) {
 }
 
 
+/**
+ * Validate the idToken returned and check if user exists in MongoDB
+ * @param {Object} oAuthData contains idToken, refresh_token, access_token
+ */
 function userExistsInMongo(oAuthData) {
-    let { idToken, access_token, refresh_token } = oAuthData;
+    let { idToken, access_token,
+          refresh_token, expiry_date } = oAuthData;
 
     return new Promise((resolve, reject) => {
         verifyGIDToken(idToken)
@@ -107,7 +121,7 @@ function userExistsInMongo(oAuthData) {
                         let newOAuthData = {
                             refresh_token,
                             access_token: cipherAccessToken,
-                            expiry_date: oAuthData.expiry_date
+                            expiry_date
                         };
 
                         if (!user)
@@ -122,6 +136,12 @@ function userExistsInMongo(oAuthData) {
     });
 }
 
+
+/**
+ * Set Headers in our Habitica Axios instance
+ * and set tokens in our Google OAuthClient
+ * @param {Object} decodedJWT Decoded object of the JWT
+ */
 function setHnGCredentials(decodedJWT) {
     if (decodedJWT.habiticaAPI && decodedJWT.habiticaID) {
         let plainHabiticaAPI = Crypt.decrypt(decodedJWT.habiticaAPI);
@@ -131,7 +151,7 @@ function setHnGCredentials(decodedJWT) {
         axiosInstance.defaults.headers.common['x-api-user'] = decodedJWT.habiticaID;
     }
 
-    gCalOAuth2Client.setCredentials({
+    googleOAuth2Client.setCredentials({
         access_token: Crypt.decrypt(decodedJWT.access_token),
         refresh_token: Crypt.decrypt(decodedJWT.refresh_token),
         expiry_date: decodedJWT.expiry_date
@@ -141,15 +161,13 @@ function setHnGCredentials(decodedJWT) {
 
 /**
  * Verify Google-generated idToken
- * and pass back a JWT so that the app can communicate 
+ * and pass back profile info for further processing
  * with the Calbitica API
  * @param {JWT} idToken 
  */
 function verifyGIDToken(idToken) {
-    const client = new OAuth2Client(process.env.GCLIENT_ID);
-
     return new Promise((resolve, reject) => {
-        client.verifyIdToken({
+        googleOAuth2Client.verifyIdToken({
             idToken,
             audience: [
                 process.env.GCLIENT_ID, // MVC
@@ -174,15 +192,21 @@ function verifyGIDToken(idToken) {
                 }
             })
             .catch(err => {
-                console.log("GOOGLE AUTH ERROR", err);
                 reject({ status: 400, message: "Invalid token" });
             });
     });
 }
 
+/**
+ * Retrieve OAuth tokens from Google using the provided Authorization code.
+ * Then, sign in/up the user accordingly and return the signed Calbitica JWT
+ * for the user's access to our API
+ * @param {AuthCode} code Google Authorization code generated by the
+ * sign-in libraries on respective platforms (Android, iOS)
+ */
 function tokensFromAuthCode(code) {
     return new Promise((resolve, reject) => {
-        gCalOAuth2Client.getToken(code)
+        googleOAuth2Client.getToken(code)
             .then((data) => {
                 // retrieve the profile....
                 let tokens = data.tokens;
@@ -193,7 +217,7 @@ function tokensFromAuthCode(code) {
                 let refresh_token = (!tokens.refresh_token) ? "" : tokens.refresh_token;
 
                 // Set tokens on the oAuth client
-                gCalOAuth2Client.setCredentials(tokens);
+                googleOAuth2Client.setCredentials(tokens);
 
                 let oAuthData = {
                     refresh_token,
@@ -202,6 +226,10 @@ function tokensFromAuthCode(code) {
                     expiry_date: tokens.expiry_date
                 };
 
+                // Check if the User Exists in MongoDB
+                // and login/register accordingly.
+                // Then, return the signed Calbitica JWT
+                // for the user to use.
                 userExistsInMongo(oAuthData)
                     .then(jwt => resolve(jwt))
                     .catch(err => reject(err));
@@ -213,10 +241,65 @@ function tokensFromAuthCode(code) {
     })
 }
 
+/**
+ * Refresh the JWT signed by Calbitica
+ * @param {JWT} decoded Decoded JWT
+ * @param {Bool} accessTokenExpiring access_token is expiring?
+ */
+function refreshJWT(decoded, accessTokenExpiring) {
+    // I need a new payload even if I don't need a new access_token
+    // This is to ensure that JWT-specific things like exp will be re-signed
+    let payload = {
+        access_token: decoded.access_token,
+        refresh_token: decoded.refresh_token,
+        expiry_date: decoded.expiry_date,
+        profile: decoded.profile,
+        habiticaID: decoded.habiticaID,
+        habiticaAPI: decoded.habiticaAPI,
+    };
+
+    let refresh_token = Crypt.decrypt(decoded.refresh_token);
+
+    return new Promise((resolve, reject) => {
+        if (!accessTokenExpiring) {
+            resolve({
+                newJWT: JWTUtil.signCalbiticaJWT(payload, decoded.sub),
+                decoded: payload
+            });
+            return;
+        }
+
+        googleOAuth2Client.setCredentials({ refresh_token })
+        googleOAuth2Client.getAccessToken()
+            .then((token_obj) => {
+                let cipherAccessToken = Crypt.encrypt(token_obj.token)
+                payload.access_token = cipherAccessToken
+                payload.expiry_date = new Date().getTime() + DateUtil.getMs("h", 1)
+
+                resolve({
+                    newJWT: JWTUtil.signCalbiticaJWT(payload, decoded.sub),
+                    decoded: payload
+                })
+            })
+            .catch((err) => {
+                // The refresh_token no longer works -
+                // user has revoked our access to their account
+                reject({ 
+                    status: 410, 
+                    message: "Your refresh token has expired. Please sign in again." 
+                });
+            });
+    })
+}
+
+/**
+ * Compile the functions for export
+ */
 let authController = {
     verifyGIDToken,
     setHnGCredentials,
-    tokensFromAuthCode
+    tokensFromAuthCode,
+    refreshJWT,
 }
 
 module.exports = authController;

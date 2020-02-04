@@ -21,16 +21,16 @@ const isValidCalbiticaJWT = (req, res, next) => {
     let external = req.header("Authorization") || 'lmao';
     let jwt = (!internal) ? external.replace("Bearer ", '') : req.session.user;
 
+    // We need to modify the JSON function later
+    // if it's a non-MVC call
+    let jsonFunc = res.json;
+
+    // Verify the JWT
     JWTUtil.verifyCalbiticaJWT(jwt)
         .then(result => {
+            // JWT is safe for now - continue normally
             authController.setHnGCredentials(result.decoded)
 
-            req.body.decodedJWT = result.decoded;
-
-            if (internal && result.newJWT != undefined)
-                req.session.user = result.newJWT;
-
-            let jsonFunc = res.json;
             res.json = (data) => {
                 // data: whatever data you passed during .json(xxx)
                 let finalResponse = {};
@@ -41,11 +41,7 @@ const isValidCalbiticaJWT = (req, res, next) => {
                 if (!internal && !data.jwt) {
                     finalResponse.data = data;
 
-                    // there's a new JWT because the old
-                    // one is expired!
-                    if (result.newJWT)
-                        finalResponse.jwt = result.newJWT;
-                } else // flatten the structure
+                } else // flatten the structure for our MVC
                     finalResponse = data;
 
                 // Express 4.17: Use apply(), not call()
@@ -53,10 +49,55 @@ const isValidCalbiticaJWT = (req, res, next) => {
                 jsonFunc.call(res, finalResponse);
             };
 
+            req.body.decodedJWT = result.decoded;
             next();
         })
         .catch(err => {
-            next({ status: 400, message: err });
+            if (!err.decoded) {
+                next({ status: 400, message: err });
+                return;
+            }
+            
+            let accessTokenExpiring = err.status == 444;
+            if (accessTokenExpiring || err.status == 443) {
+                // JWT/access token is expiring!
+                // Refresh the JWT and access token
+                authController.refreshJWT(err.decoded, accessTokenExpiring)
+                    .then((result) => {
+                        authController.setHnGCredentials(result.decoded)
+
+                        if (internal && result.newJWT != undefined)
+                            req.session.user = result.newJWT;
+
+                        res.json = (data) => {
+                            // data: whatever data you passed during .json(xxx)
+                            let finalResponse = {};
+
+                            // If you're not passing back a JWT
+                            // (from /api/settings or /auth/code)
+                            // then park the data in data key
+                            if (!internal && !data.jwt) {
+                                finalResponse.data = data;
+
+                                // there's a new JWT because the old
+                                // one is expired!
+                                if (result.newJWT)
+                                    finalResponse.jwt = result.newJWT;
+                            } else // flatten the structure for our MVC
+                                finalResponse = data;
+
+                            // Express 4.17: Use apply(), not call()
+                            // also "this" is an empty obj lmao
+                            jsonFunc.call(res, finalResponse);
+                        };
+
+                        req.body.decodedJWT = result.decoded;
+                        next();
+                    })
+                    .catch((err) => {
+                        next({ status: 400, message: err });
+                    })
+            }
         });
 }
 

@@ -152,7 +152,7 @@
             "optional": true,
             "field": "isDump",
             "defaultValue": "false",
-            "description": "<p>Whether to get only &quot;dumped&quot; Calbits (<code>isDump: true</code>), non-dump Calbits, or both dump &amp; non-dump Calbit.</p>"
+            "description": "<p>Whether to get only &quot;dumped&quot; Calbits (<code>isDump: true</code>), non-dump Calbits, or both dump &amp; non-dump Calbit. <br><br><strong>This param has no effect on the results returned for now.</strong></p>"
           },
           {
             "group": "QueryParam",
@@ -872,7 +872,7 @@
     "url": "/h/sync",
     "title": "Import Habitica Tasks",
     "group": "Habitica",
-    "description": "<p>Import a user's tasks from Habitica as &quot;dumped&quot; Calbits. Google Calendar events will not be created until the user assigns the Calbit to a specific date-time.</p>",
+    "description": "<p><strong>THIS ROUTE IS NOT IN USE. REQUESTING THIS ROUTE WILL RESULT IN 404</strong> <br><br> Import a user's tasks from Habitica as &quot;dumped&quot; Calbits. Google Calendar events will not be created until the user assigns the Calbit to a specific date-time.</p>",
     "parameter": {
       "fields": {
         "Query Parameters": [

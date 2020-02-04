@@ -1,4 +1,5 @@
-// Needs to be let since we're modifying it later
+// Configurations for our axios instance
+// Needs to be 'let' since we're modifying it later
 let axiosConfig = {
     baseURL: 'https://habitica.com/api/v3/',
     timeout: 10000,

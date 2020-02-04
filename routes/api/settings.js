@@ -46,6 +46,7 @@ router.post('/habitica', apiCheck, (req, res) => {
                 let data = {
                     access_token: decodedJWT.access_token,
                     refresh_token: decodedJWT.access_token,
+                    expiry_date: decodedJWT.expiry_date,
                     profile: decodedJWT.profile,
                     habiticaID: user.habiticaID,
                     habiticaAPI: user.habiticaAPI,
@@ -64,7 +65,6 @@ router.post('/habitica', apiCheck, (req, res) => {
             } else 
                 res.status(400).json({ message: "Could not save Habitica settings" });
         }).catch(err => {
-            console.log(err);
             res.status(400).json({ message: "Could not save Habitica settings" });
         });
 

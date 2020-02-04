@@ -1,10 +1,13 @@
 /**
- * Verifies all JWT sent by anywhere (to be called by
- * the api-check middleware only!)
+ * Signs & verifies all JWT sent by anywhere
+ * 
+ * If the JWT is expiring, re-sign it
+ * with new access_tokens from Google
+ * (to be called by api-check middleware only!)
  */
 
-const jwt = require('jsonwebtoken');
-const DateUtil = require('../util/date');
+const jwt = require("jsonwebtoken");
+const DateUtil = require("./date");
 
 const audRegex = new RegExp(`${process.env.CALBITICA_SUBDOMAIN_ID}$`);
 
@@ -21,8 +24,7 @@ function signCalbiticaJWT(payload, userID) {
         issuer: process.env.CALBITICA_ID,
         audience: `${userID}.${process.env.CALBITICA_SUBDOMAIN_ID}`,
         subject: userID,
-        expiresIn: "10d" // expires in 10 days
-        // expiresIn: 60 // expires in 60s
+        expiresIn: "10d"
     };
 
     // create a token
@@ -43,7 +45,6 @@ function verifyCalbiticaJWT(token) {
         audience: audRegex,
     };
 
-    console.log("JWT: ", token)
     return new Promise((resolve, reject) => {
         jwt.verify(token, process.env.COOKIE_KEY, verifyOptions,
             // You can't turn this into a promise :(
@@ -59,38 +60,46 @@ function verifyCalbiticaJWT(token) {
                     return;
                 }
 
-                // Check expiry and resolve decoded JWT
-                // with a new JWT :)
-                let finalResponse = { decoded };
-                if (isExpiring(decoded.exp)) {
-                    let payload = {
-                        access_token: decoded.access_token,
-                        refresh_token: decoded.refresh_token,
-                        profile: decoded.profile,
-                        habiticaID: decoded.habiticaID,
-                        habiticaAPI: decoded.habiticaAPI,
-                    };
-                    finalResponse.newJWT = signCalbiticaJWT(payload, userID);
-                    finalResponse.newDecodedJWT = payload;
+                // Check expiry of JWT
+                // expiry refreshing will be done by auth-controller
+                let statuses = isExpiring(decoded.exp, decoded.expiry_date);
+                if (statuses.isAccessTokenExpiring ||
+                    statuses.isJWTExpiring) {
 
-                    console.log("TRYNA NEW JWT: ", finalResponse);
-
+                    // 443: JWT is expiring
+                    // 444: Access token is expiring
+                    let status = statuses.isAccessTokenExpiring
+                                ? 444 : 443;
+                    reject({ status, decoded });
+                    return;
                 }
 
+                // If the JWT is not expiring yet,
+                // Just pass back the decoded JWT for our own use
+                let finalResponse = { decoded };
                 resolve(finalResponse);
             })
     })
 }
 
 /**
- * Is the JWT expiring soon?
- * @param {Number} exp Number of SECONDS since the epoch
+ * Is the JWT and the tokens within expiring soon?
+ * @param {Number} exp JWT expiry: Number of SECONDS since the epoch
+ * @param {Number} expiry_date access_token expiry: Number of Millseconds since the epoch
  */
-function isExpiring(exp) {
-    let now = new Date().getTime();
-    let oneDayInMs = DateUtil.getMs("h", 24);
+function isExpiring(exp, expiry_date) {
+    let oneDayInMs = DateUtil.getMs("d", 1);
+    let tenMinsInMs = 10 * 60 * 1000;
 
-    return ((exp * 1000) - now <= oneDayInMs);
+    let isJWTExpiring = (DateUtil.timeFromNow(exp * 1000) <= oneDayInMs);
+    let isAccessTokenExpiring = (DateUtil.timeFromNow(expiry_date) <= tenMinsInMs);
+
+    return { isJWTExpiring, isAccessTokenExpiring };
 }
 
-module.exports = { signCalbiticaJWT, verifyCalbiticaJWT };
+let JWTUtil = { 
+    signCalbiticaJWT, 
+    verifyCalbiticaJWT 
+};
+
+module.exports = JWTUtil;

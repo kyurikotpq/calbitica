@@ -21,20 +21,22 @@ router.get('/dashboard', [authCheck.mustLogin], (req, res) => {
         profile: null,
         calendars: null,
     };
-    console.log("DATA IN THE ROUTE FUNCTION", data);
     
     habiticaController.getProfile(decodedJWT.habiticaID)
         .then(profile => data.profile = profile)
         .catch(err => {
             // API key not set up or something
-            console.log("Habitica Profile error", err);
+            // it's alright - just continue :)
         })
         .finally(() => {
             calendarController.listCal(decodedJWT.sub)
                 .then(calendars => data.calendars = calendars)
                 .catch(err => {
                     // Calendar CMI
-                    console.log("Calendar error", err);
+                    if(err.status != undefined && err.status == 401) {
+                        req.session = null;
+                        res.redirect("/auth/login");
+                    }
                 })
                 .finally(() => res.render("dashboard", data))
         })

@@ -38,11 +38,11 @@ function listCal(userID, syncedOnly = false, importCal = true) {
                         })
                 })
                 .catch(err => {
-                    console.log(err);
                     reject({ status: 500, message: err });
                 });
         })
             .finally(() => {
+                // Return the calendars
                 resolve(Calendar.find(
                     calendarFilter,
                     "_id userID googleID summary description sync defaultReminders"
@@ -64,11 +64,12 @@ function importCalToMongo(userID, storedSyncToken = null) {
         gcalController.listCal(storedSyncToken)
             .then((calendarListResult) => {
                 let calendarList = calendarListResult.data;
+
+                // If calendars exist
                 if (calendarList.items.length > 0) {
                     Promise.all(handleCalendarList(userID, calendarList, storedSyncToken))
                         .then(calendars => resolve(1))
                         .catch(err => {
-                            console.log(err);
                             reject({
                                 status: 500,
                                 message: "Could not save Google Calendars"
@@ -77,31 +78,40 @@ function importCalToMongo(userID, storedSyncToken = null) {
                 } else resolve(1);
             })
             .catch(err => {
-                console.log("ERROR FROM LINE 74", err);
-                // if the CALENDAR SYNC token is expired, perform a full sync!
-                if (err.status == 410) {
-                    gcalController.listCal().then((calendarListResult) => {
-                        Promise.all(handleCalendarList(userID, calendarListResult.data))
-                            .then(calendars => {
-                                resolve(calendars);
-                            })
-                            .catch(err => {
-                                console.log(err);
-                                reject({
-                                    status: 500,
-                                    message: "Could not save Google Calendars"
-                                });
-                            })
-                    })
-                } else {
-                    // TODO: Most likely is the access token expired
-                    // so need to refresh it!
+                // Access and refresh token is revoked
+                if (err.code == 401) {
                     reject({
-                        status: 500,
-                        message: "Could not retrieve Google Calendars"
-                    });
-
+                        status: 401,
+                        message: "You have revoked Calbitica's access to your Google Account. "
+                            + "Please log out, reauthorize Calbitica and try again."
+                    })
+                    return;
                 }
+
+                // Access token is exipired
+                if (err.data != undefined && err.data.error == "invalid_grant") {
+                    reject({ status: 400, message: "Could not retrieve Google Calendars" });
+                    return;
+                }
+
+                /* 
+                * If you've reached here,
+                * It's most likely a calendar-specifc sync error
+                * where the nextSyncToken is expired.
+                * Perform a full sync!
+                */ 
+                gcalController.listCal().then((calendarListResult) => {
+                    Promise.all(handleCalendarList(userID, calendarListResult.data))
+                        .then(calendars => {
+                            resolve(calendars);
+                        })
+                        .catch(err => {
+                            reject({
+                                status: 500,
+                                message: "Could not save Google Calendars"
+                            });
+                        })
+                })
             })
     });
 }
@@ -171,19 +181,18 @@ function changeSync(_id, sync = false) {
                 )
                     .then((result) => {
                         resolve(`Calendar ${cal.summary} is now ${syncedText}`)
-
-                        Calendar.find().then(c => { console.log("cal sync result:", c) })
                     })
                     .catch(err => {
-                        console.log(err);
                         reject({
                             status: 500,
                             message: `Calendar ${cal.summary} could not be ${syncedText}.`
                         });
                     })
             }).catch(err => {
-                console.log(err);
-                reject({ status: 404, message: "Could not find the specified calendar" });
+                reject({ 
+                    status: 404, 
+                    message: "Could not find the specified calendar" 
+                });
             })
 
 

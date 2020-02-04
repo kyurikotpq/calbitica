@@ -10,7 +10,9 @@ const allowedTypes = ["habits", "dailys", "todos", "rewards", "completedTodos"];
 /**
  * @api {get} /h/sync Import Habitica Tasks
  * @apiGroup Habitica
- * @apiDescription Import a user's tasks from Habitica as "dumped" Calbits.
+ * @apiDescription <strong>THIS ROUTE IS NOT IN USE. REQUESTING THIS ROUTE WILL RESULT IN 404</strong>
+ * <br><br>
+ * Import a user's tasks from Habitica as "dumped" Calbits.
  * Google Calendar events will not be created until the user assigns
  * the Calbit to a specific date-time.
  *  
@@ -28,6 +30,7 @@ const allowedTypes = ["habits", "dailys", "todos", "rewards", "completedTodos"];
  * @apiErrorExample Error Response:
  *     WILL BE DOCUMENTED SOON
  */
+/*
 router.get('/sync', [apiCheck, habiticaCheck], (req, res) => {
     let type = req.query.type;
     if (!allowedTypes.includes(type))
@@ -40,10 +43,10 @@ router.get('/sync', [apiCheck, habiticaCheck], (req, res) => {
             res.status(200).json(result);
         })
         .catch(err => {
-            console.log(err);
             res.status(err.status).json({ message: err.message });
         });
 });
+*/
 
 /**
  * @api {get} /h/profile Get Habitica Profile
@@ -70,7 +73,6 @@ router.get('/profile', [apiCheck, habiticaCheck], (req, res) => {
             res.status(200).json(profile);
         })
         .catch(err => {
-            console.log(err);
             res.status(err.status).json({ message: err.message });
         });
 });
@@ -105,7 +107,6 @@ router.post('/quest', [apiCheck, habiticaCheck], (req, res) => {
             res.status(200).json(quest);
         })
         .catch(err => {
-            console.log(err);
             res.status(err.status).json({ message: err.message });
         })
 });
@@ -136,7 +137,6 @@ router.get('/sleep', [apiCheck, habiticaCheck], (req, res) => {
     habiticaController.toggleSleep()
         .then(result => res.status(200).json(result))
         .catch(err => {
-            console.log(err);
             res.status(err.status).json({ message: err.message });
         })
 })

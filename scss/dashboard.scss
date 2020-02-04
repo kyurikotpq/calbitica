@@ -70,6 +70,15 @@
 
     // Big calendar
     #main-calendar {
+        .fc-event {
+            background-color: $blue-1;
+        }
+
+        // Event Completion state
+        .fc-content.completed {
+            opacity         : 0.5;
+        }
+
         .fc-time-grid .fc-slats .fc-minor td {
             border: none;
         }

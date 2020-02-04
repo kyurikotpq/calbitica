@@ -18,13 +18,12 @@ const retrieveTokens = (req, res, next) => {
 
     if (!code) {
         // error occured - redirect to login page
-        // TODO: Add error message
-        console.log("OAUTH2 ERROR");
-        console.log(err);
         res.redirect('/auth/login');
         return;
     }
 
+    // Retrieve the tokens from the give Authorization Code
+    // Our controller will return the signed JWT
     authController.tokensFromAuthCode(code)
         .then(jwt => {
             // store the JWT in the cookies
