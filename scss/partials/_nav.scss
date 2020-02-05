@@ -139,6 +139,15 @@
         position        : relative;
         background-color: $gray-1;
 
+        // Submenu styling
+        // Contains the list of Google calendars
+        &.submenu {
+            margin-bottom: 1rem;
+            overflow-y   : scroll;
+            overflow-x   : hidden;
+            max-height   : calc(40vh - 60px);
+        }
+
         &:not(.submenu) {
             padding  : calc(50px + 2rem) 0 0;
             width    : 20%; // 20vw

@@ -33,7 +33,6 @@ function listCal(userID, syncedOnly = false, importCal = true) {
                     importCalToMongo(userID, syncToken)
                         .then(result => { innerResolve(result) })
                         .catch(err => {
-                            console.log(err);
                             reject(err);
                         })
                 })

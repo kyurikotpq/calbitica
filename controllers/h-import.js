@@ -113,7 +113,7 @@ function hImporter(type = null, userID) {
                         if (error.response) {
                             reject({ status: err.response.status, message: err.message });
                         } else {
-                            console.log('Error', error.message);
+                            // console.log('Error', error.message);
                             reject({ status: 500, message: err.message });
                         }
                     })
@@ -121,7 +121,7 @@ function hImporter(type = null, userID) {
                 if (error.response) {
                     reject({ status: err.response.status, message: err.message });
                 } else {
-                    console.log('Error', error.message);
+                    // console.log('Error', error.message);
                     reject({ status: 500, message: err.message });
                 }
             })

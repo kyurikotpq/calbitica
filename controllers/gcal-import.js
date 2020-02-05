@@ -98,7 +98,6 @@ function listSomeCalbitsAndCompare(events, userID) {
                 resolve(compareItems(events, calbits, userID));
             })
             .catch(err => {
-                console.log(err);
                 reject(err);
             });
     })
@@ -117,7 +116,6 @@ function listAllCalbitsAndCompare(events, userID) {
                 resolve(compareItems(events, calbits, userID));
             })
             .catch(err => {
-                console.log(err);
                 reject(err);
             });
     })
@@ -138,7 +136,6 @@ function compareItems(events, calbits, userID) {
         });
 
         let deletedPromises = [];
-        console.log("NOT IN CALBIT ARR", notInCalbitArr);
         notInCalbitArr.forEach(c => {
             deletedPromises.push(calbitController.deleteInMongo(c._id));
         });
@@ -164,9 +161,7 @@ function compareItems(events, calbits, userID) {
                             createdPromises.push(calbitController.createCalbit(gcalItem, userID, 'gcal'))
                         }
                     })
-                    .catch(err => {
-                        console.log(err)
-                    });
+                    .catch(err => { });
             }
         });
 

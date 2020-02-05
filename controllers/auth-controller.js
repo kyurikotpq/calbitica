@@ -28,16 +28,19 @@ function login(user, profile, oAuthData) {
         // get indexof the googleID & retrieve the token in the same index
         let index = user.googleIDs.indexOf(profile.id);
         let cipherStoredRefreshToken = user.refresh_tokens[index];
-        let plainStoredRefreshToken = Crypt.decrypt(cipherStoredRefreshToken);
-        let newRefreshToken = cipherStoredRefreshToken;
-
+        let newRefreshToken = cipherStoredRefreshToken || '';
+      
         // stored refresh token is different from incoming refresh token
-        if (refresh_token != '' && plainStoredRefreshToken != refresh_token) {
-            let newCipherRefreshToken = Crypt.encrypt(refresh_token);
-            user.refresh_tokens[index] = newCipherRefreshToken;
-            user.save(); // Save the encrypted version of the new refresh_token
-
-            newRefreshToken = newCipherRefreshToken;
+        if (cipherStoredRefreshToken != undefined && refresh_token != '') {
+            let plainStoredRefreshToken = Crypt.decrypt(cipherStoredRefreshToken);
+    
+            if(plainStoredRefreshToken != refresh_token) {
+                let newCipherRefreshToken = Crypt.encrypt(refresh_token);
+                user.refresh_tokens[index] = newCipherRefreshToken;
+                user.save(); // Save the encrypted version of the new refresh_token
+    
+                newRefreshToken = newCipherRefreshToken;
+            }
         }
 
         // Prepare the data for JWT signing
@@ -235,7 +238,6 @@ function tokensFromAuthCode(code) {
                     .catch(err => reject(err));
             })
             .catch((err) => {
-                console.log(err)
                 reject(err);
             });
     })
