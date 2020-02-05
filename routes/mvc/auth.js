@@ -14,7 +14,7 @@ router.get('/login', authCheck.isLoggedin, (req, res) => {
 // MVC Logout
 router.get('/logout', (req, res) => {
     req.session = null; // invalidate all MVC sessions
-    res.redirect('/'); // redirect back to home page
+    res.redirect('/calbitica/'); // redirect back to home page
 })
 
 // redirect to google auth
@@ -36,7 +36,7 @@ router.get('/google/callback',
     // before we redirect to the dashboard page
     authToken,
     (req, res) => {
-        res.redirect('/dashboard');
+        res.redirect('/calbitica/dashboard');
     }
 );
 

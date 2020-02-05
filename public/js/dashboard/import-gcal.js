@@ -25,7 +25,7 @@ function gcalImport(firstLoad = false) {
     
     $.ajax({
         method: 'get',
-        url: `/api/cal/import?fullSync=${fullSync}`
+        url: `api/cal/import?fullSync=${fullSync}`
     }).done(result => {
         sessionStorage.lastSync = new Date().getTime();
 
@@ -39,8 +39,12 @@ function gcalImport(firstLoad = false) {
 
         createToast('success', "Events synced successfully.");
     }).fail(err => {
-        console.log(err);
         // Make a toast
         createToast('danger', err.message);
     })
 }
+
+// Button event listener
+$(window).on("load", function() {
+    $("#gCalImport").on("click", gcalImport);
+});

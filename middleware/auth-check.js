@@ -15,7 +15,7 @@ let authController = require('../controllers/auth-controller');
 const authCheckMustLogin = (req, res, next) => {
     if (req.session == undefined || req.session.user == undefined) {
         req.session = null;
-        res.redirect('/auth/login');
+        res.redirect('/calbitica/auth/login');
         return;
     }
 
@@ -35,7 +35,7 @@ const authCheckMustLogin = (req, res, next) => {
         .catch(err => {
             if (!err.status || !err.decoded) {
                 req.session = null;
-                res.redirect('/auth/login');
+                res.redirect('/calbitica/auth/login');
                 return;
             }
 
@@ -58,11 +58,11 @@ const authCheckMustLogin = (req, res, next) => {
                     })
                     .catch((err) => {
                         req.session = null;
-                        res.redirect('/auth/login');
+                        res.redirect('/calbitica/auth/login');
                     })
             } else {
                 req.session = null;
-                res.redirect('/auth/login');
+                res.redirect('/calbitica/auth/login');
             }
         });
 }
@@ -76,7 +76,7 @@ const authCheckMustLogin = (req, res, next) => {
 const authCheckIsLoggedin = (req, res, next) => {
     (!req.session.user)
         ? next()
-        : res.redirect('/dashboard');
+        : res.redirect('/calbitica/dashboard');
 }
 
 module.exports.mustLogin = authCheckMustLogin;

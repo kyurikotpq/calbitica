@@ -248,6 +248,11 @@ label,
     list-style: none;
     position: relative;
     background-color: #333333; }
+    .navbar ul.submenu {
+      margin-bottom: 1rem;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      max-height: calc(40vh - 60px); }
     .navbar ul:not(.submenu) {
       padding: calc(50px + 2rem) 0 0;
       width: 20%;
@@ -580,20 +585,24 @@ a.btn {
     #container #sidebar-calendar .fc-day-number {
       float: none; }
     #container #sidebar-calendar .fc-bg .fc-today {
-      border-radius: 50%;
-      background-color: #0067AE; }
-    #container #sidebar-calendar .fc-today .fc-day-number {
-      color: #ffffff; }
+      background-color: rgba(0, 103, 174, 0.2);
+      border-radius: 50%; }
+  #container .fc-today .fc-day-number,
+  #container .fc-day-header.fc-today {
+    color: #ffffff;
+    font-weight: bold; }
   #container #main-calendar .fc-event {
     background-color: #0067AE; }
   #container #main-calendar .fc-content.completed {
-    opacity: 0.5; }
+    opacity: 0.7; }
   #container #main-calendar .fc-time-grid .fc-slats .fc-minor td {
     border: none; }
   #container #main-calendar .fc-time-grid-event.fc-short .fc-time:after {
     content: ""; }
   #container #main-calendar .fc-title {
     font-weight: bold; }
+  #container #main-calendar .fc-today {
+    background-color: rgba(0, 103, 174, 0.2); }
   #container #h-profile-header {
     position: relative;
     display: flex;

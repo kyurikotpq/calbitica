@@ -7,7 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title><%= title %> - Calbitica</title>
 
-  <link rel="shortcut icon" href="/images/brand/icon/favicon.ico">
+  <link rel="shortcut icon" href="images/brand/icon/favicon.ico">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:700|Open+Sans:400,700&display=swap"
     rel="stylesheet">
 
@@ -22,7 +22,7 @@
         if(styles) {
             styles.forEach(s => { 
     %>
-  <link rel="stylesheet" type="text/css" href="/<%= s %>">
+  <link rel="stylesheet" type="text/css" href="<%= s %>">
   <%  
             });
         }
@@ -34,7 +34,7 @@
     <nav class="navbar">
       <!-- If not signed in  -->
       <% if(!user) { %>
-      <a class="btn btn-primary" href="/calbitica/auth/google">Continue with Google</a>
+      <a class="btn btn-primary" href="auth/google">Continue with Google</a>
       <% } else { %>
       <!-- If signed in -->
       <input type="checkbox" name="user-profile-toggle" id="user-profile-toggle" class="hidden">
@@ -43,10 +43,10 @@
       <div class="sidebar-nav">
         <ul>
           <!-- Dashboard -->
-          <li class="nav-item"><a href="/calbitica/dashboard">Dashboard</a></li>
+          <li class="nav-item"><a href="dashboard">Dashboard</a></li>
 
           <!-- Settings -->
-          <li class="nav-item"><a href="/calbitica/settings">Settings</a></li>
+          <li class="nav-item"><a href="settings">Settings</a></li>
 
           <li class="nav-item submenu">
             <h3 class="submenu-header">Google Calendars</h3>
@@ -80,7 +80,7 @@
           </li>
           
           <!-- Logout -->
-          <li class="nav-item logout"><a href="/calbitica/auth/logout">Logout</a></li>
+          <li class="nav-item logout"><a href="auth/logout">Logout</a></li>
 
           <label class="user-profile-close" for="user-profile-toggle">
             &times;

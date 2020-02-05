@@ -35,7 +35,7 @@ router.get('/dashboard', [authCheck.mustLogin], (req, res) => {
                     // Calendar CMI
                     if(err.status != undefined && err.status == 401) {
                         req.session = null;
-                        res.redirect("/auth/login");
+                        res.redirect("/calbitica/auth/login");
                     }
                 })
                 .finally(() => res.render("dashboard", data))

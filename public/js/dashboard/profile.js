@@ -30,7 +30,7 @@ function updateStats(stats, scoreTask = false) {
 function getProfile() {
     $.ajax({
         method: 'get',
-        url: "/api/h/profile"
+        url: "api/h/profile"
     }).done(r => {
         console.log(r);
         // Update the elements
@@ -49,7 +49,7 @@ function getProfile() {
  */
 function toggleSleep() {
     $.ajax({
-        url: '/api/h/sleep',
+        url: 'api/h/sleep',
         method: 'get'
     })
         .done(result => {
@@ -79,7 +79,7 @@ function respondToQuest(e) {
 
     $.ajax({
         method: "POST",
-        url: "/api/h/quest",
+        url: "api/h/quest",
         data: { accept, groupID }
     }).done(result => {
         let verb = e.target.dataset.response + "ed";

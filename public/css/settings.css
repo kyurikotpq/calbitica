@@ -248,6 +248,11 @@ label,
     list-style: none;
     position: relative;
     background-color: #333333; }
+    .navbar ul.submenu {
+      margin-bottom: 1rem;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      max-height: calc(40vh - 60px); }
     .navbar ul:not(.submenu) {
       padding: calc(50px + 2rem) 0 0;
       width: 20%;

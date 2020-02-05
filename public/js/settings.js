@@ -9,7 +9,7 @@ $(window).on('load', function() {
         if(apiKey) data.apiKey = apiKey.replace(/[<>!*&^%$/.,'"=?`~|\\/; ]/g, "");
         
         $.ajax({
-            url: "/api/settings/habitica",
+            url: "api/settings/habitica",
             method: "post",
             data,
         }) // create toasts

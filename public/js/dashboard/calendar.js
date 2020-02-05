@@ -343,7 +343,7 @@ function deleteEvent() {
         }
         
         $.ajax({
-            url: `/api/calbit/${id}`,
+            url: `api/calbit/${id}`,
             method: "delete",
         })
             .done(result => {
@@ -385,7 +385,7 @@ function modifyEvent(event) {
     };
 
     $.ajax({
-        url: `/api/calbit/${event._id}`,
+        url: `api/calbit/${event._id}`,
         method: "put",
         data,
     })
@@ -484,7 +484,7 @@ function saveEvent() {
     let id = $('#myModal #event-form-_id').val();
 
     let method = (id != '') ? 'put' : "post";
-    let url = '/api/calbit';
+    let url = 'api/calbit';
     if (id != '') url += `/${id}`;
 
     if (id != '') {
@@ -580,7 +580,8 @@ $(document).ready(function () {
         editable: true,
         selectable: true,
         nowIndicator: true,
-        events: "/api/calbit",
+        scrollTime: new Date().toTimeString().split(" ")[0],
+        events: "api/calbit",
         eventDataTransform: transformData,
         select: selectSection,
         eventRender: renderEvent,
@@ -626,7 +627,7 @@ $(document).ready(function () {
             data = { status: $(this).prop('checked') };
 
         $.ajax({
-            url: `/api/calbit/${eventID}/complete`,
+            url: `api/calbit/${eventID}/complete`,
             method: 'put',
             data
         }).done((result) => {
@@ -637,7 +638,6 @@ $(document).ready(function () {
             updateStats(result.stats, true);
         }).fail((err) => {
             createToast("danger", err.responseJSON.message);
-            alert(err.responseText);
         })
     });
 

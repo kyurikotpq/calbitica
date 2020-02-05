@@ -18,7 +18,7 @@ const retrieveTokens = (req, res, next) => {
 
     if (!code) {
         // error occured - redirect to login page
-        res.redirect('/auth/login');
+        res.redirect('/calbitica/auth/login');
         return;
     }
 

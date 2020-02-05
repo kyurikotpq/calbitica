@@ -140,7 +140,7 @@
         background-color: $gray-1;
 
         // Submenu styling
-        // Contains the list of Google calendars
+        // Make the list of Google calendars scrollable 
         &.submenu {
             margin-bottom: 1rem;
             overflow-y   : scroll;

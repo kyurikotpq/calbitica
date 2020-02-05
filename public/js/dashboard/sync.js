@@ -10,13 +10,13 @@ $(window).on("load", function () {
         console.log(checked);
         $.ajax({
             method: 'get',
-            url: `/api/cal/sync/${id}?sync=${checked}`
+            url: `api/cal/sync/${id}?sync=${checked}`
         }).done(result => {
             // make a toast
             console.log(result);
             createToast('success', result.message);
 
-            if(window.location.pathname == "/dashboard") {
+            if(window.location.pathname.includes("/dashboard")) {
                 gcalImport(false);
             }
         }).fail(err => {
