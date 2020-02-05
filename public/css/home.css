@@ -44,7 +44,7 @@ h6 {
   margin-left: 1rem; }
 
 .ml-auto {
-  margin-left: auto; }
+  margin-left: auto !important; }
 
 .hidden {
   display: none; }

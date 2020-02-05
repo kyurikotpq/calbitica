@@ -44,7 +44,7 @@ h6 {
   margin-left: 1rem; }
 
 .ml-auto {
-  margin-left: auto; }
+  margin-left: auto !important; }
 
 .hidden {
   display: none; }
@@ -204,11 +204,14 @@ label,
     margin-bottom: 0; }
   .navbar .user-profile {
     flex-shrink: 0;
-    overflow: hidden; }
-    .navbar .user-profile img {
-      border-radius: 50%;
-      width: 50px;
-      height: 50px; }
+    overflow: hidden;
+    display: block;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    background-color: #e2e2e2;
+    background-size: cover;
+    background-position: center; }
   .navbar .sidebar-nav {
     position: fixed;
     top: 0;

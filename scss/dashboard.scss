@@ -134,6 +134,7 @@
 
             .progress-bar {
                 height: 100%;
+                transition: width .5s ease-out;
             }
         }
 

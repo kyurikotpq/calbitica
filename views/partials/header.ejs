@@ -38,9 +38,7 @@
       <% } else { %>
       <!-- If signed in -->
       <input type="checkbox" name="user-profile-toggle" id="user-profile-toggle" class="hidden">
-      <label class="user-profile" for="user-profile-toggle">
-        <img src="<%= user.thumbnails[0] %>" alt="<%= user.displayNames[0] %> Profile"
-          title="<%= user.displayNames[0] %>">
+      <label class="user-profile" for="user-profile-toggle" style="background-image: url(<%= user.thumbnails[0] %>);">
       </label>
       <div class="sidebar-nav">
         <ul>

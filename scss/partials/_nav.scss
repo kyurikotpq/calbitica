@@ -58,11 +58,14 @@
         flex-shrink: 0;
         overflow   : hidden;
 
-        img {
-            border-radius: 50%;
-            width        : 50px;
-            height       : 50px;
-        }
+        display      : block;
+        border-radius: 50%;
+        width        : 50px;
+        height       : 50px;
+
+        background-color   : #e2e2e2;
+        background-size    : cover;
+        background-position: center;
     }
 
     .sidebar-nav {
@@ -94,6 +97,7 @@
                 }
             }
         }
+
         .calendar-item {
             display    : flex;
             align-items: center;
@@ -107,6 +111,7 @@
 
             // Hover state
             &:hover {
+
                 .checkedbox,
                 .checkbox {
                     fill: $gray-1;

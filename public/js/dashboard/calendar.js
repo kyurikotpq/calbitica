@@ -34,7 +34,6 @@ function getCalendarHeight() {
 function openModal(day, jsEvent) {
     let columnWidth = $('.fc-axis.fc-time').width();
     let positionX = (day < 2) ? `left+${columnWidth}px` : `right-${columnWidth}px`;
-    console.log(positionX);
 
     let mousePosY = jsEvent.clientY / $(window).height();
     let positionY = "bottom";
@@ -49,7 +48,7 @@ function openModal(day, jsEvent) {
         {
             my: positionX + " " + positionY,
             at: positionY,
-            of: jsEvent.target,
+            of: jsEvent,
 
             // prevent dialog from going out of the window
             collision: "fit"
@@ -78,46 +77,54 @@ function transformData(event) {
             ? event.reminders.map(r => moment(r).local())
             : [];
 
-    // allDay is now returned by API
+    // Find the index of the existing reminder for this event
+    let existingIndex = REMINDERS.map(r => r.id).indexOf(event._id);
 
-    if(reminders.length != 0) {
-        let reminderDate = new Date(reminders).getTime();
-        let now = new Date().getTime();
-        let milliseconds;
+    // if this event has NO reminders tracked,
+    // just push an empty arr
+    if (existingIndex == -1) {
+        REMINDERS.push({ id: event._id, timeouts: [] });
+        existingIndex = REMINDERS.length - 1;
+    }
 
-        // Will not get the past date here...
-        if(reminderDate > now) {
-            // When there is actual reminders that have not notify
-            alertReminders.push(true);
+    // check if reminders have been removed
+    if (reminders.length == 0) {
+        REMINDERS.splice(existingIndex, 1);
+    } else {
+        let now = moment().local();
 
-            if(reminderTrigger == false) {
-                new Promise((resolve, reject) => {
-                    // Calculated when the actual reminders Date & Time reach on present
-                    milliseconds = reminderDate - now;
-    
-                    var timeout = setTimeout(() => {
-                        alert("Your Event: " + event.summary + " is happening at " + reminders);
+        // take out existing reminders and clear the timeouts
+        let existingReminderObj = REMINDERS[existingIndex];
+
+        Promise.all(existingReminderObj.timeouts.map(
+            to =>
+                new Promise((resolve, rej) => resolve(clearTimeout(to)))
+        )
+        ).then(() => {
+            existingReminderObj.timeouts = [];
+
+            // loop through reminders from MongoDB
+            reminders.forEach(r => {
+                // If reminder is in the future,
+                // settimeout and push it to the timeouts array
+                if (r.isAfter(now)) {
+                    let milliseconds = r.diff(now, "seconds") * 1000;
+
+                    let timeout = setTimeout(() => {
+                        alert(`${event.summary} is happening ${start.fromNow()}`);
                     }, milliseconds);
-    
-                    REMINDERS.push(timeout);
-                    resolve(REMINDERS);
-                }).then(input => {
-                    reminderTrigger = true;
-                });
-            }
-        } else {
-            alertReminders.push(false);
-        }
+
+                    existingReminderObj.timeouts.push(timeout);
+                }
+            })
+
+            // re-assign slot in REMINDERS arr to the new obj
+            REMINDERS[existingIndex] = existingReminderObj;
+        });
+
     }
 
-
-    // if it's all day with time
-    if (event.allDay && event.end.dateTime) {
-        // TODO
-    }
-    // console.log(start.local(), end.local())
-
-    return {
+    let eventObject = {
         _id: event._id,
         id: event._id,
         title: event.summary,
@@ -132,9 +139,15 @@ function transformData(event) {
 
         reminders,
 
+        // allDay is now returned by API as allDay for aesthetic purposes only
+        originalStart: event.start,
         allDay: event.allDay,
         completed: event.completed,
-    };
+        backgroundColor: (event.completed.status) ? "#aaaaaa" : "#0067AE",
+        borderColor: (event.completed.status) ? "#aaaaaa" : "#0067AE",
+    }
+
+    return eventObject;
 }
 
 /**
@@ -145,6 +158,13 @@ function hideDetails() {
     $("#myModal .modal-header").hide();
     $("#myModal .event-form").show();
     $("#myModal + .ui-dialog-buttonpane").show();
+
+    let position = $("#myModal").dialog("option", "position");
+    $("#myModal").dialog(
+        "option",
+        "position",
+        position
+    );
 }
 
 /**
@@ -164,27 +184,13 @@ function refreshCalendar() {
     // Refetch events
     $('#main-calendar').fullCalendar('refetchEvents');
 
-    // reset values in form
-    $("#myModal #event-form-title").val("");
-    $("#myModal #event-form-location").text("");
-    $("#myModal #event-form-startDate").val("");
-    $("#myModal #event-form-startTime").val("");
-    $("#myModal #event-form-endDate").val("");
-    $("#myModal #event-form-endTime").val("");
-
-    if (CALENDARARR.length > 0 && CALENDARARR[0].googleID != undefined)
-        $("#myModal #event-form-calendarID").val(CALENDARARR[0].googleID);
-
-    $("#myModal #event-form-_id").val("");
-    $("#myModal #event-form-googleID").text("");
-    $("#myModal #event-form-allDay").val("");
 
     // Discard the notification that alert before
-    var allData = (currentValue) => currentValue == false;
-    if(alertReminders.every(allData)) {
-        REMINDERS.forEach(time => clearTimeout(time));
-        REMINDERS = [];
-    }
+    // var allData = (currentValue) => currentValue == false;
+    // if (alertReminders.every(allData)) {
+    //     REMINDERS.forEach(time => clearTimeout(time));
+    //     REMINDERS = [];
+    // }
 }
 
 /**
@@ -237,7 +243,7 @@ function selectSection(start, end, jsEvent) {
 function clickOnEvent(event, jsEvent, view, resourceObj) {
     let start = event.start,
         end = event.end,
-        allDay = !start.hasTime(),
+        allDay = !event.originalStart.dateTime,
         calendar = CALENDARARR.find(c => c.googleID == event.calendarID);
 
     let notificationText = "";
@@ -308,6 +314,7 @@ function clickOnEvent(event, jsEvent, view, resourceObj) {
     $("#myModal #event-form-calendarID").val(event.calendarID);
     $("#myModal #event-form-_id").val(event._id);
     $("#myModal #event-form-googleID").val(event.googleID);
+
     $("#myModal #event-form-allDay").val(allDay);
 
     // show the event details
@@ -328,14 +335,22 @@ function deleteEvent() {
 
     if (confirmDelete) {
         let id = $("#myModal #event-form-_id").val();
+
+        let existingIndex = REMINDERS.map(r => r.id).indexOf(id);
+        if(existingIndex != -1) {
+            REMINDERS[existingIndex].timeouts.forEach(to => clearTimeout(to));
+            REMINDERS.splice(existingIndex, 1);
+        }
+        
         $.ajax({
             url: `/api/calbit/${id}`,
             method: "delete",
         })
             .done(result => {
                 $("#myModal").dialog("close");
-                refreshCalendar();
                 createToast("success", result.message);
+
+                refreshCalendar();
             })
             .fail(err => {
                 console.log(err);
@@ -353,7 +368,7 @@ function deleteEvent() {
  * @param {*} event 
  */
 function modifyEvent(event) {
-    let allDay = !event.start.hasTime(),
+    let allDay = !event.originalStart.dateTime,
         start = (allDay)
             ? event.start.format("YYYY-MM-DD")
             : toYmdThisZ(event.start.format("YYYY-MM-DD HH:mm:ss")),
@@ -375,9 +390,10 @@ function modifyEvent(event) {
         data,
     })
         .done(result => {
-            console.log(result);
+            $("#myModal").dialog("close");
             createToast('success', result.message);
-            refreshCalendar();
+
+            setTimeout(refreshCalendar, 1000);
         })
         .fail((err) => {
             createToast('danger', err.responseJSON.message);
@@ -485,8 +501,7 @@ function saveEvent() {
             $('#myModal').dialog('close');
             createToast("success", messageObj.message);
 
-            (id == '') ? setTimeout(refreshCalendar, 1000)
-                : refreshCalendar();
+            setTimeout(refreshCalendar, 1000)
         })
         .fail((err) => {
             createToast("danger", err.responseJSON.message);
@@ -556,7 +571,7 @@ $(document).ready(function () {
         header: {
             left: 'prev,next today',
             center: 'title',
-            right: 'agendaWeek,agendaDay,month,listWeek'
+            right: 'agendaWeek,agendaDay,month'
         },
         height: getCalendarHeight,
         defaultView: "agendaWeek",
@@ -615,10 +630,10 @@ $(document).ready(function () {
             method: 'put',
             data
         }).done((result) => {
-            createToast("success", result.message);
-
             $("#myModal").dialog("close");
-            refreshCalendar();
+            createToast("success", result.message);
+            
+            setTimeout(refreshCalendar, 1000);
             updateStats(result.stats, true);
         }).fail((err) => {
             createToast("danger", err.responseJSON.message);
