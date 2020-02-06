@@ -260,8 +260,6 @@ function refreshJWT(decoded, accessTokenExpiring) {
         habiticaAPI: decoded.habiticaAPI,
     };
 
-    let refresh_token = Crypt.decrypt(decoded.refresh_token);
-
     return new Promise((resolve, reject) => {
         if (!accessTokenExpiring) {
             resolve({
@@ -271,7 +269,6 @@ function refreshJWT(decoded, accessTokenExpiring) {
             return;
         }
 
-        googleOAuth2Client.setCredentials({ refresh_token })
         googleOAuth2Client.getAccessToken()
             .then((token_obj) => {
                 let cipherAccessToken = Crypt.encrypt(token_obj.token)

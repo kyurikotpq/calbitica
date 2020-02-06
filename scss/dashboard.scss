@@ -96,8 +96,12 @@
             font-weight: bold;
         }
 
-        .fc-today {
+        .fc-today:not(.fc-day-top) {
             background-color: transparentize($blue-1, 0.8);
+        }
+
+        .fc-today.fc-day-top {
+            background-color: transparent;
         }
     }
 

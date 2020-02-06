@@ -121,9 +121,9 @@ label,
     font-size: 12px;
     transition: all .5s ease-out; }
   .form-group input.datepicker {
-    width: 100px; }
+    width: 85px; }
   .form-group .timepicker {
-    width: 80px; }
+    width: 110px; }
   .form-group select.form-control {
     background-color: #4F4F4F; }
 
@@ -601,8 +601,10 @@ a.btn {
     content: ""; }
   #container #main-calendar .fc-title {
     font-weight: bold; }
-  #container #main-calendar .fc-today {
+  #container #main-calendar .fc-today:not(.fc-day-top) {
     background-color: rgba(0, 103, 174, 0.2); }
+  #container #main-calendar .fc-today.fc-day-top {
+    background-color: transparent; }
   #container #h-profile-header {
     position: relative;
     display: flex;

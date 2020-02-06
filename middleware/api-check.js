@@ -95,7 +95,11 @@ const isValidCalbiticaJWT = (req, res, next) => {
                         next();
                     })
                     .catch((err) => {
-                        next({ status: 400, message: err });
+                        let errResponseObj = (!err.status || !err.message)
+                        ? { status: 400, message: "Something went wrong. Please sign out and sign in again." }
+                        : err
+
+                        next(errResponseObj);
                     })
             }
         });

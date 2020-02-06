@@ -14,11 +14,9 @@ $(window).on('load', function() {
             data,
         }) // create toasts
         .done((result) => {
-            console.log(result);
             createToast('success', result.message);
         })
         .fail((err) => {
-            console.log(err);
             createToast('danger', err.responseJSON.message);
         })
     })

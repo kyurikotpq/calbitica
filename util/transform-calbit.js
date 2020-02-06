@@ -20,8 +20,6 @@ function prepMVCDataForMongo(body, userID = null) {
     start[dateKey] = body.start;
     end[dateKey] = body.end;
 
-    let acceptedDumpTypes = ["true", "false"];
-
     let data = {
         habiticaType: "todo", // add support for habit and daily in future
         start,
@@ -35,8 +33,9 @@ function prepMVCDataForMongo(body, userID = null) {
     if (body.title)
         data.summary = body.title;
 
-    if (body.isDump && acceptedDumpTypes.includes(`${body.isDump}`))
-        data.isDump = body.isDump;
+    data.isDump = (body.isDump != undefined && body.isDump != "")
+    ? (body.isDump + "") == "true"
+    : true;
 
     if (body.completed != undefined) {
         data.completed = { status: body.completed };
@@ -52,7 +51,6 @@ function prepMVCDataForMongo(body, userID = null) {
         reminders.push(body.reminders);
         data.reminders = reminders;
     } else {
-        reminders.push(body.reminders);
         data.reminders = null;
     }
 

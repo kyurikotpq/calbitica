@@ -13,7 +13,6 @@ function createToast(type, message) {
         closeBtn = $(closeBtnMarkup);
 
     closeBtn.on("click", (e) => {
-        console.log(e.target.dataset.count)
         let count = e.target.dataset.count;
         destroyToast(count, $(e.target));
     });

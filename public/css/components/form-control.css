@@ -44,8 +44,8 @@
     font-size: 12px;
     transition: all .5s ease-out; }
   .form-group input.datepicker {
-    width: 100px; }
+    width: 85px; }
   .form-group .timepicker {
-    width: 80px; }
+    width: 110px; }
   .form-group select.form-control {
     background-color: #4F4F4F; }

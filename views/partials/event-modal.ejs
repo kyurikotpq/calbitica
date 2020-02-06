@@ -82,15 +82,7 @@
                 <input type="text" id="event-form-startDate" name="startDate" class="datepicker form-control">
             </div>
             <div class="form-group">
-                <select name="startTime" id="event-form-startTime" class="form-control timepicker">
-                    <% if(timeList != undefined) {
-                  timeList.forEach(time => {
-                %>
-                    <option value="<%= time %>"><%= time %></option>
-                    <%
-                  })
-                } %>
-                </select>
+                <input type="time" name="startTime" id="event-form-startTime" class="form-control timepicker">
             </div>
 
             <!-- Divider -->
@@ -100,15 +92,7 @@
                 <input type="text" id="event-form-endDate" name="endDate" class="datepicker form-control">
             </div>
             <div class="form-group">
-                <select name="endTime" id="event-form-endTime" class="form-control timepicker">
-                    <% if(timeList != undefined) {
-                  timeList.forEach(time => {
-                %>
-                    <option value="<%= time %>"><%= time %></option>
-                    <%
-                  })
-                } %>
-                </select>
+                <input type="time" name="endTime" id="event-form-endTime" class="form-control timepicker">
             </div>
         </div>
         <div class="form-group-row">

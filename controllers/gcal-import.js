@@ -17,7 +17,6 @@
  * Calbitica will be treated as the single source of truth.
  * 
  */
-const DateUtil = require('../util/date');
 const habiticaController = require('./h-controller');
 const calbitController = require('./calbit-controller');
 const calendarController = require('./calendar-controller');
@@ -91,8 +90,8 @@ function listEventsFromGCal(calendars, fullSync = false) {
 function listSomeCalbitsAndCompare(events, userID) {
     return new Promise((resolve, reject) => {
         calbitController.getAllCalbits(
-            userID, false, true, 
-            { googleID: { $in: events.map(e => e.id) }}
+            userID, false, true,
+            [{ googleID: { $in: events.map(e => e.id) } }]
         )
             .then(calbits => {
                 resolve(compareItems(events, calbits, userID));
@@ -124,45 +123,56 @@ function listAllCalbitsAndCompare(events, userID) {
 function compareItems(events, calbits, userID) {
     return new Promise((resolve, reject) => {
         let updatedPromises = [];
-        let notInCalbitArr = calbits.filter(c => {
-            let gcalItem = events.find(e => c.googleID == e.id && e.status != 'cancelled');
-            if (gcalItem != undefined) {
-                // update mongo
-                updatedPromises.push(calbitController.updateCalbit(c._id, gcalItem, 'gcal'))
+        let deletedCalbitArr = calbits.filter(c => {
+            let gcalItemIndex = events.findIndex(e => c.googleID == e.id);
+
+            // If the MongoDB item can be found in Google Calendar,
+            // update MongoDB with GCal information
+            let existsInBoth = gcalItemIndex != -1;
+
+            if (existsInBoth) {
+                updatedPromises.push(calbitController.updateCalbit(c._id, events[gcalItemIndex], 'gcal'));
+                
+                // remove the gcal item from the events arr so that 
+                // we won't iterate over that event again
+                events.splice(gcalItemIndex, 1);
             }
 
-            // else - calbit no longer exists in gCal, delete it
-            return gcalItem == undefined || gcalItem.status == 'cancelled';
+            // Calbit cannot be found in Google Calendar.
+            // Delete corresponding calbit from MongoDB
+            return !existsInBoth;
         });
 
+        console.log("-----------------")
+        console.log("deletedCalbits", deletedCalbitArr);
         let deletedPromises = [];
-        notInCalbitArr.forEach(c => {
+        deletedCalbitArr.forEach(c => {
             deletedPromises.push(calbitController.deleteInMongo(c._id));
         });
 
+        // At this point, events should be the ones that have 
+        // no Calbit record in MongoDB
         let createdPromises = [];
+        console.log("remaining events", events);
         events.forEach(gcalItem => {
-            
-            let existsInMongo = gcalItem.status == 'cancelled'
-                || calbits.find(c => c.googleID == gcalItem.id);
+            // If calbit doesn't exist, but underlying GCal Event
+            // has NOT been removed/completed,
+            // create in Habitica, then mongodb
+            habiticaController.saveToHabitica({
+                text: gcalItem.summary,
+                type: 'todo' // add support for habits & dailies in future
+            })
+                .then((axiosResponse) => {
+                    let hResponse = axiosResponse.data;
 
-            // If it doesn't exist, create in Habitica, then mongodb
-            if (!existsInMongo) {
-                habiticaController.saveToHabitica({
-                    text: gcalItem.summary,
-                    type: 'todo' // add support for habits & dailies in future
+                    if (hResponse.success) {
+                        gcalItem.habiticaID = hResponse.data.id;
+                        gcalItem.habiticaType = hResponse.data.type;
+                        createdPromises.push(calbitController.createCalbit(gcalItem, userID, 'gcal'))
+                    }
                 })
-                    .then((axiosResponse) => {
-                        let hResponse = axiosResponse.data;
+                .catch(err => { });
 
-                        if (hResponse.success) {
-                            gcalItem.habiticaID = hResponse.data.id;
-                            gcalItem.habiticaType = hResponse.data.type;
-                            createdPromises.push(calbitController.createCalbit(gcalItem, userID, 'gcal'))
-                        }
-                    })
-                    .catch(err => { });
-            }
         });
 
         Promise.all([
@@ -228,6 +238,8 @@ function gcalImporter(userID, fullSync) {
                         } else if (response.database.length > 0) {
                             reject({ status: 500, message: response.database[0] });
                         } else {
+                            console.log(response.success)
+
                             // no errors - return the successful calendar events
                             if (fullSync)
                                 resolve(listAllCalbitsAndCompare(response.success, userID))
@@ -237,6 +249,7 @@ function gcalImporter(userID, fullSync) {
                     })
             })
             .catch(err => {
+                console.log(err)
                 // If you're here, the errors most likely
                 // involve the access_token or refresh_token
                 let message = (err.errors != undefined && err.errors[0])

@@ -11,7 +11,6 @@ function isFullSync() {
 
     if (!lastSync) {
         let timeDiff = new Date() - lastSync;
-        console.log(timeDiff);
 
         if (timeDiff < 60 * 1000)
             fullSync = false;
@@ -22,7 +21,7 @@ function isFullSync() {
 // Google to Habitica Import
 function gcalImport(firstLoad = false) {
     let fullSync = isFullSync();
-    
+
     $.ajax({
         method: 'get',
         url: `api/cal/import?fullSync=${fullSync}`
@@ -30,12 +29,7 @@ function gcalImport(firstLoad = false) {
         sessionStorage.lastSync = new Date().getTime();
 
         // get the events again
-        if (!firstLoad) {
-            setTimeout(() => {
-                $('#main-calendar').fullCalendar('refetchEvents');
-                $('#main-calendar').fullCalendar('rerenderEvents');
-            }, 400);
-        }
+        setTimeout(refreshCalendar, 1000);
 
         createToast('success', "Events synced successfully.");
     }).fail(err => {
@@ -45,6 +39,6 @@ function gcalImport(firstLoad = false) {
 }
 
 // Button event listener
-$(window).on("load", function() {
+$(window).on("load", function () {
     $("#gCalImport").on("click", gcalImport);
 });

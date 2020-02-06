@@ -32,13 +32,11 @@ function getProfile() {
         method: 'get',
         url: "api/h/profile"
     }).done(r => {
-        console.log(r);
         // Update the elements
         let stats = r.stats;
         updateStats(stats);
 
     }).fail(err => {
-        console.log(err);
         // Make a toast
         createToast('danger', err.responseJSON.message);
     })
@@ -72,7 +70,6 @@ function toggleSleep() {
  * Respond to a quest
  */
 function respondToQuest(e) {
-    console.log(e.target);
     let accept = e.target.dataset.response != undefined
                 && e.target.dataset.response == "accept";
     let groupID = $("#party-groupID").text()

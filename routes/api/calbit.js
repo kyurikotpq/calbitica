@@ -37,11 +37,35 @@ router.get('/', apiCheck, function (req, res) {
     let userID = req.body.decodedJWT.sub;
     let fullSync = !req.query.fullSync ? true : req.query.fullSync + "";
 
-    // CONSIDER: putting the google import and habitica import here 
-    // so one less API call from client to our Calbitica API
+    let searchCriteria = [];
+    let start = new Date(req.query.start),
+        end = new Date(req.query.end);
+
+    if (!isNaN(start.getTime())) {
+        let startCriteria = { $lte: end };
+        searchCriteria.push({
+            $or: [
+                { "start.dateTime": startCriteria },
+                { "start.date": startCriteria },
+            ]
+        });
+    }
+    if (!isNaN(end.getTime())) {
+        let endCriteria = { $gte: start };
+        searchCriteria.push({
+            $or: [
+                { "end.dateTime": endCriteria },
+                { "end.date": endCriteria },
+            ]
+        });
+    }
+
     gcalImporter(userID, fullSync)
         .then(result => {
-            calbitController.getAllCalbits(userID, req.query.isDump, true)
+            calbitController.getAllCalbits(
+                userID, req.query.isDump,
+                true, searchCriteria
+            )
                 .then((events) => {
                     res.status(200).json(events);
                 })
@@ -192,10 +216,10 @@ router.put('/:id', [apiCheck, habiticaCheck], function (req, res) {
     let data = req.body;
     calbitController.updateCalbit(id, data, 'mvc')
         .then((resultCode) => {
-            res.status(200).json({ message: "Event updated." });
+            res.status(200).json({ message: "Event updated. Completed tasks will be marked incomplete." });
         })
         .catch(err => {
-            res.status(500).json({ message: "Unable to update the event" });
+            res.status(500).json({ message: "Unable to update the event." });
         });
 });
 

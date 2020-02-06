@@ -30,13 +30,12 @@ function listCal(nextSyncToken = null) {
 function listEvents(calendarId, syncToken = null) {
     let params = {
         calendarId,
-        maxResults: 300,
-
-        // I need to know what's deleted so can delete from Habitica too
-        // Deleted events' status = cancelled
-        showDeleted: true,
-        syncToken
+        maxResults: 300
     };
+
+    (!syncToken)
+        ? params.showDeleted = false
+        : params.syncToken = syncToken;
 
     return cal.events.list(params)
 }

@@ -353,9 +353,8 @@ function deleteEvent() {
                 refreshCalendar();
             })
             .fail(err => {
-                console.log(err);
                 // Make a toast
-                createToast('danger', err.message);
+                createToast('danger', err.responseJSON.message);
             })
     }
 }
@@ -519,9 +518,9 @@ function saveEvent() {
  * @param {*} view 
  */
 function renderEvent(event, element, view) {
-    let diff = event.end.diff(event.start, "minutes");
+    let difference = event.end.diff(event.start, "minutes");
 
-    let start = (diff <= 30) ? event.start.format("ha") : event.start.format("h"),
+    let start = (difference <= 30) ? event.start.format("ha") : event.start.format("h"),
         startWithA = event.start.format("HH:mm A"),
         end = event.end.format("ha"),
         endWithA = event.end.format("HH:mm A"),
