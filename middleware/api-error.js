@@ -9,7 +9,6 @@ function apiErrorHandler(err, req, res, next) {
     if (res.headersSent) {
         return next(err)
     }
-    console.error(err)
     let status = (err.status != undefined) ? err.status : 500;
     let message = (err.message != undefined) ? err.message : "Internal Server Error";
     

@@ -35,7 +35,7 @@ const habiticaController = require('../../controllers/h-controller');
  */
 router.get('/', apiCheck, function (req, res) {
     let userID = req.body.decodedJWT.sub;
-    let fullSync = !req.query.fullSync ? true : req.query.fullSync + "";
+    let fullSync = !req.query.fullSync ? false : req.query.fullSync + "";
 
     let searchCriteria = [];
     let start = new Date(req.query.start),
@@ -60,8 +60,15 @@ router.get('/', apiCheck, function (req, res) {
         });
     }
 
-    gcalImporter(userID, fullSync)
-        .then(result => {
+    new Promise((resolve, reject) => {
+        if (`${fullSync}` == "true") {
+            gcalImporter(userID, fullSync)
+                .then(() => { resolve(true); })
+                .catch((err) => { reject(err); });
+
+        } else resolve(true)
+    })
+        .then(() => {
             calbitController.getAllCalbits(
                 userID, req.query.isDump,
                 true, searchCriteria
@@ -216,7 +223,7 @@ router.put('/:id', [apiCheck, habiticaCheck], function (req, res) {
     let data = req.body;
     calbitController.updateCalbit(id, data, 'mvc')
         .then((resultCode) => {
-            res.status(200).json({ message: "Event updated. Completed tasks will be marked incomplete." });
+            res.status(200).json({ message: "Event updated." });
         })
         .catch(err => {
             res.status(500).json({ message: "Unable to update the event." });

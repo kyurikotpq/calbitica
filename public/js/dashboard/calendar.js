@@ -183,14 +183,6 @@ function showDetails() {
 function refreshCalendar() {
     // Refetch events
     $('#main-calendar').fullCalendar('refetchEvents');
-
-
-    // Discard the notification that alert before
-    // var allData = (currentValue) => currentValue == false;
-    // if (alertReminders.every(allData)) {
-    //     REMINDERS.forEach(time => clearTimeout(time));
-    //     REMINDERS = [];
-    // }
 }
 
 /**
@@ -518,13 +510,15 @@ function saveEvent() {
  * @param {*} view 
  */
 function renderEvent(event, element, view) {
-    let difference = event.end.diff(event.start, "minutes");
-
-    let start = (difference <= 30) ? event.start.format("ha") : event.start.format("h"),
+    let startMins = event.start.format("mm"),
+        start = (parseInt(startMins) > 0) ? event.start.format("h:mm") : event.start.format("h"),
         startWithA = event.start.format("HH:mm A"),
-        end = event.end.format("ha"),
+
+        endMins = event.end.format("mm"),
+        end = (parseInt(endMins) > 0) ? event.end.format("h:mma") : event.end.format("ha"),
         endWithA = event.end.format("HH:mm A"),
-        allDay = !event.start.hasTime(),
+
+        allDay = event.allDay,
         completed = event.completed.status;
 
     let markup = `<div class="fc-content ${(completed) ? "completed" : ""}">

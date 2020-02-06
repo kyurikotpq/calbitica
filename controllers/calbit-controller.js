@@ -35,7 +35,6 @@ function getAllCalbits(userID, isDump = null, displayOnly = null, others = null)
         criterion.push({ display: `${displayOnly}` == "true" });
 
     let searchCriteria = { $and: criterion };
-    console.log("search criteria", searchCriteria);
 
     // NOTE: location, description are optional and may not be in the field list.
     let fields = "_id summary description isDump calendarID googleID "
@@ -121,7 +120,9 @@ function createCalbit(body, userID, dataFrom) {
 
 /***
  * Update the event into MongoDB
+ * @param {ObjectID} _id Event's MongoDB ObjectId
  * @param {Calbit} data
+ * @param {Boolean} mvc Whether this update is from the MVC/API
  */
 function updateInMongo(_id, data, mvc = false) {
     return new Promise((resolve, reject) => {
@@ -133,7 +134,7 @@ function updateInMongo(_id, data, mvc = false) {
             })
             .catch(err => { })
             .finally(() => {
-                (mvc && code != -1) ? resolve(updatedCalbit) : resolve(code);
+                (mvc && code == 1) ? resolve(updatedCalbit) : resolve(code);
             })
     })
 }
@@ -205,8 +206,12 @@ function deleteInMongo(_id, mvc = false) {
                             })
                             .catch(err => {
                                 reject({
-                                    status: err.response.status,
-                                    message: err.response.data
+                                    status: (!err.response || !err.response.status)
+                                        ? 400
+                                        : err.response.status,
+                                    message: (!err.response || !err.response.status)
+                                        ? "Could not delete from Habitica"
+                                        : err.response.data
                                 });
                             });
                     })

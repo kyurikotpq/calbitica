@@ -143,8 +143,6 @@ function compareItems(events, calbits, userID) {
             return !existsInBoth;
         });
 
-        console.log("-----------------")
-        console.log("deletedCalbits", deletedCalbitArr);
         let deletedPromises = [];
         deletedCalbitArr.forEach(c => {
             deletedPromises.push(calbitController.deleteInMongo(c._id));
@@ -153,7 +151,6 @@ function compareItems(events, calbits, userID) {
         // At this point, events should be the ones that have 
         // no Calbit record in MongoDB
         let createdPromises = [];
-        console.log("remaining events", events);
         events.forEach(gcalItem => {
             // If calbit doesn't exist, but underlying GCal Event
             // has NOT been removed/completed,
@@ -238,8 +235,6 @@ function gcalImporter(userID, fullSync) {
                         } else if (response.database.length > 0) {
                             reject({ status: 500, message: response.database[0] });
                         } else {
-                            console.log(response.success)
-
                             // no errors - return the successful calendar events
                             if (fullSync)
                                 resolve(listAllCalbitsAndCompare(response.success, userID))
@@ -249,7 +244,6 @@ function gcalImporter(userID, fullSync) {
                     })
             })
             .catch(err => {
-                console.log(err)
                 // If you're here, the errors most likely
                 // involve the access_token or refresh_token
                 let message = (err.errors != undefined && err.errors[0])
