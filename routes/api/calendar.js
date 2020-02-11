@@ -2,9 +2,11 @@
  * Routes for keeping track of GCal-related operations
  */
 const router = require('express').Router();
-const calendarController = require('../../controllers/calendar-controller');
-const gcalImporter = require('../../controllers/gcal-import');
+const CalendarController = require('../../controllers/calendar-controller');
+const GCalImporter = require('../../controllers/gcal-import');
 const apiCheck = require('../../middleware/api-check');
+
+const CalbitQueueUtil = require("../../util/queue");
 
 /**
  * @api {get} /cal Get all Calendars
@@ -25,7 +27,9 @@ const apiCheck = require('../../middleware/api-check');
  */
 router.get('/', apiCheck, (req, res) => {
     let decodedJWT = req.body.decodedJWT;
-    calendarController.listCal(decodedJWT.sub)
+
+    new CalendarController(res.locals.googleOAuth2Client)
+        .listCal(decodedJWT.sub, false, false)
         .then(calendars => {
             res.status(200).json(calendars);
         })
@@ -62,13 +66,16 @@ router.get('/import', apiCheck, (req, res) => {
     let fullSync = !req.query.fullSync ? true : req.query.fullSync;
 
     let decodedJWT = req.body.decodedJWT;
-    gcalImporter(decodedJWT.sub, fullSync)
-        .then(result => {
-            res.status(200).json(result);
-        })
-        .catch(err => {
-            res.status(err.status).json({ message: err.message });
-        });
+
+    CalbitQueueUtil.push(
+        new GCalImporter(
+            res.locals.googleOAuth2Client,
+            res.locals.axiosInstance
+        ).importCalbits(decodedJWT.sub, fullSync)
+    );
+    CalbitQueueUtil.process();
+
+    res.status(200).json({ message: "Events synced successfully." });
 });
 
 /**
@@ -100,13 +107,15 @@ router.get('/sync/:id', apiCheck, (req, res) => {
         reqSync = req.query.sync,
         sync = (!reqSync) ? false : reqSync;
 
-    calendarController.changeSync(id, sync)
-        .then(message => {
-            res.status(200).json({ message });
-        })
-        .catch(err => {
-            res.status(err.status).json({ message: err.message });
-        });
+    CalbitQueueUtil.push(
+        new CalendarController(res.locals.googleOAuth2Client)
+            .changeSync(id, sync)
+    );
+    CalbitQueueUtil.process();
+
+    let syncedText = (`${sync}` == "true") ? "synced" : "unsynced";
+    let message = `Calendar is now ${syncedText}`;
+    res.status(200).json({ message });
 });
 
 module.exports = router;

@@ -25,7 +25,11 @@ const authCheckMustLogin = (req, res, next) => {
             // JWT verification successful.
             // Set the credentials in the Habitica
             // and Google Clients
-            authController.setHnGCredentials(result.decoded)
+            let { googleOAuth2Client, axiosInstance }
+                = authController.setHnGCredentials(result.decoded);
+
+            res.locals.googleOAuth2Client = googleOAuth2Client;
+            res.locals.axiosInstance = axiosInstance;
 
             // Set the decoded JWT object to the req.body 
             // for our controllers' use
@@ -44,7 +48,11 @@ const authCheckMustLogin = (req, res, next) => {
                 // Refresh the JWT
                 authController.refreshJWT(err.decoded, accessTokenExpiring)
                     .then((result) => {
-                        authController.setHnGCredentials(result.decoded)
+                        let { googleOAuth2Client, axiosInstance }
+                            = authController.setHnGCredentials(result.decoded);
+
+                        res.locals.googleOAuth2Client = googleOAuth2Client;
+                        res.locals.axiosInstance = axiosInstance;
 
                         // You can still use the old JWT for now - it's
                         // expiring, not expired. BUT:

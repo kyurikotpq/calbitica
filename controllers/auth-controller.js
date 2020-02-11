@@ -29,16 +29,16 @@ function login(user, profile, oAuthData) {
         let index = user.googleIDs.indexOf(profile.id);
         let cipherStoredRefreshToken = user.refresh_tokens[index];
         let newRefreshToken = cipherStoredRefreshToken || '';
-      
+
         // stored refresh token is different from incoming refresh token
         if (cipherStoredRefreshToken != undefined && refresh_token != '') {
             let plainStoredRefreshToken = Crypt.decrypt(cipherStoredRefreshToken);
-    
-            if(plainStoredRefreshToken != refresh_token) {
+
+            if (plainStoredRefreshToken != refresh_token) {
                 let newCipherRefreshToken = Crypt.encrypt(refresh_token);
                 user.refresh_tokens[index] = newCipherRefreshToken;
                 user.save(); // Save the encrypted version of the new refresh_token
-    
+
                 newRefreshToken = newCipherRefreshToken;
             }
         }
@@ -109,7 +109,7 @@ function register(profile, oAuthData) {
  */
 function userExistsInMongo(oAuthData) {
     let { idToken, access_token,
-          refresh_token, expiry_date } = oAuthData;
+        refresh_token, expiry_date } = oAuthData;
 
     return new Promise((resolve, reject) => {
         verifyGIDToken(idToken)
@@ -142,7 +142,10 @@ function userExistsInMongo(oAuthData) {
 
 /**
  * Set Headers in our Habitica Axios instance
- * and set tokens in our Google OAuthClient
+ * and set tokens in our Google OAuthClient.
+ * 
+ * Returns the OAuthClient and axiosInstance
+ * objects for use in the controllers.
  * @param {Object} decodedJWT Decoded object of the JWT
  */
 function setHnGCredentials(decodedJWT) {
@@ -159,6 +162,8 @@ function setHnGCredentials(decodedJWT) {
         refresh_token: Crypt.decrypt(decodedJWT.refresh_token),
         expiry_date: decodedJWT.expiry_date
     });
+
+    return { googleOAuth2Client, axiosInstance };
 }
 
 
@@ -219,8 +224,8 @@ function tokensFromAuthCode(code) {
                 // else store the refresh_token in DB
                 let refresh_token = (!tokens.refresh_token) ? "" : tokens.refresh_token;
 
-                // Set tokens on the oAuth client
-                googleOAuth2Client.setCredentials(tokens);
+                // // Set tokens on the oAuth client
+                // googleOAuth2Client.setCredentials(tokens);
 
                 let oAuthData = {
                     refresh_token,
@@ -245,29 +250,34 @@ function tokensFromAuthCode(code) {
 
 /**
  * Refresh the JWT signed by Calbitica
- * @param {JWT} decoded Decoded JWT
+ * @param {JWT} decodedJWT Decoded JWT
  * @param {Bool} accessTokenExpiring access_token is expiring?
  */
-function refreshJWT(decoded, accessTokenExpiring) {
+function refreshJWT(decodedJWT, accessTokenExpiring) {
     // I need a new payload even if I don't need a new access_token
     // This is to ensure that JWT-specific things like exp will be re-signed
     let payload = {
-        access_token: decoded.access_token,
-        refresh_token: decoded.refresh_token,
-        expiry_date: decoded.expiry_date,
-        profile: decoded.profile,
-        habiticaID: decoded.habiticaID,
-        habiticaAPI: decoded.habiticaAPI,
+        access_token: decodedJWT.access_token,
+        refresh_token: decodedJWT.refresh_token,
+        expiry_date: decodedJWT.expiry_date,
+        profile: decodedJWT.profile,
+        habiticaID: decodedJWT.habiticaID,
+        habiticaAPI: decodedJWT.habiticaAPI,
     };
 
     return new Promise((resolve, reject) => {
         if (!accessTokenExpiring) {
             resolve({
-                newJWT: JWTUtil.signCalbiticaJWT(payload, decoded.sub),
+                newJWT: JWTUtil.signCalbiticaJWT(payload, decodedJWT.sub),
                 decoded: payload
             });
             return;
         }
+
+        let decrypted_refresh_token = Crypt.decrypt(decodedJWT.refresh_token);
+        googleOAuth2Client.setCredentials({
+            refresh_token: decrypted_refresh_token
+        });
 
         googleOAuth2Client.getAccessToken()
             .then((token_obj) => {
@@ -276,16 +286,16 @@ function refreshJWT(decoded, accessTokenExpiring) {
                 payload.expiry_date = new Date().getTime() + DateUtil.getMs("h", 1)
 
                 resolve({
-                    newJWT: JWTUtil.signCalbiticaJWT(payload, decoded.sub),
+                    newJWT: JWTUtil.signCalbiticaJWT(payload, decodedJWT.sub),
                     decoded: payload
                 })
             })
             .catch((err) => {
                 // The refresh_token no longer works -
                 // user has revoked our access to their account
-                reject({ 
-                    status: 410, 
-                    message: "Your refresh token has expired. Please sign in again." 
+                reject({
+                    status: 410,
+                    message: "Your refresh token has expired. Please sign in again."
                 });
             });
     })

@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const habiticaController = require('../../controllers/h-controller');
+const HabiticaController = require('../../controllers/h-controller');
 const hImporter = require('../../controllers/h-import');
 
 const apiCheck = require('../../middleware/api-check');
@@ -68,7 +68,9 @@ router.get('/sync', [apiCheck, habiticaCheck], (req, res) => {
  */
 router.get('/profile', [apiCheck, habiticaCheck], (req, res) => {
     let decodedJWT = req.body.decodedJWT;
-    habiticaController.getProfile(decodedJWT.habiticaID)
+
+    new HabiticaController(res.locals.axiosInstance)
+        .getProfile(decodedJWT.habiticaID)
         .then(profile => {
             res.status(200).json(profile);
         })
@@ -102,7 +104,8 @@ router.post('/quest', [apiCheck, habiticaCheck], (req, res) => {
     let acceptQuest = (req.body.accept + "") == "true",
         groupID = req.body.groupID;
 
-    habiticaController.respondToQuest(acceptQuest, groupID)
+    new HabiticaController(res.locals.axiosInstance)
+        .respondToQuest(acceptQuest, groupID)
         .then(quest => {
             res.status(200).json(quest);
         })
@@ -134,7 +137,8 @@ router.post('/quest', [apiCheck, habiticaCheck], (req, res) => {
  *     WILL BE DOCUMENTED SOON
  */
 router.get('/sleep', [apiCheck, habiticaCheck], (req, res) => {
-    habiticaController.toggleSleep()
+    new HabiticaController(res.locals.axiosInstance)
+        .toggleSleep()
         .then(result => res.status(200).json(result))
         .catch(err => {
             res.status(err.status).json({ message: err.message });

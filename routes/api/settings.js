@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const habiticaController = require('../../controllers/h-controller');
+const HabiticaController = require('../../controllers/h-controller');
 const apiCheck = require('../../middleware/api-check');
 const JWTUtil = require('../../util/jwt');
 
@@ -40,7 +40,8 @@ const JWTUtil = require('../../util/jwt');
 router.post('/habitica', apiCheck, (req, res) => {
     let decodedJWT = req.body.decodedJWT;
     
-    habiticaController.saveSettings(req.body)
+    new HabiticaController(res.locals.axiosInstance)
+        .saveSettings(req.body)
         .then(user => {
             if(user._id.toString() == decodedJWT.sub) {
                 let data = {

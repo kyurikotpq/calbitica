@@ -53,7 +53,8 @@ function verifyCalbiticaJWT(token) {
                 if (decoded)
                     userID = decoded.sub;
 
-                if (err || decoded.aud != `${userID}.${process.env.CALBITICA_SUBDOMAIN_ID}`) {
+                if (err || decoded.aud != `${userID}.${process.env.CALBITICA_SUBDOMAIN_ID}`
+                    || !userID) {
                     let reason = !err ? "Invalid audience and subject" : err.message;
 
                     reject(reason);
@@ -69,7 +70,7 @@ function verifyCalbiticaJWT(token) {
                     // 443: JWT is expiring
                     // 444: Access token is expiring
                     let status = statuses.isAccessTokenExpiring
-                                ? 444 : 443;
+                        ? 444 : 443;
                     reject({ status, decoded });
                     return;
                 }
@@ -97,9 +98,9 @@ function isExpiring(exp, expiry_date) {
     return { isJWTExpiring, isAccessTokenExpiring };
 }
 
-let JWTUtil = { 
-    signCalbiticaJWT, 
-    verifyCalbiticaJWT 
+let JWTUtil = {
+    signCalbiticaJWT,
+    verifyCalbiticaJWT
 };
 
 module.exports = JWTUtil;

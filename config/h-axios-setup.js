@@ -3,6 +3,6 @@ const habiticaConfig = require('./h-axios-config')
 
 // Create an axios instance for interfacing
 // with the Habitica API
-const instance = axios.create(habiticaConfig);
+let instance = axios.create(habiticaConfig);
 
 module.exports = instance;

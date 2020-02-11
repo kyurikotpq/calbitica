@@ -9,7 +9,6 @@
 const JWTUtil = require('../util/jwt');
 const authController = require('../controllers/auth-controller');
 
-
 /**
  * Is the Calbitica JWT provided valid?
  * @param {*} req 
@@ -29,7 +28,11 @@ const isValidCalbiticaJWT = (req, res, next) => {
     JWTUtil.verifyCalbiticaJWT(jwt)
         .then(result => {
             // JWT is safe for now - continue normally
-            authController.setHnGCredentials(result.decoded)
+            let { googleOAuth2Client, axiosInstance }
+                = authController.setHnGCredentials(result.decoded);
+
+            res.locals.googleOAuth2Client = googleOAuth2Client;
+            res.locals.axiosInstance = axiosInstance;
 
             res.json = (data) => {
                 // data: whatever data you passed during .json(xxx)
@@ -57,14 +60,18 @@ const isValidCalbiticaJWT = (req, res, next) => {
                 next({ status: 400, message: err });
                 return;
             }
-            
+
             let accessTokenExpiring = err.status == 444;
             if (accessTokenExpiring || err.status == 443) {
                 // JWT/access token is expiring!
                 // Refresh the JWT and access token
                 authController.refreshJWT(err.decoded, accessTokenExpiring)
                     .then((result) => {
-                        authController.setHnGCredentials(result.decoded)
+                        let { googleOAuth2Client, axiosInstance }
+                            = authController.setHnGCredentials(result.decoded);
+
+                        res.locals.googleOAuth2Client = googleOAuth2Client;
+                        res.locals.axiosInstance = axiosInstance;
 
                         if (internal && result.newJWT != undefined)
                             req.session.user = result.newJWT;
@@ -96,8 +103,11 @@ const isValidCalbiticaJWT = (req, res, next) => {
                     })
                     .catch((err) => {
                         let errResponseObj = (!err.status || !err.message)
-                        ? { status: 400, message: "Something went wrong. Please sign out and sign in again." }
-                        : err
+                            ? { 
+                                status: 400, 
+                                message: "Something went wrong. Please sign out and sign in again." 
+                            }
+                            : err
 
                         next(errResponseObj);
                     })

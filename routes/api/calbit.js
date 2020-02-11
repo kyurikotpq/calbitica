@@ -4,9 +4,11 @@
 const router = require('express').Router();
 const apiCheck = require('../../middleware/api-check');
 const habiticaCheck = require('../../middleware/h-check');
-const calbitController = require('../../controllers/calbit-controller');
-const gcalImporter = require('../../controllers/gcal-import');
-const habiticaController = require('../../controllers/h-controller');
+const CalbitController = require('../../controllers/calbit-controller');
+const GCalImporter = require('../../controllers/gcal-import');
+const HabiticaController = require('../../controllers/h-controller');
+
+const CalbitQueueUtil = require("../../util/queue");
 
 /**
  * @api {get} /calbit Get all Calbits
@@ -62,17 +64,23 @@ router.get('/', apiCheck, function (req, res) {
 
     new Promise((resolve, reject) => {
         if (`${fullSync}` == "true") {
-            gcalImporter(userID, fullSync)
-                .then(() => { resolve(true); })
-                .catch((err) => { reject(err); });
-
-        } else resolve(true)
+            CalbitQueueUtil.push(
+                new GCalImporter(
+                    res.locals.googleOAuth2Client,
+                    res.locals.axiosInstance
+                ).importCalbits(userID, fullSync)
+            );
+            CalbitQueueUtil.process();
+        }
+        // } else 
+        resolve(true)
     })
         .then(() => {
-            calbitController.getAllCalbits(
-                userID, req.query.isDump,
-                true, searchCriteria
-            )
+            new CalbitController(res.locals.googleOAuth2Client, res.locals.axiosInstance)
+                .getAllCalbits(
+                    userID, req.query.isDump,
+                    true, searchCriteria
+                )
                 .then((events) => {
                     res.status(200).json(events);
                 })
@@ -123,24 +131,27 @@ router.post('/', [apiCheck, habiticaCheck], function (req, res) {
 
     delete data.decodedJWT;
 
-    habiticaController.saveToHabitica({
-        text: data.title,
-        type: 'todo' // add support for habits & dailies in future
-    }).then((axiosResponse) => {
-        let hResponse = axiosResponse.data;
-        if (hResponse.success) {
-            data.habiticaID = hResponse.data.id;
-            calbitController.createCalbit(data, decodedJWT.sub, 'mvc')
-                .then(resultCode => {
-                    res.status(200).json({ message: `Event ${data.title} created.` });
-                })
-                .catch(err => {
-                    res.status(500).json({ message: err });
-                })
-        }
-    }).catch(err => {
-        res.status(400).json({ message: err });
-    })
+    new HabiticaController(res.locals.axiosInstance)
+        .saveToHabitica({
+            text: data.title,
+            type: 'todo' // add support for habits & dailies in future
+        }).then((axiosResponse) => {
+            let hResponse = axiosResponse.data;
+            if (hResponse.success) {
+                data.habiticaID = hResponse.data.id;
+
+                new CalbitController(res.locals.googleOAuth2Client, res.locals.axiosInstance)
+                    .createCalbit(data, decodedJWT.sub, 'mvc')
+                    .then(resultCode => {
+                        res.status(200).json({ message: `Event ${data.title} created.` });
+                    })
+                    .catch(err => {
+                        res.status(500).json({ message: err });
+                    })
+            }
+        }).catch(err => {
+            res.status(400).json({ message: err });
+        })
 });
 
 /**
@@ -170,18 +181,28 @@ router.post('/', [apiCheck, habiticaCheck], function (req, res) {
 router.put('/:id/complete', [apiCheck, habiticaCheck], (req, res) => {
     let id = req.params.id;
     let status = !req.body.status ? false : (req.body.status + "") == "true";
-    let complete = (status) ? "completed" : "incomplete";
+    let complete = (status) ? "complete" : "incomplete";
 
-    calbitController.updateCompletion(id, status)
-        .then((result) => {
-            res.status(200).json({
-                message: `${result.summary} is now ${complete}`,
-                stats: result.stats
-            });
-        })
-        .catch(err => {
-            res.status(500).json({ message: `Unable to ${complete} the event` });
+    let controller = new CalbitController(res.locals.googleOAuth2Client, res.locals.axiosInstance);
+    if (CalbitQueueUtil.isProcessing()) {
+        CalbitQueueUtil.push(controller.updateCompletion(id, status));
+        CalbitQueueUtil.process();
+
+        res.status(200).json({
+            message: `Marked as ${complete}`
         });
+    } else {
+        controller.updateCompletion(id, status)
+            .then((result) => {
+                res.status(200).json({
+                    message: `Marked as ${complete}`,
+                    stats: result.stats
+                });
+            })
+            .catch(err => {
+                res.status(500).json({ message: `Unable to ${complete} the event` });
+            });
+    }
 })
 
 /**
@@ -221,13 +242,14 @@ router.put('/:id/complete', [apiCheck, habiticaCheck], (req, res) => {
 router.put('/:id', [apiCheck, habiticaCheck], function (req, res) {
     let id = req.params.id;
     let data = req.body;
-    calbitController.updateCalbit(id, data, 'mvc')
-        .then((resultCode) => {
-            res.status(200).json({ message: "Event updated." });
-        })
-        .catch(err => {
-            res.status(500).json({ message: "Unable to update the event." });
-        });
+
+    CalbitQueueUtil.push(
+        new CalbitController(res.locals.googleOAuth2Client, res.locals.axiosInstance)
+            .updateCalbit(id, data, 'mvc')
+    );
+    CalbitQueueUtil.process();
+
+    res.status(200).json({ message: "Event updated." });
 });
 
 /**
@@ -252,13 +274,13 @@ router.put('/:id', [apiCheck, habiticaCheck], function (req, res) {
  */
 router.delete('/:id', [apiCheck, habiticaCheck], function (req, res) {
     let id = req.params.id;
-    calbitController.deleteInMongo(id, true)
-        .then((event) => {
-            res.status(200).json({ message: `Event ${event.summary} deleted.` });
-        })
-        .catch(err => {
-            res.status(500).json({ message: "Unable to delete event" });
-        })
+
+    CalbitQueueUtil.push(
+        new CalbitController(res.locals.googleOAuth2Client, res.locals.axiosInstance)
+            .deleteInMongo(id, true)
+    );
+    CalbitQueueUtil.process();
+    res.status(200).json({ message: `Event deleted.` });
 });
 
 module.exports = router;

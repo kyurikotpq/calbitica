@@ -150,8 +150,8 @@ label,
   top: 1rem;
   right: 1rem;
   z-index: 100;
-  width: 35vw;
-  max-width: 35vw; }
+  width: 30vw;
+  max-width: 30vw; }
   .toast-container .toast {
     display: flex;
     align-items: center;
@@ -600,7 +600,11 @@ a.btn {
   #container #main-calendar .fc-time-grid-event.fc-short .fc-time:after {
     content: ""; }
   #container #main-calendar .fc-title {
-    font-weight: bold; }
+    font-weight: bold;
+    margin-right: 5px;
+    max-width: 75%;
+    overflow: hidden;
+    text-overflow: ellipsis; }
   #container #main-calendar .fc-today:not(.fc-day-top) {
     background-color: rgba(0, 103, 174, 0.2); }
   #container #main-calendar .fc-today.fc-day-top {

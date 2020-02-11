@@ -62,3 +62,6 @@ keys
 
 # next.js build output
 .next
+
+# db-dump (for project submission)
+db-dump

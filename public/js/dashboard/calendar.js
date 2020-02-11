@@ -3,8 +3,6 @@ let CALENDARARR = null;
 
 // Keep track of the reminders
 let REMINDERS = [];
-let reminderTrigger = false;
-let alertReminders = [];
 
 /**
  * v3 - helper functions
@@ -510,8 +508,14 @@ function saveEvent() {
  * @param {*} view 
  */
 function renderEvent(event, element, view) {
+    let difference = event.end.diff(event.start, "minutes");
+
     let startMins = event.start.format("mm"),
-        start = (parseInt(startMins) > 0) ? event.start.format("h:mm") : event.start.format("h"),
+        start = (difference <= 30) 
+            ? event.start.format("h:mma") 
+            : (parseInt(startMins) > 0) 
+                ? event.start.format("h:mm") 
+                : event.start.format("h"),
         startWithA = event.start.format("HH:mm A"),
 
         endMins = event.end.format("mm"),

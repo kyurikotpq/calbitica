@@ -61,20 +61,6 @@ function sub(date, type, amount) {
 }
 
 /**
- * Generate 30-min intervals for
- * a dropdown list
- */
-function halfHourIntervals() {
-    let intervals = [];
-    for (let i = 0; i < 24; i++) {
-        let start = ("0" + i).slice(-2);
-        intervals.push(`${start}:00`);
-        intervals.push(`${start}:30`);
-    }
-    return intervals;
-}
-
-/**
  * Calbit-specific helper function
  * @param {*} startDateObj 
  * @param {*} endDateObj 
@@ -102,7 +88,6 @@ function timeFromNow(timeInDateMs) {
 
 let DateUtil = { 
     getMs, add, sub, 
-    halfHourIntervals, 
     isAllDay,
     timeFromNow
 };
